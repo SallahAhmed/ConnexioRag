@@ -1,0 +1,4 @@
+$kind: collection
+name: mini-rag-app
+variables:
+  api: http://localhost:8000
