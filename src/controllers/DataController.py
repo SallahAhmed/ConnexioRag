@@ -1,5 +1,5 @@
 from .BaseController import BaseController
-from .ProjectControllers import ProjectController
+from .ProjectController import ProjectController
 from fastapi import UploadFile
 from models import ResponseSignal
 import os
