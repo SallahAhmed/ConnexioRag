@@ -1,0 +1,12 @@
+# Use this workspace to collaborate
+workspace:
+  id: ""
+
+localResources:
+  collections:
+    - ..\src\assets\response.json
+  environments:
+    - ..\src\postman\environments\local.environment.yaml
+cloudResources:
+  collections:
+    ..\postman\collections\mini-rag-app: ce321771-1c87-4071-8c37-b6eded1e6d7f

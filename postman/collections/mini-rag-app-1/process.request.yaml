@@ -1,0 +1,12 @@
+$kind: http-request
+name: process
+url: "{{api}}/api/v1/data/process/1"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"file_id\": \"81nlfxz336ef_Day1level5.txt\"\r
+
+    }"
+order: 5000

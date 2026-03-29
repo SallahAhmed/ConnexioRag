@@ -1,0 +1,5 @@
+$kind: http-request
+name: welcome-request
+url: "{{api}}/"
+method: GET
+order: 3000

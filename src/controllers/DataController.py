@@ -12,14 +12,28 @@ class DataController(BaseController):
         self.size_scale = 1048576 # to convert MB to Bytes
 
 
-    def validate_uploaded_file(self, file:UploadFile):
+    def validate_uploaded_file(self, file: UploadFile):
+        print("Validating file: ", file.content_type)
 
-        if file.content_type not in self.app_settings.FILE_ALLOWED_TYPES:
-            return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
-        
-        if file.size > self.app_settings.FILE_MAX_SIZE * self.size_scale:
-            return False, ResponseSignal.FILE_SIZE_EXCEEDED.value
-        
+        allowed_types = self.app_settings.FILE_ALLOWED_TYPES
+        allowed_exts = [ext.lower() for ext in [getattr(self.app_settings, 'FILE_ALLOWED_EXTENSIONS', None)] if ext]  # fallback if you add FILE_ALLOWED_EXTENSIONS
+        filename = file.filename or ""
+        file_ext = os.path.splitext(filename)[-1].lower()
+
+        # If content_type is application/octet-stream, check extension
+        if file.content_type == "application/octet-stream":
+            # Accept only if extension is allowed (txt, pdf, etc.)
+            if file_ext not in ['.txt', '.pdf']:
+                return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
+        else:
+            if file.content_type not in allowed_types:
+                return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
+
+        # Check file size if available
+        if hasattr(file, 'size') and file.size is not None:
+            if file.size > self.app_settings.FILE_MAX_SIZE * self.size_scale:
+                return False, ResponseSignal.FILE_SIZE_EXCEEDED.value
+
         return True, ResponseSignal.FILE_VALIDATED_SUCCESS.value
     def generate_unique_filepath(self, orig_file_name: str, project_id: str):
 
