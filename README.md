@@ -27,3 +27,14 @@ note that the .env file should be on the same level as main.py to see the variab
 #### text splitters have types on lang-chain website, you need to know them before making the chunks 
 
 ### this is the link for fastapi events to read/search about them https://fastapi.tiangolo.com/advanced/events/
+
+
+
+
+### how to remove all docker containers, images, volumes, and networks
+
+- sudo docker stop $(sudo docker ps -aq)
+- sudo docker rm $(sudo docker ps -aq)
+- sudo docker rmi $(sudo docker images -q)
+- sudo docker volume rm $(sudo docker volume ls -q)
+- sudo docker system prune --all
