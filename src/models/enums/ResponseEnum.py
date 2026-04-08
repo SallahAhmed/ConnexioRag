@@ -19,4 +19,8 @@ class ResponseSignal(Enum):
     RAG_ANSWER_ERROR = "rag_answer_error"
     RAG_ANSWER_SUCCESS = "rag_answer_success"
     PROJECT_NOT_FOUND_ERROR = "project_not_found_error"
+    GENERATION_CLIENT_ERROR = "generation_client_error"
+    EMBEDDING_CLIENT_ERROR = "embedding_client_error"
+    VECTORDB_CLIENT_ERROR = "vector_db_client_error"
+    TEMPLATE_PARSER_ERROR = "template_parser_error"
     
