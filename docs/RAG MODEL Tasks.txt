@@ -1,0 +1,21 @@
+RAG MODEL Tasks
+
+Answer questions about user profiles (skills, commitment level, availability)
+Retrieve and surface project descriptions, timelines, and current status
+Answer questions about team history, roles, and contributions
+Retrieve community threads and discussion context
+Surface relevant resource files and technical docs within a project
+Provide context-aware streak quotes matched to the user's current activity domain
+Retrieve past feedback and ratings to inform team matching answers
+Answer intelligent questions using platform data instead of hallucinating generic answers
+Answer "why was I matched to this project?" using profile and project data
+Answer questions from community threads without re-reading the entire feed
+Retrieve and explain task history and workload distribution for a team
+Retrieve and score profile compatibility for team member matching !0
+
+
+Generate project documentation from retrieved project context
+Generate README content by retrieving project data (description, stack, contributors, milestones) !
+
+
+Summarize a project's full history on demand (tasks, milestones, activity)

@@ -11,3 +11,12 @@ class ResponseSignal(Enum):
     PROCESSING_SUCCESS= "processing_success"
     NO_FILES_FOUND = "no_files_found"
     FILE_ID_ERROR = "no_file_found_with_this_id"
+    INSERT_INTO_VECTORDB_ERROR = "insert_into_vector_db_error"
+    INSERT_INTO_VECTORDB_SUCCESS = "insert_into_vector_db_success"
+    VECTORDB_COLLECTION_RETRIEVED = "vector_db_collection_retrieved"
+    VECTORDB_SEARCH_ERROR = "vector_db_search_error"
+    VECTORDB_SEARCH_SUCCESS = "vector_db_search_success"
+    RAG_ANSWER_ERROR = "rag_answer_error"
+    RAG_ANSWER_SUCCESS = "rag_answer_success"
+    PROJECT_NOT_FOUND_ERROR = "project_not_found_error"
+    

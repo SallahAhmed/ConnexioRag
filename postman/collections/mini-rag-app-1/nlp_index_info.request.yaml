@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{api}}/api/v1/nlp/index/info/1"
+method: GET
+order: 2753006356590045

@@ -1,0 +1,14 @@
+$kind: http-request
+name: nlp_index_search
+url: "{{api}}/api/v1/nlp/index/search/1"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"text\": \"\",\r
+
+    \    \"limit\": 3\r
+
+    }"
+order: 3508884032336661
