@@ -4,8 +4,7 @@ from .schemas.nlp import PushRequest, SearchRequest
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
 from controllers import NLPController
-from models import ResponseSignal
-
+from models.enums import ResponseSignal
 import logging
 
 logger = logging.getLogger('uvicorn.error')
@@ -42,6 +41,7 @@ async def index_project(request: Request, project_id: str, push_request: PushReq
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
         embedding_client=request.app.embedding_client,
+        template_parser=request.app.template_parser,
     )
 
     has_records = True
@@ -100,6 +100,7 @@ async def get_project_index_info(request: Request, project_id: str):
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
         embedding_client=request.app.embedding_client,
+        template_parser=request.app.template_parser,
     )
 
     collection_info = nlp_controller.get_vector_db_collection_info(project=project)
