@@ -4,7 +4,7 @@ from .schemas.nlp import PushRequest, SearchRequest
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
 from controllers import NLPController
-from models.enums import ResponseSignal
+from models import ResponseSignal
 import logging
 
 logger = logging.getLogger('uvicorn.error')

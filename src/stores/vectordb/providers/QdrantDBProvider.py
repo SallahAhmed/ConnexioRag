@@ -67,11 +67,11 @@ class QdrantDBProvider(VectorDBInterface):
             return False
         
         try:
-            _ = self.client.upload_records(
+            _ = self.client.upsert(
                 collection_name=collection_name,
-                records=[
-                    models.Record(
-                        id=[record_id],
+                points=[
+                    models.PointStruct(
+                        id=record_id if record_id else None,
                         vector=vector,
                         payload={
                             "text": text, "metadata": metadata
@@ -80,7 +80,7 @@ class QdrantDBProvider(VectorDBInterface):
                 ]
             )
         except Exception as e:
-            self.logger.error(f"Error while inserting batch: {e}")
+            self.logger.error(f"Error while inserting record: {e}")
             return False
 
         return True
@@ -103,22 +103,21 @@ class QdrantDBProvider(VectorDBInterface):
             batch_metadata = metadata[i:batch_end]
             batch_record_ids= record_ids[i:batch_end]
 
-            batch_records = [
-                models.Record(
+            batch_points = [
+                models.PointStruct(
                     id=batch_record_ids[x],
                     vector=batch_vectors[x],
                     payload={
                         "text": batch_texts[x], "metadata": batch_metadata[x]
                     }
                 )
-
                 for x in range(len(batch_texts))
             ]
 
             try:
-                _ = self.client.upload_records(
+                _ = self.client.upsert(
                     collection_name=collection_name,
-                    records=batch_records,
+                    points=batch_points,
                 )
             except Exception as e:
                 self.logger.error(f"Error while inserting batch: {e}")
@@ -128,13 +127,13 @@ class QdrantDBProvider(VectorDBInterface):
         
     def search_by_vector(self, collection_name: str, vector: list, limit: int = 5):
 
-        results = self.client.search(
+        response = self.client.query_points(
             collection_name=collection_name,
-            query_vector=vector,
+            query=vector,
             limit=limit
         )
 
-        if not results or len(results) == 0:
+        if not response or not response.points or len(response.points) == 0:
             return None
         
         return [
@@ -142,5 +141,5 @@ class QdrantDBProvider(VectorDBInterface):
                 "score": result.score,
                 "text": result.payload["text"],
             })
-            for result in results
+            for result in response.points
         ]

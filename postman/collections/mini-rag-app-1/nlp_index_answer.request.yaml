@@ -6,9 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"text\": \"\",\r
+    \    \"text\": \"what is the capital of Egypt\",\r
 
-    \    \"limit\": 5\r
+    \    \"limit\": 1\r
 
     }"
 order: 4147596711528312
