@@ -6,10 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"text\": \"what are the four teams of the semi final of champions
-    league 2024\",\r
+    \    \"text\": \"what is the destination for the eastern desert?\",\r
 
-    \    \"limit\": 1\r
+    \    \"limit\": 3\r
 
     }"
 order: 3508884032336661
