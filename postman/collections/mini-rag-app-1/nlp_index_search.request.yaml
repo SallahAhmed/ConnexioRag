@@ -6,9 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"text\": \"what is the destination for the eastern desert?\",\r
+    \    \"text\": \"ما معنى كلمة لبنان؟\",\r
 
-    \    \"limit\": 3\r
+    \    \"limit\": 5\r
 
     }"
 order: 3508884032336661
