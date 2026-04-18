@@ -33,9 +33,9 @@ class Settings(BaseSettings):
     GENERATION_MODEL_ID: str | None = None
     EMBEDDING_MODEL_ID: str | None = None
     EMBEDDING_MODEL_SIZE: int | None = None
-    INPUT_DAFAULT_MAX_CHARACTERS: int | None = None
-    GENERATION_DAFAULT_MAX_TOKENS: int | None = None
-    GENERATION_DAFAULT_TEMPERATURE: float | None = None
+    INPUT_DEFAULT_MAX_CHARACTERS: int | None = None
+    GENERATION_DEFAULT_MAX_TOKENS: int | None = None
+    GENERATION_DEFAULT_TEMPERATURE: float | None = None
 
     VECTOR_DB_BACKEND_LITERAL: List[str] | None = None
     VECTOR_DB_BACKEND : str

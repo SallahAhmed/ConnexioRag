@@ -13,6 +13,7 @@ app = FastAPI()
 
 async def startup_span():
     settings = get_settings()
+    app.settings = settings
 
     postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_MAIN_DATABASE}"
 
