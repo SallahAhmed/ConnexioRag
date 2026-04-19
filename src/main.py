@@ -5,6 +5,7 @@ from helpers.config import get_settings
 from stores.llm.LLMProviderFactory import LLMProviderFactory
 from stores.vectordb.VectorDBProviderFactory import VectorDBProviderFactory
 from stores.llm.templates.template_parser import TemplateParser
+from models.db_schemas.connexio.schemas import SQLAlchemyBase # Ensure all schemas are registered
 # from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -18,6 +19,18 @@ async def startup_span():
     postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_MAIN_DATABASE}"
 
     app.db_engine = create_async_engine(postgres_conn)
+    
+    # Ensure tables are created (with a safety timeout to prevent hanging the whole server)
+    try:
+        import asyncio
+        async with app.db_engine.begin() as conn:
+            print("[AGENT] Initializing database tables...")
+            await asyncio.wait_for(conn.run_sync(SQLAlchemyBase.metadata.create_all), timeout=5.0)
+            print("[AGENT] Database tables initialized or already exist.")
+    except Exception as e:
+        print(f"[AGENT] Skipping database auto-initialization: {str(e)}")
+        print("[AGENT] (The server will still start, but some database features might fail until fixed).")
+
     app.db_client = sessionmaker(
         app.db_engine, class_=AsyncSession, expire_on_commit=False
     )

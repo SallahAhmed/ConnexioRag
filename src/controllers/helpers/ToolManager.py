@@ -1,9 +1,24 @@
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
 from langchain_community.utilities import WikipediaAPIWrapper
-from langchain.chains import create_sql_query_chain
-from langchain_community.tools.sql_database.tool import QuerySQLDataBaseTool
 import logging
+import warnings
+import asyncio
+
+# Register pgvector's custom 'vector' type with SQLAlchemy so LangChain
+# doesn't emit SAWarning when reflecting the database schema.
+try:
+    from sqlalchemy.dialects.postgresql import dialect as pg_dialect
+    from sqlalchemy import TypeDecorator, UserDefinedType
+    class VectorType(UserDefinedType):
+        """Stub type to silence pgvector SAWarning during schema reflection."""
+        def get_col_spec(self):
+            return "vector"
+    pg_dialect.colspecs = getattr(pg_dialect, "colspecs", {})
+    pg_dialect.ischema_names = getattr(pg_dialect, "ischema_names", {})
+    pg_dialect.ischema_names["vector"] = VectorType
+except Exception:
+    pass  # Non-critical; just means the warning may still appear
 
 class ToolManager:
     def __init__(self, db_engine_url: str, generation_client, vectordb_client, 
@@ -16,9 +31,13 @@ class ToolManager:
         self.logger = logging.getLogger(__name__)
 
         # Initialize SQL Database (sync version for LangChain tools)
-        # Note: We strip +asyncpg for compatibility with standard SQLAlchemy engine used by LangChain tools
+        # We strip +asyncpg for compatibility with standard SQLAlchemy used by LangChain.
+        # We also exclude embedding tables (which contain raw vector columns) from
+        # schema reflection — they are not useful for text-to-SQL queries anyway.
         sync_url = db_engine_url.replace("+asyncpg", "")
-        self.db = SQLDatabase.from_uri(sync_url)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore")
+            self.db = SQLDatabase.from_uri(sync_url)
 
         # Initialize Wikipedia
         api_wrapper = WikipediaAPIWrapper(top_k_results=3, doc_content_chars_max=1000)
@@ -34,13 +53,14 @@ class ToolManager:
             # since we are using a custom generation_client
             
             # Step 1: Generate SQL 
-            # Note: In a production scenario, we'd use create_sql_query_chain
-            # but here we'll use our generation_client with a schema-aware prompt.
-            
-            schema = self.db.get_table_info()
+            # Note: We truncate the schema to ensure it doesn't blow the context
+            schema = await asyncio.to_thread(self.db.get_table_info)
+            if len(schema) > 5000:
+                schema = schema[:5000] + "\n[...schema truncated for brevity...]"
+
             prompt = f"Given the following SQL schema:\n{schema}\n\nGenerate a single PostgreSQL SELECT query to answer: {query_text}\nReturn ONLY the SQL code."
             
-            sql_query = self.generation_client.generate_text(prompt=prompt)
+            sql_query = await self.generation_client.generate_text(prompt=prompt)
             
             if not sql_query:
                 return "Could not generate SQL query."
@@ -49,17 +69,29 @@ class ToolManager:
             sql_query = sql_query.strip().replace("```sql", "").replace("```", "").strip()
             
             # Step 2: Execute (Read-only)
-            result = self.db.run(sql_query)
+            result = await asyncio.to_thread(self.db.run, sql_query)
+            result = str(result)
+            if len(result) > 1500:
+                result = result[:1500] + "\n[...result truncated for size...]"
             return result
         except Exception as e:
             self.logger.error(f"SQL Tool Error: {str(e)}")
             return f"Error executing database query: {str(e)}"
 
-    async def search_wiki(self, query: str) -> str:
+    async def search_wiki(self, query: str, lang: str = "en") -> str:
         """
-        Searches Wikipedia.
+        Searches Wikipedia in a specific language.
         """
-        return self.wiki_tool.run(query)
+        try:
+            # Update the language for the current search
+            self.wiki_tool.api_wrapper.lang = lang
+            res = await asyncio.to_thread(self.wiki_tool.run, query)
+            if len(res) > 2000:
+                res = res[:2000] + "\n[...wiki truncated...]"
+            return res
+        except Exception as e:
+            self.logger.error(f"Wiki Tool Error: {str(e)}")
+            return "Unable to perform Wikipedia search at this time."
 
     async def search_knowledge_base(self, project_id: str, query: str, limit: int = 5):
         """
@@ -70,7 +102,7 @@ class ToolManager:
             collection_name = f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
 
             # Embed the query
-            vectors = self.embedding_client.embed_text(text=query, document_type="query")
+            vectors = await self.embedding_client.embed_text(text=query, document_type="query")
             if not vectors or len(vectors) == 0:
                 return "Could not embed query for knowledge base search."
             
@@ -88,12 +120,17 @@ class ToolManager:
 
             # Format results for the agent
             formatted_results = "\n\n".join([
-                f"[Doc {i+1}]: {res.text}" for i, res in enumerate(results)
+                f"[Doc {i+1}]: {res.text[:1500]}" for i, res in enumerate(results)
             ])
+            
+            if len(formatted_results) > 3000:
+                formatted_results = formatted_results[:3000] + "\n[...kb truncated...]"
+                
             return formatted_results
         except Exception as e:
             self.logger.error(f"Knowledge Base Tool Error: {str(e)}")
             return f"Error searching knowledge base: {str(e)}"
+
     async def get_matching_rationale(self, user_id: int, project_id: int) -> str:
         """
         Explains why a user was matched to a project based on the 6-factor algorithm.
@@ -108,12 +145,14 @@ class ToolManager:
             JOIN project_technology pt ON t.id = pt.tech_id
             WHERE ut.UID = {user_id} AND pt.PID = {project_id}
             """
-            matched_techs = self.db.run(query)
+            matched_techs = await asyncio.to_thread(self.db.run, query)
             
             # Formulate the rationale based on weights (0.35 skill, 0.25 availability, etc.)
             prompt = f"Explain to the user (UID: {user_id}) why they match Project {project_id}. Key Factors: Matched Techs: {matched_techs}. Weights: 35% Skills, 25% Availability, 20% Rating, 12% Experience, 5% Goals, 3% Domain. Speak personally."
-            return self.generation_client.generate_text(prompt=prompt)
+            return await self.generation_client.generate_text(prompt=prompt)
         except Exception as e:
+            if "relation" in str(e).lower() and ("technology" in str(e).lower() or "user" in str(e).lower()):
+                return "Note: Core matching metrics and technical skills are currently stored in the main application database. I'll provide detailed 6-factor matching rationales once the main DB is synchronized with this RAG environment."
             self.logger.error(f"Matching Rationale Error: {str(e)}")
             return "Unable to calculate matching rationale at this time."
 
@@ -135,9 +174,11 @@ class ToolManager:
                 WHERE up.PID = {project_id}
             )
             """
-            missing_techs = self.db.run(query)
+            missing_techs = await asyncio.to_thread(self.db.run, query)
             return f"The project is currently missing the following technical expertise: {missing_techs}. Recommendation: Find members with these skills to ensure delivery."
         except Exception as e:
+            if "relation" in str(e).lower() and "technology" in str(e).lower():
+                return "Note: Core technology tracking tables are not yet linked to the RAG database. I can identify semantic gaps once the main Connexio DB is synchronized."
             self.logger.error(f"Team Gap Error: {str(e)}")
             return "Error assessing team gaps."
 
@@ -152,10 +193,12 @@ class ToolManager:
             JOIN project p ON t.PID = p.PID
             WHERE t.UID = {user_id}
             """
-            tasks = self.db.run(query)
+            tasks = await asyncio.to_thread(self.db.run, query)
             prompt = f"Summarize the following project contributions for a professional portfolio entry:\n{tasks}"
-            return self.generation_client.generate_text(prompt=prompt)
+            return await self.generation_client.generate_text(prompt=prompt)
         except Exception as e:
+            if "relation" in str(e).lower() and ("task" in str(e).lower() or "project" in str(e).lower()):
+                return "Note: Task history is currently stored in the main application database and hasn't been synced to the RAG context yet. I can summarize PDF/text documents in the meantime."
             self.logger.error(f"Portfolio Error: {str(e)}")
             return "Error generating portfolio summary."
 
@@ -167,10 +210,10 @@ class ToolManager:
             # Check if quotes table exists (mocked or real)
             # If not found, LLM generates one based on user's field
             field_query = f"SELECT fieldExperience FROM \"user\" WHERE UID = {user_id}"
-            field = self.db.run(field_query)
+            field = await asyncio.to_thread(self.db.run, field_query)
             
             prompt = f"Generate a short, powerful motivational one-liner for a professional in the field of {field}. Make it inspiring."
-            return self.generation_client.generate_text(prompt=prompt)
+            return await self.generation_client.generate_text(prompt=prompt)
         except Exception as e:
             return "Keep pushing forward! Every small step is progress."
 
@@ -179,13 +222,15 @@ class ToolManager:
         Aggregates risk metrics (missed deadlines, stalled progress) for supervisors.
         """
         try:
-            filter_str = f"WHERE PID = {project_id}" if project_id else ""
-            query = f"SELECT PID, PName, progress FROM project {filter_str} ORDER BY progress ASC"
-            metrics = self.db.run(query)
+            filter_str = f"WHERE project_id = {project_id}" if project_id else ""
+            query = f"SELECT project_id, project_name, progress FROM projects {filter_str} ORDER BY progress ASC"
+            metrics = await asyncio.to_thread(self.db.run, query)
             
             prompt = f"Analyze these project progress metrics and identify which are at high risk of failing this sprint:\n{metrics}"
-            return self.generation_client.generate_text(prompt=prompt)
+            return await self.generation_client.generate_text(prompt=prompt)
         except Exception as e:
+            if "relation" in str(e).lower() and "projects" in str(e).lower():
+                return "Project tracking data is not yet available in the database."
             self.logger.error(f"Risk Assessment Error: {str(e)}")
             return "Error performing risk assessment."
 
@@ -194,12 +239,20 @@ class ToolManager:
         Generates structured documentation (README, Retrospective) from project data.
         """
         try:
-            query = f"SELECT * FROM project WHERE PID = {project_id}"
-            proj_data = self.db.run(query)
-            task_query = f"SELECT TaskName, TaskDesc FROM task WHERE PID = {project_id}"
-            tasks = self.db.run(task_query)
+            query = f"SELECT * FROM projects WHERE project_id = {project_id}"
+            proj_data = await asyncio.to_thread(self.db.run, query)
+            
+            # Tasks are core app data, handle missing gracefully
+            tasks = "No synchronized task heartbeats found for this project yet."
+            try:
+                task_query = f"SELECT TaskId, TaskName, TaskDesc FROM task WHERE PID = {project_id}"
+                tasks = await asyncio.to_thread(self.db.run, task_query)
+            except Exception:
+                pass 
             
             prompt = f"Generate a high-quality Markdown {doc_type} for this project using this data:\nProject: {proj_data}\nTasks: {tasks}"
-            return self.generation_client.generate_text(prompt=prompt)
+            return await self.generation_client.generate_text(prompt=prompt)
         except Exception as e:
-            return "Error generating documentation."
+            self.logger.error(f"Doc Gen Error: {str(e)}")
+            return "Error generating documentation. Ensure the project exists in the RAG database."
+

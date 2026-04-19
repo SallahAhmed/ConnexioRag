@@ -11,12 +11,23 @@ class WorkflowController(BaseController):
     async def detect_node(self, query: str) -> WorkflowNodeEnum:
         """
         Detects the workflow node from the user query.
-        Uses keywords first, falls back to LLM if needed.
+        Uses a Fast-Path for short queries, then Keywords, then falls back to LLM.
         """
-        query_lower = query.lower()
+        query_lower = query.lower().strip()
         
-        # Keyword mappings (as defined in v2 docs)
+        # 1. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly.
+        # This bypasses all keyword and LLM checks for maximum speed.
+        if len(query_lower) < 50:
+            return WorkflowNodeEnum.GENERAL
+
+        # 2. KEYWORD MAPPING: Priority ordered
         keywords = {
+            # Check General first to avoid false positives in specialized nodes
+            WorkflowNodeEnum.GENERAL: [
+                "hello", "hi", "hey", "greeting", "how are you", "good morning", "good afternoon",
+                "who are you", "what can you do", "help me", "how can you help", "your name",
+                "مرحبا", "سلام", "اهلا", "كيف حالك", "من انت", "ماذا تفعل", "ساعدني"
+            ],
             WorkflowNodeEnum.ONBOARDING: ["where do i start", "new here", "how it works", "start"],
             WorkflowNodeEnum.TEAM_FORMATION: ["find teammate", "need a dev", "looking for", "join team"],
             WorkflowNodeEnum.PHASE_TRANSITION: ["next phase", "done with", "advance", "transition"],
@@ -28,18 +39,18 @@ class WorkflowController(BaseController):
             if any(trigger in query_lower for trigger in triggers):
                 return node
 
-        # Fallback to LLM for classification
+        # 3. Fallback to LLM for complex classification
         language = await self.detect_language(query)
         self.template_parser.set_language(language)
 
         system_prompt = self.template_parser.get("workflow", "classification_system_prompt")
-        user_prompt = self.template_parser.get("workflow", "classification_user_prompt", {"query": query})
+        user_prompt = self.template_parser.get("workflow", "classification_user_prompt", {"query": query[:2000]})
 
         chat_history = [
             self.generation_client.construct_prompt(prompt=system_prompt, role=self.generation_client.enums.SYSTEM.value)
         ]
 
-        response = self.generation_client.generate_text(prompt=user_prompt, chat_history=chat_history)
+        response = await self.generation_client.generate_text(prompt=user_prompt, chat_history=chat_history)
 
         if response:
             try:

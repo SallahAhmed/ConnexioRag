@@ -7,6 +7,8 @@ from .WorkflowController import WorkflowController
 from .helpers.ToolManager import ToolManager
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 from models.SessionModel import SessionModel
+import asyncio
+from datetime import datetime
 
 class NLPController(BaseController):
 
@@ -66,7 +68,7 @@ class NLPController(BaseController):
         # step2: manage items
         texts = [ c.chunk_text for c in chunks ]
         metadata = [ c.chunk_metadata for c in  chunks]
-        vectors = self.embedding_client.embed_text(text=texts, 
+        vectors = await self.embedding_client.embed_text(text=texts, 
                                                   document_type=DocumentTypeEnum.DOCUMENT.value)
 
         # step3: create collection if not exists
@@ -93,7 +95,7 @@ class NLPController(BaseController):
         collection_name = self.create_collection_name(project_id=project.project_id)
 
         # step2: get text embedding vector
-        vectors = self.embedding_client.embed_text(text=text, 
+        vectors = await self.embedding_client.embed_text(text=text, 
                                                  document_type=DocumentTypeEnum.QUERY.value)
 
         if not vectors or len(vectors) == 0:
@@ -127,11 +129,26 @@ class NLPController(BaseController):
         4. Generate Grounded Response
         """
         # Step 1: Detect Intent & Language
+        now = lambda: datetime.now().strftime("%H:%M:%S")
+        print(f"\n[AGENT] [{now()}] Query: {query[:50]}...")
         language = await self.workflow_controller.detect_language(query)
         self.template_parser.set_language(language)
+
+        print(f"[AGENT] [{now()}] Detecting user intent (Node)...")
         node = await self.workflow_controller.detect_node(query)
+        print(f"[AGENT] [{now()}] Node: {node}")
         
-        # Step 2: Session Management
+        # Step 2: Session Management & Persona Mapping
+        if language == "ar":
+            # Map common English persona keys to Arabic for better prompt grounding
+            persona_map = {
+                "student": "طالب",
+                "early_career": "مبتدئ مهني",
+                "educator": "معلم",
+                "company": "شركة"
+            }
+            persona = persona_map.get(persona.lower(), persona)
+
         if self.db_client:
             chat_session = await self.session_model.get_or_create_session(
                 user_id=user_id, project_id=project_id, persona=persona, language=language
@@ -141,11 +158,11 @@ class NLPController(BaseController):
         else:
             history = []
 
-        # Step 3: Multi-Source Retrieval
+        # Step 3: Multi-Source Retrieval (Sequential for Stability)
         retrieved_context = []
         sources = []
 
-        # Tool 1: Vector Knowledge Base (Always checked for grounding)
+        print(f"[AGENT] [{now()}] Searching Knowledge Base...")
         kb_results = await self.tool_manager.search_knowledge_base(project_id=project_id, query=query, limit=limit)
         retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
         sources.append("Documentation")
@@ -169,29 +186,48 @@ class NLPController(BaseController):
 
         # Fallback to Wiki for Jargon
         if node == WorkflowNodeEnum.GENERAL and len(retrieved_context) < 2:
-            wiki = await self.tool_manager.search_wiki(query)
+            wiki = await self.tool_manager.search_wiki(query, lang=language)
             if wiki:
                 retrieved_context.append(f"--- WIKIPEDIA ---\n{wiki}")
                 sources.append("General Research")
 
-        # Step 4: Construct Generation Context
+        # Step 4: Construct Generation Context with Strict Budgeting
         system_prompt = self.template_parser.get("rag", "system_prompt", {
             "persona": persona,
             "node": node.value
         })
         
+        # Calculate total available budget
+        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
+        
+        # Arabic Optimization: Arabic text uses significantly more tokens per character.
+        # We lower the budget to 6,000 to ensure it stays within local model memory limits.
+        if language == "ar":
+            total_budget = 6000
+        
+        # Build context string
         context_string = "\n\n".join(retrieved_context)
+        # Allocate 50% of budget to retrieved context
+        max_context_chars = int(total_budget * 0.5)
+        context_string = context_string[:max_context_chars]
+
         footer_prompt = self.template_parser.get("rag", "footer_prompt", {
             "query": query,
             "context": context_string
         })
 
-        # Step 5: Generate & Persist
+        # Step 5: Manage History with Strict Budgeting (Sliding Window)
+        # Allocate 30% of budget to history (rest is for prompts and generation)
+        max_history_chars = int(total_budget * 0.3)
+        truncated_history = self._get_truncated_history(history, max_history_chars)
+
+        # Build final chat history for the AI provider
         chat_history = [self.generation_client.construct_prompt(prompt=system_prompt, role="system")]
-        for msg in history:
+        for msg in truncated_history:
             chat_history.append(self.generation_client.construct_prompt(prompt=msg['content'], role=msg['role']))
 
-        answer = self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
+        # Step 6: Generate & Persist
+        answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
         
         if self.db_client:
             await self.session_model.append_message(session_id, "user", query, node.value)
@@ -204,6 +240,25 @@ class NLPController(BaseController):
             "sources": list(set(sources)),
             "session_id": session_id
         }
+
+    def _get_truncated_history(self, history: list, total_char_limit: int) -> list:
+        """
+        Works backward from the most recent messages. 
+        Ensures the total character count across history messages doesn't exceed the limit.
+        """
+        truncated = []
+        current_chars = 0
+        
+        # Reverse to get newest first, then reverse back at the end
+        for msg in reversed(history):
+            content = msg['content'][:2000] # Truncate individual massive messages
+            if current_chars + len(content) > total_char_limit:
+                break
+            
+            truncated.append({"role": msg['role'], "content": content})
+            current_chars += len(content)
+            
+        return list(reversed(truncated))
 
     async def get_user_portfolio(self, user_id: int):
         return await self.tool_manager.get_user_portfolio(user_id)

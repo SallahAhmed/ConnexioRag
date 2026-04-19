@@ -1,8 +1,14 @@
 $kind: http-request
-name: "Generate Portfolio Entry"
+name: Generate Portfolio Entry
 url: "{{api}}/api/v1/nlp/agent/portfolio"
 method: POST
 body:
   type: json
-  content: ""
+  content: "{\r
+
+    \    \"user_id\": 1, \r
+
+    \    \"format\": \"linkedin\"\r
+
+    \    }"
 order: 4476805742200316

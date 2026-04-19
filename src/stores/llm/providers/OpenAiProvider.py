@@ -1,6 +1,6 @@
 from ..LLMInterface import LLMInterface
 from ..LLMEnums import OpenAIEnums
-from openai import OpenAI
+from openai import AsyncOpenAI
 import logging
 from typing import List, Union
 
@@ -23,7 +23,7 @@ class OpenAIProvider(LLMInterface):
         self.embedding_model_id = None
         self.embedding_size = None
 
-        self.client = OpenAI(
+        self.client = AsyncOpenAI(
             api_key = self.api_key,
             base_url = self.api_url if self.api_url and len(self.api_url) else None
         )
@@ -41,8 +41,8 @@ class OpenAIProvider(LLMInterface):
     def process_text(self, text: str):
         return text[:self.default_input_max_characters].strip()
 
-    def generate_text(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
-                            temperature: float = None):
+    async def generate_text(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
+                             temperature: float = None):
         
         if not self.client:
             self.logger.error("OpenAI client was not set")
@@ -55,13 +55,15 @@ class OpenAIProvider(LLMInterface):
         max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
         temperature = temperature if temperature else self.default_generation_temperature
 
-        chat_history.append(
+        # Create localized copy of history to avoid side-effects in async contexts
+        local_history = list(chat_history)
+        local_history.append(
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
-        response = self.client.chat.completions.create(
+        response = await self.client.chat.completions.create(
             model = self.generation_model_id,
-            messages = chat_history,
+            messages = local_history,
             max_tokens = max_output_tokens,
             temperature = temperature
         )
@@ -73,7 +75,7 @@ class OpenAIProvider(LLMInterface):
         return response.choices[0].message.content
 
 
-    def embed_text(self, text: Union[str, List[str]], document_type: str = None):
+    async def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         
         if not self.client:
             self.logger.error("OpenAI client was not set")
@@ -88,7 +90,7 @@ class OpenAIProvider(LLMInterface):
             self.logger.error("Embedding model for OpenAI was not set")
             return None
         
-        response = self.client.embeddings.create(
+        response = await self.client.embeddings.create(
             model = self.embedding_model_id,
             input = text,
         )
@@ -103,4 +105,4 @@ class OpenAIProvider(LLMInterface):
         return {
             "role": role,
             "content": prompt,
-        }
+        }

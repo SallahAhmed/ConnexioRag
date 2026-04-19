@@ -2,4 +2,15 @@ $kind: http-request
 name: Task Architect Plan
 url: "{{api}}/api/v1/nlp/agent/task-architect/plan"
 method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"query\": \"How do I implement user authentication in this project?\", \r
+
+    \    \"user_id\": 1, \r
+
+    \    \"project_id\": 2\r
+
+    }"
 order: 4502447530441297
