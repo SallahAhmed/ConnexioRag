@@ -1,0 +1,5 @@
+$kind: http-request
+name: Task Architect Plan
+url: "{{api}}/api/v1/nlp/agent/task-architect/plan"
+method: POST
+order: 4502447530441297

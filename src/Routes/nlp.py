@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, status, Request
+from fastapi import APIRouter, status, Request
 from fastapi.responses import JSONResponse
 from .schemas.nlp import PushRequest, SearchRequest
 from models.ProjectModel import ProjectModel
@@ -16,8 +16,8 @@ nlp_router = APIRouter(
     tags=["api_v1", "nlp"],
 )
 
-@nlp_router.post("/index/push/{project_id}")
-async def index_project(request: Request, project_id: int, push_request: PushRequest):
+@nlp_router.post("/index/push")
+async def index_project(request: Request, push_request: PushRequest):
 
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
@@ -28,7 +28,7 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=project_id
+        project_id=push_request.project_id
     )
 
     if not project:
@@ -45,6 +45,7 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
+        db_client=request.app.db_client
     )
 
     has_records = True
@@ -53,7 +54,7 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
     idx = 0
 
 
-# create collection if not exists
+    # create collection if not exists
     collection_name = nlp_controller.create_collection_name(project_id=project.project_id)
 
     _ = await request.app.vectordb_client.create_collection(
@@ -66,7 +67,9 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
     total_chunks_count = await chunk_model.get_total_chunks_count(project_id=project.project_id)
     pbar = tqdm(total=total_chunks_count, desc="Vector Indexing", position=0)
 
-
+    has_records = True
+    page_no = 1
+    inserted_items_count = 0
 
     while has_records:
         page_chunks = await chunk_model.get_poject_chunks(project_id=project.project_id, page_no=page_no)
@@ -94,7 +97,6 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
                 }
             )
         
-        
         inserted_items_count += len(page_chunks)
         pbar.update(len(page_chunks))
         
@@ -106,15 +108,15 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
         }
     )
 
-@nlp_router.get("/index/info/{project_id}")
-async def get_project_index_info(request: Request, project_id: int):
+@nlp_router.post("/index/info")
+async def get_project_index_info(request: Request, search_request: SearchRequest):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=project_id
+        project_id=search_request.project_id
     )
 
     nlp_controller = NLPController(
@@ -123,6 +125,7 @@ async def get_project_index_info(request: Request, project_id: int):
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
+        db_client=request.app.db_client
     )
 
     collection_info = await nlp_controller.get_vector_db_collection_info(project=project)
@@ -134,15 +137,15 @@ async def get_project_index_info(request: Request, project_id: int):
         }
     )
 
-@nlp_router.post("/index/search/{project_id}")
-async def search_index(request: Request, project_id: int, search_request: SearchRequest):
+@nlp_router.post("/index/search")
+async def search_index(request: Request, search_request: SearchRequest):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=project_id
+        project_id=search_request.project_id
     )
 
     nlp_controller = NLPController(
@@ -151,6 +154,7 @@ async def search_index(request: Request, project_id: int, search_request: Search
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
+        db_client=request.app.db_client
     )
 
     results = await nlp_controller.search_vector_db_collection(
@@ -172,15 +176,15 @@ async def search_index(request: Request, project_id: int, search_request: Search
         }
     )
 
-@nlp_router.post("/index/answer/{project_id}")
-async def answer_rag(request: Request, project_id: int, search_request: SearchRequest):
+@nlp_router.post("/index/answer")
+async def answer_rag(request: Request, search_request: SearchRequest):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=project_id
+        project_id=search_request.project_id
     )
 
     nlp_controller = NLPController(
@@ -189,29 +193,27 @@ async def answer_rag(request: Request, project_id: int, search_request: SearchRe
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
+        db_client=request.app.db_client
     )
 
-    answer, full_prompt, chat_history = await nlp_controller.answer_rag_question(
-        project=project,
+    result = await nlp_controller.answer_agent_chat(
+        user_id=1, # Default for legacy RAG endpoint
+        project_id=search_request.project_id,
         query=search_request.text,
         limit=search_request.limit,
     )
 
-    if not answer:
-        return JSONResponse(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                content={
-                    "signal": ResponseSignal.RAG_ANSWER_ERROR.value
-                }
-        )
-    
+    # if not answer:
+    #     return JSONResponse(
+    #             status_code=status.HTTP_400_BAD_REQUEST,
+    #             content={
+    #                 "signal": ResponseSignal.RAG_ANSWER_ERROR.value
+    #             }
+    # )
+
     return JSONResponse(
         content={
             "signal": ResponseSignal.RAG_ANSWER_SUCCESS.value,
-            "answer": answer,
-            "full_prompt": full_prompt,
-            "chat_history": chat_history
+            **result
         }
     )
-
-    

@@ -94,3 +94,112 @@ class ToolManager:
         except Exception as e:
             self.logger.error(f"Knowledge Base Tool Error: {str(e)}")
             return f"Error searching knowledge base: {str(e)}"
+    async def get_matching_rationale(self, user_id: int, project_id: int) -> str:
+        """
+        Explains why a user was matched to a project based on the 6-factor algorithm.
+        """
+        try:
+            # In a real scenario, we'd query the weights and scores from the DB.
+            # Here, we'll fetch the user's technology match for the project as a primary factor.
+            query = f"""
+            SELECT t.name 
+            FROM technology t
+            JOIN user_technology ut ON t.id = ut.tech_id
+            JOIN project_technology pt ON t.id = pt.tech_id
+            WHERE ut.UID = {user_id} AND pt.PID = {project_id}
+            """
+            matched_techs = self.db.run(query)
+            
+            # Formulate the rationale based on weights (0.35 skill, 0.25 availability, etc.)
+            prompt = f"Explain to the user (UID: {user_id}) why they match Project {project_id}. Key Factors: Matched Techs: {matched_techs}. Weights: 35% Skills, 25% Availability, 20% Rating, 12% Experience, 5% Goals, 3% Domain. Speak personally."
+            return self.generation_client.generate_text(prompt=prompt)
+        except Exception as e:
+            self.logger.error(f"Matching Rationale Error: {str(e)}")
+            return "Unable to calculate matching rationale at this time."
+
+    async def get_team_gaps(self, project_id: int) -> str:
+        """
+        Identifies missing technical and non-technical roles in a team.
+        """
+        try:
+            # Find required technology that isn't covered by current team
+            query = f"""
+            SELECT t.name 
+            FROM technology t
+            JOIN project_technology pt ON t.id = pt.tech_id
+            WHERE pt.PID = {project_id}
+            AND t.id NOT IN (
+                SELECT ut.tech_id 
+                FROM user_technology ut
+                JOIN user_project up ON ut.UID = up.UID
+                WHERE up.PID = {project_id}
+            )
+            """
+            missing_techs = self.db.run(query)
+            return f"The project is currently missing the following technical expertise: {missing_techs}. Recommendation: Find members with these skills to ensure delivery."
+        except Exception as e:
+            self.logger.error(f"Team Gap Error: {str(e)}")
+            return "Error assessing team gaps."
+
+    async def get_user_portfolio(self, user_id: int) -> str:
+        """
+        Summarizes a user's task history and deliverables for their portfolio.
+        """
+        try:
+            query = f"""
+            SELECT t.TaskName, t.TaskDesc, p.PName
+            FROM task t
+            JOIN project p ON t.PID = p.PID
+            WHERE t.UID = {user_id}
+            """
+            tasks = self.db.run(query)
+            prompt = f"Summarize the following project contributions for a professional portfolio entry:\n{tasks}"
+            return self.generation_client.generate_text(prompt=prompt)
+        except Exception as e:
+            self.logger.error(f"Portfolio Error: {str(e)}")
+            return "Error generating portfolio summary."
+
+    async def get_streak_quote(self, user_id: int) -> str:
+        """
+        Fetches or generates a domain-aware motivational quote for the user.
+        """
+        try:
+            # Check if quotes table exists (mocked or real)
+            # If not found, LLM generates one based on user's field
+            field_query = f"SELECT fieldExperience FROM \"user\" WHERE UID = {user_id}"
+            field = self.db.run(field_query)
+            
+            prompt = f"Generate a short, powerful motivational one-liner for a professional in the field of {field}. Make it inspiring."
+            return self.generation_client.generate_text(prompt=prompt)
+        except Exception as e:
+            return "Keep pushing forward! Every small step is progress."
+
+    async def get_project_risks(self, project_id: int = None) -> str:
+        """
+        Aggregates risk metrics (missed deadlines, stalled progress) for supervisors.
+        """
+        try:
+            filter_str = f"WHERE PID = {project_id}" if project_id else ""
+            query = f"SELECT PID, PName, progress FROM project {filter_str} ORDER BY progress ASC"
+            metrics = self.db.run(query)
+            
+            prompt = f"Analyze these project progress metrics and identify which are at high risk of failing this sprint:\n{metrics}"
+            return self.generation_client.generate_text(prompt=prompt)
+        except Exception as e:
+            self.logger.error(f"Risk Assessment Error: {str(e)}")
+            return "Error performing risk assessment."
+
+    async def generate_project_docs(self, project_id: int, doc_type: str = "readme") -> str:
+        """
+        Generates structured documentation (README, Retrospective) from project data.
+        """
+        try:
+            query = f"SELECT * FROM project WHERE PID = {project_id}"
+            proj_data = self.db.run(query)
+            task_query = f"SELECT TaskName, TaskDesc FROM task WHERE PID = {project_id}"
+            tasks = self.db.run(task_query)
+            
+            prompt = f"Generate a high-quality Markdown {doc_type} for this project using this data:\nProject: {proj_data}\nTasks: {tasks}"
+            return self.generation_client.generate_text(prompt=prompt)
+        except Exception as e:
+            return "Error generating documentation."

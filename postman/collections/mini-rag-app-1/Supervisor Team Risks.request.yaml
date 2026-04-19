@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{api}}/api/v1/nlp/agent/supervisor/risks"
+method: GET
+order: 4488851416633229

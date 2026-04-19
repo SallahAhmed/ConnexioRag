@@ -1,0 +1,8 @@
+$kind: http-request
+name: "Generate Portfolio Entry"
+url: "{{api}}/api/v1/nlp/agent/portfolio"
+method: POST
+body:
+  type: json
+  content: ""
+order: 4476805742200316

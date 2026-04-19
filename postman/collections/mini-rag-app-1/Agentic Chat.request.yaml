@@ -1,0 +1,7 @@
+$kind: http-request
+url: "{{api}}/api/v1/nlp/agent/chat"
+method: POST
+body:
+  type: json
+  content: ""
+order: 4344731937616382

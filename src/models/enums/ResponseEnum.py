@@ -23,4 +23,20 @@ class ResponseSignal(Enum):
     EMBEDDING_CLIENT_ERROR = "embedding_client_error"
     VECTORDB_CLIENT_ERROR = "vector_db_client_error"
     TEMPLATE_PARSER_ERROR = "template_parser_error"
+
+    # ============ Agent V2 Signals ============
+    AGENT_CHAT_SUCCESS = "agent_chat_success"
+    AGENT_CHAT_ERROR = "agent_chat_error"
+    AGENT_PORTFOLIO_SUCCESS = "agent_portfolio_success"
+    AGENT_PORTFOLIO_ERROR = "agent_portfolio_error"
+    AGENT_SUPERVISOR_SUCCESS = "agent_supervisor_risks_success"
+    AGENT_SUPERVISOR_ERROR = "agent_supervisor_risks_error"
+    AGENT_COACH_SUCCESS = "agent_coach_path_success"
+    AGENT_COACH_ERROR = "agent_coach_path_error"
+    AGENT_DOCGEN_SUCCESS = "agent_doc_gen_success"
+    AGENT_DOCGEN_ERROR = "agent_doc_gen_error"
+    AGENT_SESSION_NOT_FOUND = "agent_session_not_found"
+    AGENT_MATCHING_ERROR = "agent_matching_rationale_error"
+    AGENT_ARCHITECT_SUCCESS = "agent_task_architect_success"
+    AGENT_ARCHITECT_ERROR = "agent_task_architect_error"
     

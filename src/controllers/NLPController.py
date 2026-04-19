@@ -1,16 +1,17 @@
 from .BaseController import BaseController
 from models.db_schemas import Project, DataChunk
 from stores.llm.LLMEnums import DocumentTypeEnum
-from typing import List
+from typing import List, Optional
 import json
 from .WorkflowController import WorkflowController
 from .helpers.ToolManager import ToolManager
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
+from models.SessionModel import SessionModel
 
 class NLPController(BaseController):
 
     def __init__(self, vectordb_client, generation_client, 
-                 embedding_client, template_parser, settings=None):
+                 embedding_client, template_parser, settings=None, db_client=None):
         super().__init__()
 
         self.vectordb_client = vectordb_client
@@ -18,12 +19,16 @@ class NLPController(BaseController):
         self.embedding_client = embedding_client
         self.template_parser = template_parser
         self.settings = settings
+        self.db_client = db_client
 
-        # Initialize Workflow and Tool Controllers
+        # Initialize Controllers
         self.workflow_controller = WorkflowController(
             generation_client=self.generation_client,
             template_parser=self.template_parser
         )
+
+        if self.db_client:
+            self.session_model = SessionModel(db_client=self.db_client)
 
         if self.settings:
             postgres_conn = f"postgresql://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_MAIN_DATABASE}"
@@ -112,65 +117,108 @@ class NLPController(BaseController):
 
         return results
     
-    async def answer_rag_question(self, project: Project, query: str, limit: int = 10):
-        
-        answer, full_prompt, chat_history = None, None, None
-
-        # Step 1: Detect Metadata (Node, Language, Persona)
+    async def answer_agent_chat(self, user_id: int, project_id: Optional[int], query: str, 
+                                persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
+        """
+        Comprehensive Agentic Chat Loop:
+        1. Detect Node & Language
+        2. Manage Session/Memory
+        3. Route to Multi-Source Tools
+        4. Generate Grounded Response
+        """
+        # Step 1: Detect Intent & Language
         language = await self.workflow_controller.detect_language(query)
         self.template_parser.set_language(language)
-        
         node = await self.workflow_controller.detect_node(query)
-        persona = await self.workflow_controller.detect_persona(query)
+        
+        # Step 2: Session Management
+        if self.db_client:
+            chat_session = await self.session_model.get_or_create_session(
+                user_id=user_id, project_id=project_id, persona=persona, language=language
+            )
+            session_id = chat_session.session_id
+            history = await self.session_model.get_recent_history(session_id)
+        else:
+            history = []
 
-        # Step 2: Adaptive Retrieval based on Node
+        # Step 3: Multi-Source Retrieval
         retrieved_context = []
-        
-        # Always search knowledge base (Vector DB) for grounding
-        kb_results = await self.tool_manager.search_knowledge_base(
-            project_id=project.project_id, query=query, limit=limit
-        )
+        sources = []
+
+        # Tool 1: Vector Knowledge Base (Always checked for grounding)
+        kb_results = await self.tool_manager.search_knowledge_base(project_id=project_id, query=query, limit=limit)
         retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
+        sources.append("Documentation")
 
-        # Check for specific nodes that need extra tools
-        if node in [WorkflowNodeEnum.TEAM_FORMATION, WorkflowNodeEnum.PHASE_TRANSITION, WorkflowNodeEnum.MILESTONE_WARNING]:
-            # These nodes require project metrics from the SQL database
-            sql_results = await self.tool_manager.execute_sql_query(query)
-            retrieved_context.append(f"--- PROJECT DATABASE ---\n{sql_results}")
+        # Tool 2: Adaptive SQL/Wiki Routing based on query keywords or node
+        lower_query = query.lower()
+        if "why was i matched" in lower_query or "recommendation" in lower_query:
+            match_rationale = await self.tool_manager.get_matching_rationale(user_id, project_id)
+            retrieved_context.append(f"--- MATCHING RATIONALE ---\n{match_rationale}")
+            sources.append("Matching Algorithm")
         
-        elif node == WorkflowNodeEnum.GENERAL:
-            # General facts might benefit from Wikipedia
-            wiki_results = await self.tool_manager.search_wiki(query)
-            retrieved_context.append(f"--- WIKIPEDIA ---\n{wiki_results}")
+        if "role" in lower_query or "what should i do" in lower_query:
+            role_gaps = await self.tool_manager.get_team_gaps(project_id)
+            retrieved_context.append(f"--- ROLE ANALYSIS ---\n{role_gaps}")
+            sources.append("Project Structure")
 
-        # Step 3: Construct LLM prompt
-        # Use node-specific persona guides from templates
+        if node in [WorkflowNodeEnum.MILESTONE_WARNING, WorkflowNodeEnum.BLOCKER]:
+            risks = await self.tool_manager.get_project_risks(project_id)
+            retrieved_context.append(f"--- PROJECT RISKS ---\n{risks}")
+            sources.append("Project Metrics")
+
+        # Fallback to Wiki for Jargon
+        if node == WorkflowNodeEnum.GENERAL and len(retrieved_context) < 2:
+            wiki = await self.tool_manager.search_wiki(query)
+            if wiki:
+                retrieved_context.append(f"--- WIKIPEDIA ---\n{wiki}")
+                sources.append("General Research")
+
+        # Step 4: Construct Generation Context
         system_prompt = self.template_parser.get("rag", "system_prompt", {
             "persona": persona,
             "node": node.value
         })
-
-        context_string = "\n\n".join(retrieved_context)
         
+        context_string = "\n\n".join(retrieved_context)
         footer_prompt = self.template_parser.get("rag", "footer_prompt", {
             "query": query,
             "context": context_string
         })
 
-        # Step 4: Construct Generation Client Prompts
-        chat_history = [
-            self.generation_client.construct_prompt(
-                prompt=system_prompt,
-                role=self.generation_client.enums.SYSTEM.value,
-            )
-        ]
+        # Step 5: Generate & Persist
+        chat_history = [self.generation_client.construct_prompt(prompt=system_prompt, role="system")]
+        for msg in history:
+            chat_history.append(self.generation_client.construct_prompt(prompt=msg['content'], role=msg['role']))
 
-        full_prompt = footer_prompt
+        answer = self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
+        
+        if self.db_client:
+            await self.session_model.append_message(session_id, "user", query, node.value)
+            await self.session_model.append_message(session_id, "assistant", answer, node.value)
 
-        # Step 5: Retrieve the Final Grounded Answer
-        answer = self.generation_client.generate_text(
-            prompt=full_prompt,
-            chat_history=chat_history
-        )
+        return {
+            "answer": answer,
+            "node": node.value,
+            "language": language,
+            "sources": list(set(sources)),
+            "session_id": session_id
+        }
 
-        return answer, full_prompt, chat_history
+    async def get_user_portfolio(self, user_id: int):
+        return await self.tool_manager.get_user_portfolio(user_id)
+
+    async def get_coach_path(self, user_id: int, project_id: Optional[int]):
+        return await self.tool_manager.get_streak_quote(user_id) # Example placeholder for now
+
+    async def get_supervisor_risks(self, project_id: Optional[int]):
+        return await self.tool_manager.get_project_risks(project_id)
+
+    async def get_doc_gen(self, project_id: int, doc_type: str):
+        return await self.tool_manager.generate_project_docs(project_id, doc_type)
+
+    async def get_task_architect_plan(self, query: str, user_id: int, project_id: int):
+        # Combines knowledge base search with task resolution logic
+        kb_context = await self.tool_manager.search_knowledge_base(project_id, query)
+        prompt = f"As a Task Architect, provide a step-by-step resolution plan for: {query}\n\nContext:\n{kb_context}"
+        return self.generation_client.generate_text(prompt=prompt)

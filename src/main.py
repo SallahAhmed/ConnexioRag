@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from Routes import base, data, nlp
+from Routes import base, data, nlp, agent
 from motor.motor_asyncio import AsyncIOMotorClient
 from helpers.config import get_settings
 from stores.llm.LLMProviderFactory import LLMProviderFactory
@@ -64,3 +64,4 @@ app.on_event("shutdown")(shutdown_span)
 app.include_router(base.base_router)
 app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
+app.include_router(agent.agent_router)

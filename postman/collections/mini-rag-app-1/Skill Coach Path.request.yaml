@@ -1,0 +1,4 @@
+$kind: http-request
+url: "{{api}}/api/v1/nlp/agent/coach/path"
+method: GET
+order: 4499314264332607
