@@ -9,11 +9,13 @@ from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 from models.SessionModel import SessionModel
 import asyncio
 from datetime import datetime
+import uuid
+from .helpers.TraceManager import tracer
 
 class NLPController(BaseController):
 
     def __init__(self, vectordb_client, generation_client, 
-                 embedding_client, template_parser, settings=None, db_client=None):
+                 embedding_client, template_parser, settings=None, db_client=None, reranker=None):
         super().__init__()
 
         self.vectordb_client = vectordb_client
@@ -22,6 +24,7 @@ class NLPController(BaseController):
         self.template_parser = template_parser
         self.settings = settings
         self.db_client = db_client
+        self.reranker = reranker
 
         # Initialize Controllers
         self.workflow_controller = WorkflowController(
@@ -40,7 +43,8 @@ class NLPController(BaseController):
                 generation_client=self.generation_client,
                 vectordb_client=self.vectordb_client,
                 embedding_client=self.embedding_client,
-                template_parser=self.template_parser
+                template_parser=self.template_parser,
+                reranker=self.reranker
             )
 
     def create_collection_name(self, project_id: str):
@@ -119,28 +123,27 @@ class NLPController(BaseController):
 
         return results
     
-    async def answer_agent_chat(self, user_id: int, project_id: Optional[int], query: str, 
+    async def _prepare_chat_context(self, user_id: int, project_id: Optional[int], query: str, 
                                 persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
         """
-        Comprehensive Agentic Chat Loop:
-        1. Detect Node & Language
-        2. Manage Session/Memory
-        3. Route to Multi-Source Tools
-        4. Generate Grounded Response
+        Prepares the chat context, history, and tools before generating text.
         """
-        # Step 1: Detect Intent & Language
+        trace_id = str(uuid.uuid4())
         now = lambda: datetime.now().strftime("%H:%M:%S")
         print(f"\n[AGENT] [{now()}] Query: {query[:50]}...")
+        
+        # Step 1: Detect Intent & Language
+        step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
         language = await self.workflow_controller.detect_language(query)
         self.template_parser.set_language(language)
-
-        print(f"[AGENT] [{now()}] Detecting user intent (Node)...")
         node = await self.workflow_controller.detect_node(query)
+        tracer.end_trace(trace_id, step_id, {"node": node.value, "language": language})
+
         print(f"[AGENT] [{now()}] Node: {node}")
         
-        # Step 2: Session Management & Persona Mapping
+        # Step 2: Session Management
+        step_id = tracer.start_trace(trace_id, "Session Management")
         if language == "ar":
-            # Map common English persona keys to Arabic for better prompt grounding
             persona_map = {
                 "student": "طالب",
                 "early_career": "مبتدئ مهني",
@@ -157,57 +160,113 @@ class NLPController(BaseController):
             history = await self.session_model.get_recent_history(session_id)
         else:
             history = []
+        tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
-        # Step 3: Multi-Source Retrieval (Sequential for Stability)
+        # Step 3: Multi-Source Retrieval (With Query Decomposition & CRAG)
         retrieved_context = []
         sources = []
 
-        print(f"[AGENT] [{now()}] Searching Knowledge Base...")
-        kb_results = await self.tool_manager.search_knowledge_base(project_id=project_id, query=query, limit=limit)
-        retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
-        sources.append("Documentation")
+        step_id = tracer.start_trace(trace_id, "Query Decomposition")
+        print(f"[AGENT] [{now()}] Decomposing Query (Internal Logic)...")
+        self.template_parser.set_language("en")
+        
+        decompose_sys = self.template_parser.get("relevance_grading", "decompose_query_system_prompt")
+        decompose_usr = self.template_parser.get("relevance_grading", "decompose_query_user_prompt", {"query": query})
+        decompose_history = [self.generation_client.construct_prompt(prompt=decompose_sys, role="system")]
+        
+        decomposed_queries_text = await self.generation_client.generate_text(
+            prompt=decompose_usr, chat_history=decompose_history, max_output_tokens=100
+        )
+        
+        queries_to_search = [query]
+        if decomposed_queries_text:
+            try:
+                import ast
+                cleaned_text = decomposed_queries_text.strip().replace('```python', '').replace('```', '').strip()
+                parsed = ast.literal_eval(cleaned_text)
+                if isinstance(parsed, list) and len(parsed) > 0:
+                    queries_to_search = parsed[:3]
+                    print(f"[AGENT] [{now()}] Queries decomposed into: {queries_to_search}")
+            except Exception:
+                pass
+        tracer.end_trace(trace_id, step_id, queries_to_search)
 
-        # Tool 2: Adaptive SQL/Wiki Routing based on query keywords or node
+        step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
+        print(f"[AGENT] [{now()}] Searching Knowledge Base...")
+        kb_results = ""
+        for q in queries_to_search:
+            res = await self.tool_manager.search_knowledge_base(project_id=project_id, query=q, limit=limit)
+            kb_results += f"\n[Results for: {q}]\n{res}\n"
+        tracer.end_trace(trace_id, step_id, f"Length: {len(kb_results)}")
+
+        step_id = tracer.start_trace(trace_id, "Relevance Grading")
+        print(f"[AGENT] [{now()}] Grading Document Relevance...")
+        grade_sys = self.template_parser.get("relevance_grading", "relevance_grader_system_prompt")
+        grade_usr = self.template_parser.get("relevance_grading", "relevance_grader_user_prompt", {
+            "query": query, "document": kb_results[:2000]
+        })
+        grade_history = [self.generation_client.construct_prompt(prompt=grade_sys, role="system")]
+        grade_result = await self.generation_client.generate_text(
+            prompt=grade_usr, chat_history=grade_history, max_output_tokens=10
+        )
+        grade_result_str = (grade_result or "").upper()
+        print(f"[AGENT] [{now()}] Document Grade: {grade_result_str}")
+        tracer.end_trace(trace_id, step_id, grade_result_str)
+
+        if "IRRELEVANT" in grade_result_str:
+            step_id = tracer.start_trace(trace_id, "Wikipedia Fallback")
+            print(f"[AGENT] [{now()}] Triggering Fallback Search...")
+            wiki_fb = await self.tool_manager.search_wiki(query, lang=language)
+            if wiki_fb:
+                retrieved_context.append(f"--- WIKIPEDIA FALLBACK ---\n{wiki_fb}")
+                sources.append("External Fallback")
+            tracer.end_trace(trace_id, step_id, "Completed")
+        else:
+            retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
+            sources.append("Documentation")
+            
+        self.template_parser.set_language(language)
+
         lower_query = query.lower()
         if "why was i matched" in lower_query or "recommendation" in lower_query:
+            step_id = tracer.start_trace(trace_id, "Matching Rationale Tool")
             match_rationale = await self.tool_manager.get_matching_rationale(user_id, project_id)
             retrieved_context.append(f"--- MATCHING RATIONALE ---\n{match_rationale}")
             sources.append("Matching Algorithm")
+            tracer.end_trace(trace_id, step_id, "Completed")
         
         if "role" in lower_query or "what should i do" in lower_query:
+            step_id = tracer.start_trace(trace_id, "Team Gaps Tool")
             role_gaps = await self.tool_manager.get_team_gaps(project_id)
             retrieved_context.append(f"--- ROLE ANALYSIS ---\n{role_gaps}")
             sources.append("Project Structure")
+            tracer.end_trace(trace_id, step_id, "Completed")
 
         if node in [WorkflowNodeEnum.MILESTONE_WARNING, WorkflowNodeEnum.BLOCKER]:
+            step_id = tracer.start_trace(trace_id, "Project Risk Assessment")
             risks = await self.tool_manager.get_project_risks(project_id)
             retrieved_context.append(f"--- PROJECT RISKS ---\n{risks}")
             sources.append("Project Metrics")
+            tracer.end_trace(trace_id, step_id, "Completed")
 
-        # Fallback to Wiki for Jargon
         if node == WorkflowNodeEnum.GENERAL and len(retrieved_context) < 2:
+            step_id = tracer.start_trace(trace_id, "Wikipedia Jargon Search")
             wiki = await self.tool_manager.search_wiki(query, lang=language)
             if wiki:
                 retrieved_context.append(f"--- WIKIPEDIA ---\n{wiki}")
                 sources.append("General Research")
+            tracer.end_trace(trace_id, step_id, "Completed")
 
-        # Step 4: Construct Generation Context with Strict Budgeting
         system_prompt = self.template_parser.get("rag", "system_prompt", {
             "persona": persona,
             "node": node.value
         })
         
-        # Calculate total available budget
         total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
-        
-        # Arabic Optimization: Arabic text uses significantly more tokens per character.
-        # We lower the budget to 6,000 to ensure it stays within local model memory limits.
         if language == "ar":
             total_budget = 6000
         
-        # Build context string
         context_string = "\n\n".join(retrieved_context)
-        # Allocate 50% of budget to retrieved context
         max_context_chars = int(total_budget * 0.5)
         context_string = context_string[:max_context_chars]
 
@@ -216,19 +275,28 @@ class NLPController(BaseController):
             "context": context_string
         })
 
-        # Step 5: Manage History with Strict Budgeting (Sliding Window)
-        # Allocate 30% of budget to history (rest is for prompts and generation)
         max_history_chars = int(total_budget * 0.3)
         truncated_history = self._get_truncated_history(history, max_history_chars)
 
-        # Build final chat history for the AI provider
         chat_history = [self.generation_client.construct_prompt(prompt=system_prompt, role="system")]
         for msg in truncated_history:
             chat_history.append(self.generation_client.construct_prompt(prompt=msg['content'], role=msg['role']))
 
+        return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id
+
+    async def answer_agent_chat(self, user_id: int, project_id: Optional[int], query: str, 
+                                persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
+        
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id = await self._prepare_chat_context(
+            user_id, project_id, query, persona, session_id, limit
+        )
+        
+        step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": False})
+
         # Step 6: Generate & Persist
         answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
-        
+        tracer.end_trace(trace_id, step_id, answer)
+
         if self.db_client:
             await self.session_model.append_message(session_id, "user", query, node.value)
             await self.session_model.append_message(session_id, "assistant", answer, node.value)
@@ -237,9 +305,53 @@ class NLPController(BaseController):
             "answer": answer,
             "node": node.value,
             "language": language,
-            "sources": list(set(sources)),
-            "session_id": session_id
+            "sources": sources,
+            "session_id": session_id,
+            "trace": tracer.export_trace(trace_id)
         }
+
+    async def answer_agent_chat_stream(self, user_id: int, project_id: Optional[int], query: str, 
+                                persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
+        
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id = await self._prepare_chat_context(
+            user_id, project_id, query, persona, session_id, limit
+        )
+
+        metadata_sent = False
+        full_answer = ""
+        
+        step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": True})
+        # We need to stream the textual chunks. But we must also pass connection metadata.
+        # So we yield SSE formatted lines.
+        async for chunk in self.generation_client.generate_text_stream(prompt=footer_prompt, chat_history=chat_history):
+            if not metadata_sent:
+                # First chunk sends meta info
+                metadata = {
+                    "node": node.value,
+                    "language": language,
+                    "sources": sources,
+                    "session_id": session_id,
+                    "trace_id": trace_id,
+                    "event": "meta"
+                }
+                yield f"data: {json.dumps(metadata)}\n\n"
+                metadata_sent = True
+            
+            if chunk:
+                full_answer += chunk
+                yield f"data: {json.dumps({'text': chunk})}\n\n"
+        
+        tracer.end_trace(trace_id, step_id, full_answer)
+        
+        # Finally send the full trace summary in a final event
+        yield f"data: {json.dumps({'event': 'trace', 'data': tracer.export_trace(trace_id)})}\n\n"
+
+        # When done streaming, persist to DB.
+        if self.db_client:
+            await self.session_model.append_message(session_id, "user", query, node.value)
+            await self.session_model.append_message(session_id, "assistant", full_answer, node.value)
+            
+        yield "data: [DONE]\n\n"
 
     def _get_truncated_history(self, history: list, total_char_limit: int) -> list:
         """

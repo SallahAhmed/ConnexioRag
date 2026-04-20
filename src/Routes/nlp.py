@@ -45,7 +45,8 @@ async def index_project(request: Request, push_request: PushRequest):
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
-        db_client=request.app.db_client
+        db_client=request.app.db_client,
+        reranker=getattr(request.app, 'reranker', None)
     )
 
     has_records = True

@@ -22,12 +22,13 @@ except Exception:
 
 class ToolManager:
     def __init__(self, db_engine_url: str, generation_client, vectordb_client, 
-                 embedding_client, template_parser):
+                 embedding_client, template_parser, reranker=None):
         self.db_engine_url = db_engine_url
         self.generation_client = generation_client
         self.vectordb_client = vectordb_client
         self.embedding_client = embedding_client
         self.template_parser = template_parser
+        self.reranker = reranker
         self.logger = logging.getLogger(__name__)
 
         # Initialize SQL Database (sync version for LangChain tools)
@@ -95,7 +96,7 @@ class ToolManager:
 
     async def search_knowledge_base(self, project_id: str, query: str, limit: int = 5):
         """
-        Wraps current vector search logic to find relevant document chunks.
+        Wraps current vector search logic to find relevant document chunks using hybrid search and reranking.
         """
         try:
             # Replicate collection name logic
@@ -108,15 +109,32 @@ class ToolManager:
             
             query_vector = vectors[0]
 
-            # Search vector DB
-            results = await self.vectordb_client.search_by_vector(
-                collection_name=collection_name,
-                vector=query_vector,
-                limit=limit
-            )
+            # Perform Hybrid Search (fetches more results to rerank)
+            if hasattr(self.vectordb_client, "hybrid_search"):
+                results = await self.vectordb_client.hybrid_search(
+                    collection_name=collection_name,
+                    query=query,
+                    vector=query_vector,
+                    limit=limit,
+                    over_fetch=limit * 3
+                )
+            else:
+                # Fallback to standard vector search
+                results = await self.vectordb_client.search_by_vector(
+                    collection_name=collection_name,
+                    vector=query_vector,
+                    limit=limit * 3
+                )
 
             if not results:
                 return "No relevant documents found in the knowledge base."
+
+            # Rerank if a reranker is provided
+            if self.reranker and len(results) > 0:
+                results = await self.reranker.rerank(query=query, documents=results, top_k=limit)
+            else:
+                # Fallback to naive limit
+                results = results[:limit]
 
             # Format results for the agent
             formatted_results = "\n\n".join([

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, status, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from .schemas.agent import (
     AgentChatRequest, PortfolioRequest, DocGenRequest, 
     CoachPathRequest, SupervisorRisksRequest, TaskArchitectRequest
@@ -21,8 +21,9 @@ def get_nlp_controller(request: Request):
         generation_client=request.app.generation_client,
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
-        settings=request.app.settings,
-        db_client=request.app.db_client
+        settings=getattr(request.app, 'settings', None),
+        db_client=getattr(request.app, 'db_client', None),
+        reranker=getattr(request.app, 'reranker', None)
     )
 
 @agent_router.post("/chat")
@@ -45,6 +46,28 @@ async def agent_chat(request: Request, chat_request: AgentChatRequest):
         )
     except Exception as e:
         logger.error(f"Agent Chat Error: {str(e)}")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
+        )
+
+@agent_router.post("/chat/stream")
+async def agent_chat_stream(request: Request, chat_request: AgentChatRequest):
+    try:
+        nlp_controller = get_nlp_controller(request)
+        return StreamingResponse(
+            nlp_controller.answer_agent_chat_stream(
+                user_id=chat_request.user_id,
+                project_id=chat_request.project_id,
+                query=chat_request.query,
+                persona=chat_request.persona,
+                session_id=chat_request.session_id,
+                limit=chat_request.limit
+            ),
+            media_type="text/event-stream"
+        )
+    except Exception as e:
+        logger.error(f"Agent Chat Stream Error: {str(e)}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}

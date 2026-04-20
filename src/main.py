@@ -9,8 +9,11 @@ from models.db_schemas.connexio.schemas import SQLAlchemyBase # Ensure all schem
 # from sqlalchemy import create_engine
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
+from utils.metrics import setup_metrics
 
 app = FastAPI()
+
+setup_metrics(app)
 
 async def startup_span():
     settings = get_settings()
@@ -59,6 +62,10 @@ async def startup_span():
         provider=settings.VECTOR_DB_BACKEND
     )
     await app.vectordb_client.connect()
+    
+    # reranker
+    from stores.vectordb.providers.SentenceTransformerReranker import SentenceTransformerReranker
+    app.reranker = SentenceTransformerReranker()
 
     app.template_parser = TemplateParser(
         language=settings.PRIMARY_LANG,

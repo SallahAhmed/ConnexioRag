@@ -125,6 +125,15 @@ class PGVectorProvider(VectorDBInterface):
                         ')'
                     )
                     await session.execute(create_sql)
+                    
+                    # Create GIN index for full-text search right away
+                    self.logger.info(f"Creating GIN text index for collection: {collection_name}")
+                    text_idx_sql = sql_text(
+                        f"CREATE INDEX IF NOT EXISTS {collection_name}_text_idx ON {collection_name} "
+                        f"USING GIN (to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}))"
+                    )
+                    await session.execute(text_idx_sql)
+                    
                     await session.commit()
             
             return True
@@ -294,3 +303,54 @@ class PGVectorProvider(VectorDBInterface):
                     )
                     for record in records
                 ]
+
+    async def search_by_text(self, collection_name: str, query: str, limit: int):
+        
+        is_collection_existed = await self.is_collection_existed(collection_name=collection_name)
+        if not is_collection_existed:
+            self.logger.error(f"Can not search for records in a non-existed collection: {collection_name}")
+            return False
+            
+        async with self.db_client() as session:
+            async with session.begin():
+                # Using 'simple' config to handle mixed languages without complex stemming
+                search_sql = sql_text(f"""
+                    SELECT {PgVectorTableSchemeEnums.TEXT.value} as text, 
+                           ts_rank(to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}), plainto_tsquery('simple', :query)) as score
+                    FROM {collection_name}
+                    WHERE to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}) @@ plainto_tsquery('simple', :query)
+                    ORDER BY score DESC 
+                    LIMIT {limit}
+                """)
+                
+                result = await session.execute(search_sql, {"query": query})
+                records = result.fetchall()
+
+                return [
+                    RetrievedDocument(
+                        text=record.text,
+                        score=record.score
+                    )
+                    for record in records
+                ]
+
+    async def hybrid_search(self, collection_name: str, query: str, vector: list, limit: int = 10, over_fetch: int = 20):
+        """
+        Fetches results from both vector search and full-text search, combining them via generic deduplication.
+        Pass over_fetch > limit to ensure we have enough unique documents to rerank later.
+        """
+        vector_results = await self.search_by_vector(collection_name, vector, over_fetch) or []
+        text_results = await self.search_by_text(collection_name, query, over_fetch) or []
+        
+        # Combine and deduplicate based on exact text content
+        combined = {}
+        
+        for doc in vector_results:
+            combined[doc.text] = doc
+            
+        for doc in text_results:
+            if doc.text not in combined:
+                combined[doc.text] = doc
+                
+        # Return all unique results to be handled by the reranker step
+        return list(combined.values())
