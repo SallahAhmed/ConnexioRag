@@ -1,6 +1,6 @@
 $kind: http-request
 name: Agentic Chat
-url: "{{api}}/api/v1/nlp/agent/chat"
+url: "{{api}}/api/v1/nlp/agent/chat/1"
 method: POST
 body:
   type: json
@@ -8,11 +8,9 @@ body:
 
     \    \"user_id\": 1,\r
 
-    \    \"project_id\": 2, \r
+    \    \"query\": \"ما هي منصة Connexio وكيف تساعد المطورين؟\",\r
 
-    \    \"query\": \"Hello, how can you help me today?\",\r
-
-    \    \"persona\": \"student\"\r
+    \    \"persona\": \"طالب\"\r
 
     }"
 order: 4344731937616382

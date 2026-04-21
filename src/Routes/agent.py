@@ -1,8 +1,9 @@
 from fastapi import APIRouter, status, Request
+from typing import Optional
 from fastapi.responses import JSONResponse, StreamingResponse
 from .schemas.agent import (
     AgentChatRequest, PortfolioRequest, DocGenRequest, 
-    CoachPathRequest, SupervisorRisksRequest, TaskArchitectRequest
+    TaskArchitectRequest
 )
 from controllers import NLPController
 from models import ResponseSignal
@@ -26,13 +27,13 @@ def get_nlp_controller(request: Request):
         reranker=getattr(request.app, 'reranker', None)
     )
 
-@agent_router.post("/chat")
-async def agent_chat(request: Request, chat_request: AgentChatRequest):
+@agent_router.post("/chat/{project_id}")
+async def agent_chat(request: Request, project_id: int, chat_request: AgentChatRequest):
     try:
         nlp_controller = get_nlp_controller(request)
         result = await nlp_controller.answer_agent_chat(
             user_id=chat_request.user_id,
-            project_id=chat_request.project_id,
+            project_id=project_id,
             query=chat_request.query,
             persona=chat_request.persona,
             session_id=chat_request.session_id,
@@ -51,18 +52,22 @@ async def agent_chat(request: Request, chat_request: AgentChatRequest):
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
         )
 
-@agent_router.post("/chat/stream")
-async def agent_chat_stream(request: Request, chat_request: AgentChatRequest):
+@agent_router.get("/chat/stream/{project_id}")
+async def agent_chat_stream(request: Request, project_id: int, 
+                            query: str, user_id: int, 
+                            persona: Optional[str] = "student", 
+                            session_id: Optional[int] = None, 
+                            limit: Optional[int] = 5):
     try:
         nlp_controller = get_nlp_controller(request)
         return StreamingResponse(
             nlp_controller.answer_agent_chat_stream(
-                user_id=chat_request.user_id,
-                project_id=chat_request.project_id,
-                query=chat_request.query,
-                persona=chat_request.persona,
-                session_id=chat_request.session_id,
-                limit=chat_request.limit
+                user_id=user_id,
+                project_id=project_id,
+                query=query,
+                persona=persona,
+                session_id=session_id,
+                limit=limit
             ),
             media_type="text/event-stream"
         )
@@ -73,8 +78,8 @@ async def agent_chat_stream(request: Request, chat_request: AgentChatRequest):
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
         )
 
-@agent_router.post("/portfolio")
-async def generate_portfolio(request: Request, port_request: PortfolioRequest):
+@agent_router.post("/portfolio/{project_id}")
+async def generate_portfolio(request: Request, project_id: int, port_request: PortfolioRequest):
     try:
         nlp_controller = get_nlp_controller(request)
         portfolio = await nlp_controller.get_user_portfolio(user_id=port_request.user_id)
@@ -90,11 +95,11 @@ async def generate_portfolio(request: Request, port_request: PortfolioRequest):
             content={"signal": ResponseSignal.AGENT_PORTFOLIO_ERROR.value}
         )
 
-@agent_router.post("/supervisor/risks")
-async def supervisor_risks(request: Request, risk_request: SupervisorRisksRequest):
+@agent_router.get("/supervisor/risks/{project_id}")
+async def supervisor_risks(request: Request, project_id: int, supervisor_id: Optional[int] = None):
     try:
         nlp_controller = get_nlp_controller(request)
-        risks = await nlp_controller.get_supervisor_risks(project_id=risk_request.project_id)
+        risks = await nlp_controller.get_supervisor_risks(project_id=project_id)
         return JSONResponse(
             content={
                 "signal": ResponseSignal.AGENT_SUPERVISOR_SUCCESS.value,
@@ -107,11 +112,11 @@ async def supervisor_risks(request: Request, risk_request: SupervisorRisksReques
             content={"signal": ResponseSignal.AGENT_SUPERVISOR_ERROR.value}
         )
 
-@agent_router.post("/coach/path")
-async def coach_path(request: Request, coach_request: CoachPathRequest):
+@agent_router.get("/coach/path/{project_id}")
+async def coach_path(request: Request, project_id: int, user_id: int):
     try:
         nlp_controller = get_nlp_controller(request)
-        path = await nlp_controller.get_coach_path(user_id=coach_request.user_id, project_id=coach_request.project_id)
+        path = await nlp_controller.get_coach_path(user_id=user_id, project_id=project_id)
         return JSONResponse(
             content={
                 "signal": ResponseSignal.AGENT_COACH_SUCCESS.value,
@@ -124,12 +129,12 @@ async def coach_path(request: Request, coach_request: CoachPathRequest):
             content={"signal": ResponseSignal.AGENT_COACH_ERROR.value}
         )
 
-@agent_router.post("/doc-gen")
-async def document_generation(request: Request, doc_request: DocGenRequest):
+@agent_router.post("/doc-gen/{project_id}")
+async def document_generation(request: Request, project_id: int, doc_request: DocGenRequest):
     try:
         nlp_controller = get_nlp_controller(request)
         docs = await nlp_controller.get_doc_gen(
-            project_id=doc_request.project_id, 
+            project_id=project_id, 
             doc_type=doc_request.doc_type
         )
         return JSONResponse(
@@ -144,14 +149,14 @@ async def document_generation(request: Request, doc_request: DocGenRequest):
             content={"signal": ResponseSignal.AGENT_DOCGEN_ERROR.value}
         )
 
-@agent_router.post("/task-architect/plan")
-async def task_architect_plan(request: Request, task_request: TaskArchitectRequest):
+@agent_router.post("/task-architect/plan/{project_id}")
+async def task_architect_plan(request: Request, project_id: int, task_request: TaskArchitectRequest):
     try:
         nlp_controller = get_nlp_controller(request)
         plan = await nlp_controller.get_task_architect_plan(
             query=task_request.query,
             user_id=task_request.user_id,
-            project_id=task_request.project_id
+            project_id=project_id
         )
         return JSONResponse(
             content={

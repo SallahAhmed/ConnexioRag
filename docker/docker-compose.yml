@@ -137,7 +137,7 @@ services:
 
  # RabbitMQ (Message Broker)
   rabbitmq:
-    image: rabbitmq:4.3-rc-management-alpine
+    image: rabbitmq:3.13-management-alpine
     container_name: rabbitmq
     ports:
       - "5672:5672"   # AMQP port

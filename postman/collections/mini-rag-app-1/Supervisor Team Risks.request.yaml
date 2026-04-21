@@ -1,8 +1,8 @@
 $kind: http-request
 name: Supervisor Team Risks
-url: "{{api}}/api/v1/nlp/agent/supervisor/risks"
+url: "{{api}}/api/v1/nlp/agent/supervisor/risks/"
 method: GET
 body:
   type: json
-  content: "{\r\n    \"project_id\": 2\r\n}"
+  content: ""
 order: 4488851416633229

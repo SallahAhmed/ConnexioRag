@@ -16,8 +16,8 @@ nlp_router = APIRouter(
     tags=["api_v1", "nlp"],
 )
 
-@nlp_router.post("/index/push")
-async def index_project(request: Request, push_request: PushRequest):
+@nlp_router.post("/index/push/{project_id}")
+async def index_project(request: Request, project_id: int, push_request: PushRequest):
 
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
@@ -28,7 +28,7 @@ async def index_project(request: Request, push_request: PushRequest):
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=push_request.project_id
+        project_id=project_id
     )
 
     if not project:
@@ -109,15 +109,15 @@ async def index_project(request: Request, push_request: PushRequest):
         }
     )
 
-@nlp_router.post("/index/info")
-async def get_project_index_info(request: Request, search_request: SearchRequest):
+@nlp_router.get("/index/info/{project_id}")
+async def get_project_index_info(request: Request, project_id: int):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=search_request.project_id
+        project_id=project_id
     )
 
     nlp_controller = NLPController(
@@ -138,15 +138,15 @@ async def get_project_index_info(request: Request, search_request: SearchRequest
         }
     )
 
-@nlp_router.post("/index/search")
-async def search_index(request: Request, search_request: SearchRequest):
+@nlp_router.post("/index/search/{project_id}")
+async def search_index(request: Request, project_id: int, search_request: SearchRequest):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=search_request.project_id
+        project_id=project_id
     )
 
     nlp_controller = NLPController(
@@ -177,15 +177,15 @@ async def search_index(request: Request, search_request: SearchRequest):
         }
     )
 
-@nlp_router.post("/index/answer")
-async def answer_rag(request: Request, search_request: SearchRequest):
+@nlp_router.post("/index/answer/{project_id}")
+async def answer_rag(request: Request, project_id: int, search_request: SearchRequest):
     
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
     project = await project_model.get_project_or_create_one(
-        project_id=search_request.project_id
+        project_id=project_id
     )
 
     nlp_controller = NLPController(
@@ -199,7 +199,7 @@ async def answer_rag(request: Request, search_request: SearchRequest):
 
     result = await nlp_controller.answer_agent_chat(
         user_id=1, # Default for legacy RAG endpoint
-        project_id=search_request.project_id,
+        project_id=project_id,
         query=search_request.text,
         limit=search_request.limit,
     )

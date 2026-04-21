@@ -1,12 +1,10 @@
 $kind: http-request
 name: Automated Doc Generation
-url: "{{api}}/api/v1/nlp/agent/doc-gen"
+url: "{{api}}/api/v1/nlp/agent/doc-gen/1"
 method: POST
 body:
   type: json
   content: "{\r
-
-    \    \"project_id\": 2, \r
 
     \    \"doc_type\": \"readme\"\r
 

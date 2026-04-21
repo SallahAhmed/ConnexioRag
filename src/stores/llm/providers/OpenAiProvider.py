@@ -122,6 +122,13 @@ class OpenAIProvider(LLMInterface):
 
         text = [self.process_text(t) for t in text]
 
+        # Handle Nomic specific prefixes if document_type is provided
+        if self.embedding_model_id and "nomic-embed-text" in self.embedding_model_id:
+            if document_type == "query":
+                text = [f"search_query: {t}" for t in text]
+            elif document_type == "document":
+                text = [f"search_document: {t}" for t in text]
+
         if not self.embedding_model_id:
             self.logger.error("Embedding model for OpenAI was not set")
             return None

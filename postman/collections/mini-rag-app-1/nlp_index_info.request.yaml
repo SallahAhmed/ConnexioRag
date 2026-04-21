@@ -1,8 +1,8 @@
 $kind: http-request
 name: nlp_index_info
-url: "{{api}}/api/v1/nlp/index/info"
+url: "{{api}}/api/v1/nlp/index/info/1"
 method: GET
 body:
   type: json
-  content: "{\r\n    \"project_id\": 1\r\n}"
+  content: ""
 order: 2753006356590045

@@ -1,6 +1,6 @@
 $kind: http-request
 name: Generate Portfolio Entry
-url: "{{api}}/api/v1/nlp/agent/portfolio"
+url: "{{api}}/api/v1/nlp/agent/portfolio/1"
 method: POST
 body:
   type: json

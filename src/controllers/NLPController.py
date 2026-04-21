@@ -185,43 +185,54 @@ class NLPController(BaseController):
                 cleaned_text = decomposed_queries_text.strip().replace('```python', '').replace('```', '').strip()
                 parsed = ast.literal_eval(cleaned_text)
                 if isinstance(parsed, list) and len(parsed) > 0:
-                    queries_to_search = parsed[:3]
+                    # Keep the original query and add top 2 decomposed ones
+                    queries_to_search = [query] + parsed[:2]
                     print(f"[AGENT] [{now()}] Queries decomposed into: {queries_to_search}")
             except Exception:
                 pass
         tracer.end_trace(trace_id, step_id, queries_to_search)
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
-        print(f"[AGENT] [{now()}] Searching Knowledge Base...")
+        print(f"[AGENT] [{now()}] Searching Knowledge Base (Parallel)...")
+        
+        # Search all decomposed queries (and the original one) in parallel
+        search_tasks = [
+            self.tool_manager.search_knowledge_base(project_id=project_id, query=q, limit=limit)
+            for q in queries_to_search
+        ]
+        results = await asyncio.gather(*search_tasks)
+        
         kb_results = ""
-        for q in queries_to_search:
-            res = await self.tool_manager.search_knowledge_base(project_id=project_id, query=q, limit=limit)
+        for q, res in zip(queries_to_search, results):
             kb_results += f"\n[Results for: {q}]\n{res}\n"
-        tracer.end_trace(trace_id, step_id, f"Length: {len(kb_results)}")
+        tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
 
         step_id = tracer.start_trace(trace_id, "Relevance Grading")
         print(f"[AGENT] [{now()}] Grading Document Relevance...")
         grade_sys = self.template_parser.get("relevance_grading", "relevance_grader_system_prompt")
         grade_usr = self.template_parser.get("relevance_grading", "relevance_grader_user_prompt", {
-            "query": query, "document": kb_results[:2000]
+            "query": query, "document": kb_results[:6000] # Increased context for grading
         })
         grade_history = [self.generation_client.construct_prompt(prompt=grade_sys, role="system")]
         grade_result = await self.generation_client.generate_text(
             prompt=grade_usr, chat_history=grade_history, max_output_tokens=10
         )
-        grade_result_str = (grade_result or "").upper()
+        grade_result_str = (grade_result or "").strip().upper()
         print(f"[AGENT] [{now()}] Document Grade: {grade_result_str}")
         tracer.end_trace(trace_id, step_id, grade_result_str)
 
-        if "IRRELEVANT" in grade_result_str:
+        # CRAG Logic: Only fallback if strictly IRRELEVANT. 
+        # If RELEVANT or AMBIGUOUS, we trust the internal Knowledge Base.
+        if "IRRELEVANT" in grade_result_str and "RELEVANT" not in grade_result_str:
             step_id = tracer.start_trace(trace_id, "Wikipedia Fallback")
-            print(f"[AGENT] [{now()}] Triggering Fallback Search...")
+            print(f"[AGENT] [{now()}] Knowledge Base judged IRRELEVANT. Triggering Fallback Search...")
             wiki_fb = await self.tool_manager.search_wiki(query, lang=language)
             if wiki_fb:
                 retrieved_context.append(f"--- WIKIPEDIA FALLBACK ---\n{wiki_fb}")
                 sources.append("External Fallback")
             tracer.end_trace(trace_id, step_id, "Completed")
         else:
+            # If relevant or ambiguous, we use the Knowledge Base results
             retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
             sources.append("Documentation")
             
@@ -388,4 +399,4 @@ class NLPController(BaseController):
         # Combines knowledge base search with task resolution logic
         kb_context = await self.tool_manager.search_knowledge_base(project_id, query)
         prompt = f"As a Task Architect, provide a step-by-step resolution plan for: {query}\n\nContext:\n{kb_context}"
-        return self.generation_client.generate_text(prompt=prompt)
+        return await self.generation_client.generate_text(prompt=prompt)
