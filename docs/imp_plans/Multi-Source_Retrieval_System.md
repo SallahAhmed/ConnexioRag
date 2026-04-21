@@ -15,14 +15,14 @@ This plan outlines the architecture and implementation steps to evolve the curre
 ### 1. Workflow Routing Layer
 We will implement a `WorkflowController` that classifies user intent into the nodes requested: `ONBOARDING`, `TEAM_FORMATION`, `PHASE_TRANSITION`, `BLOCKER`, `MILESTONE_WARNING`, or `GENERAL`.
 
-#### [NEW] [WorkflowController.py](file:///c:/Users/salla/mini-rag-app/src/controllers/WorkflowController.py)
+#### [NEW] WorkflowController.py
 - Logic to detect the workflow node using a lightweight LLM call or keyword matching.
 - Maps each node to a specific retrieval strategy.
 
 ### 2. Multi-Source Retrieval (Tools)
 We will introduce a `ToolManager` that wraps various data sources.
 
-#### [NEW] [ToolManager.py](file:///c:/Users/salla/mini-rag-app/src/controllers/helpers/ToolManager.py)
+#### [NEW] ToolManager.py
 - **SQL Tool**: Uses `langchain_community.utilities.SQLDatabase` to connect to the existing PostgreSQL instance. Converts English to SQL.
 - **Wikipedia Tool**: Integrates `langchain_community.tools.WikipediaQueryRun`.
 - **Knowledge Tool**: Wraps the existing `search_vector_db_collection` logic.
@@ -30,7 +30,7 @@ We will introduce a `ToolManager` that wraps various data sources.
 ### 3. Controller Updates
 Modify `NLPController` to move from a single-source RAG to a multi-source "Grounded Response" system.
 
-#### [MODIFY] [NLPController.py](file:///c:/Users/salla/mini-rag-app/src/controllers/NLPController.py)
+#### [MODIFY] NLPController.py
 - Update `answer_rag_question` to:
     1. Call the `WorkflowRouter`.
     2. Depending on the node/query, trigger the relevant tools from `ToolManager`.
@@ -40,19 +40,17 @@ Modify `NLPController` to move from a single-source RAG to a multi-source "Groun
 ### 4. Prompt Templates
 Update the template system to handle different nodes.
 
-#### [MODIFY] [templates.json](file:///c:/Users/salla/mini-rag-app/src/stores/llm/templates/templates.json)
+#### [MODIFY] templates.json
 - Add node-specific system prompts.
 - Add "Persona" instructions (Student vs Early-career) as requested in v2.
 
-## Final Architectural Constraints (User Approved)
+## Open Questions
 
 > [!IMPORTANT]
-> **Read-Only Advisor Policy**: The RAG Agent is strictly an **Advisor**. It has **Read Access** to Chat, GitHub, and Gamification data to provide insights and advice, but it is **EXTREMELY FORBIDDEN** from executing actions (commits, task assignments, point awarding, etc. are NOT allowed).
+> For the **Text-to-SQL** part: Do you have a specific list of "Admin" tables or "Business" tables that the model should *not* see? Currently, I plan to expose `projects`, `data_chunks`, and `assets`.
 
-*   **Chat Integration**: Included (Read-only).
-*   **GitHub Access**: Included (Read-only).
-*   **Gamification**: Read-only access to user points for advice.
-*   **Action Execution**: Zero-tolerance policy on agent-executed actions.
+> [!NOTE]
+> Which LLM model do you want to use for the "Workflow Node Detection"? I recommend the same one used for generation, or a faster one if available.
 
 ## Verification Plan
 

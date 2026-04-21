@@ -4,5 +4,5 @@ url: "{{api}}/api/v1/nlp/index/info"
 method: GET
 body:
   type: json
-  content: "{\r\n    \"project_id\": 2\r\n}"
+  content: "{\r\n    \"project_id\": 1\r\n}"
 order: 2753006356590045

@@ -39,4 +39,6 @@ class ResponseSignal(Enum):
     AGENT_MATCHING_ERROR = "agent_matching_rationale_error"
     AGENT_ARCHITECT_SUCCESS = "agent_task_architect_success"
     AGENT_ARCHITECT_ERROR = "agent_task_architect_error"
+    AGENT_TASK_DISPATCH_SUCCESS = "agent_task_dispatch_success"
+    AGENT_TASK_DISPATCH_ERROR = "agent_task_dispatch_error"
     

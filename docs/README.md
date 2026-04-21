@@ -1,5 +1,8 @@
 # Local Setup & Testing Guide
 
+> [!TIP]
+> **View Project History**: A chronological list of all implementation plans, tasks, and walkthroughs can be found in the [**Documentation Index**](file:///c:/Users/salla/mini-rag-app/docs/INDEX.md).
+
 This guide provides steps to run and test the application locally using Docker, Ollama, and FastAPI.
 
 ## 1. Prerequisites
