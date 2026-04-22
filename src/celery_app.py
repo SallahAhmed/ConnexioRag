@@ -51,7 +51,10 @@ celery_app = Celery(
     broker=settings.CELERY_BROKER_URL,
     backend=settings.CELERY_RESULT_BACKEND,
     include=[
-        "tasks.file_processing"
+        "tasks.file_processing",
+        "tasks.data_indexing",
+        "tasks.process_workflow",
+        "tasks.maintenance"
     ]
 )
 
@@ -82,13 +85,27 @@ celery_app.conf.update(
     broker_connection_max_retries=10,
     worker_cancel_long_running_tasks_on_connection_loss=True,
 
-    # Disable remote control and events to bypass RabbitMQ transient queue errors
-    worker_enable_remote_control=False,
-    worker_send_task_events=False,
+    # Enable remote control and events for monitoring (e.g. Flower)
+    # Ensure RabbitMQ allows transient non-exclusive queues if using version 3.13+
+    worker_enable_remote_control=True,
+    worker_send_task_events=True,
 
     task_routes={
-        "tasks.file_processing.process_project_files": {"queue": "file_processing"}
-    }
+        "tasks.file_processing.process_project_files": {"queue": "file_processing"},
+        "tasks.data_indexing.index_data_content": {"queue": "data_indexing"},
+        "tasks.process_workflow.process_and_push_workflow": {"queue": "file_processing"},
+        "tasks.maintenance.clean_celery_executions_table": {"queue": "default"},
+     },
+
+    beat_schedule={
+        'cleanup-old-task-records': {
+            'task': "tasks.maintenance.clean_celery_executions_table",
+            'schedule': 86400, #1 day
+            'args': ()
+        }
+    },
+
+    timezone='UTC',
 
 )
 

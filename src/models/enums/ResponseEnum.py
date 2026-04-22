@@ -24,6 +24,9 @@ class ResponseSignal(Enum):
     VECTORDB_CLIENT_ERROR = "vector_db_client_error"
     TEMPLATE_PARSER_ERROR = "template_parser_error"
 
+
+    
+
     # ============ Agent V2 Signals ============
     AGENT_CHAT_SUCCESS = "agent_chat_success"
     AGENT_CHAT_ERROR = "agent_chat_error"
@@ -41,4 +44,11 @@ class ResponseSignal(Enum):
     AGENT_ARCHITECT_ERROR = "agent_task_architect_error"
     AGENT_TASK_DISPATCH_SUCCESS = "agent_task_dispatch_success"
     AGENT_TASK_DISPATCH_ERROR = "agent_task_dispatch_error"
+    DATA_INDEXING_STARTED = "data_indexing_started"
+    DATA_INDEXING_ERROR = "data_indexing_error"
+    DATA_INDEXING_SUCCESS = "data_indexing_success"
+    DATA_INDEXING_PROGRESS = "data_indexing_progress"
+
+    PROCESS_AND_PUSH_WORKFLOW_READY = "process_and_push_workflow_ready"
+    NO_FILES_ERROR = "no_files_error"
     
