@@ -1,6 +1,6 @@
 $kind: http-request
 name: process
-url: "{{api}}/api/v1/data/process/1"
+url: "{{api}}/api/v1/data/process/6"
 method: POST
 body:
   type: json
@@ -8,9 +8,9 @@ body:
 
     \    // \"file_id\": \"all\",\r
 
-    \    \"chunk_size\": 300,\r
+    \    \"chunk_size\": 400,\r
 
-    \    \"overlap_size\": 20,\r
+    \    \"overlap_size\": 30,\r
 
     \    \"do_reset\": 1\r
 

@@ -1,6 +1,6 @@
 $kind: http-request
 name: nlp_index_push
-url: "{{api}}/api/v1/nlp/index/push/5"
+url: "{{api}}/api/v1/nlp/index/push/10"
 method: POST
 body:
   type: json

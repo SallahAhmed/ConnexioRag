@@ -109,22 +109,12 @@ class ToolManager:
             
             query_vector = vectors[0]
 
-            # Perform Hybrid Search (fetches more results to rerank)
-            if hasattr(self.vectordb_client, "hybrid_search"):
-                results = await self.vectordb_client.hybrid_search(
-                    collection_name=collection_name,
-                    query=query,
-                    vector=query_vector,
-                    limit=limit,
-                    over_fetch=limit * 3
-                )
-            else:
-                # Fallback to standard vector search
-                results = await self.vectordb_client.search_by_vector(
-                    collection_name=collection_name,
-                    vector=query_vector,
-                    limit=limit * 3
-                )
+            # Fallback to standard vector search (Direct Vector Search is more reliable for this setup)
+            results = await self.vectordb_client.search_by_vector(
+                collection_name=collection_name,
+                vector=query_vector,
+                limit=limit
+            )
 
             if not results:
                 return "No relevant documents found in the knowledge base."

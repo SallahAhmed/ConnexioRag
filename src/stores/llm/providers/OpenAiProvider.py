@@ -61,18 +61,24 @@ class OpenAIProvider(LLMInterface):
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
-        response = await self.client.chat.completions.create(
-            model = self.generation_model_id,
-            messages = local_history,
-            max_tokens = max_output_tokens,
-            temperature = temperature
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model = self.generation_model_id,
+                messages = local_history,
+                max_tokens = max_output_tokens,
+                temperature = temperature
+            )
+            
+            if not response or not response.choices:
+                print("DEBUG: Ollama returned an empty response object!")
+                return ""
 
-        if not response or not response.choices or len(response.choices) == 0 or not response.choices[0].message:
-            self.logger.error("Error while generating text with OpenAI")
-            return None
-
-        return response.choices[0].message.content
+            answer = response.choices[0].message.content
+            return answer if answer else ""
+            
+        except Exception as e:
+            print(f"DEBUG: OpenAIProvider Error: {str(e)}")
+            return f"Error during generation: {str(e)}"
         
     async def generate_text_stream(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
@@ -96,20 +102,21 @@ class OpenAIProvider(LLMInterface):
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
-        response = await self.client.chat.completions.create(
-            model = self.generation_model_id,
-            messages = local_history,
-            max_tokens = max_output_tokens,
-            temperature = temperature,
-            stream=True
-        )
+        try:
+            response = await self.client.chat.completions.create(
+                model = self.generation_model_id,
+                messages = local_history,
+                max_tokens = max_output_tokens,
+                temperature = temperature,
+                stream=True
+            )
 
-        async for chunk in response:
-            if chunk.choices and len(chunk.choices) > 0:
-                delta = chunk.choices[0].delta.content
-                if delta:
-                    yield delta
-
+            async for chunk in response:
+                if chunk.choices and chunk.choices[0].delta.content:
+                    yield chunk.choices[0].delta.content
+        except Exception as e:
+            print(f"DEBUG: OpenAIProvider Streaming Error: {str(e)}")
+            yield f"Error: {str(e)}"
 
     async def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         

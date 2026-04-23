@@ -191,45 +191,12 @@ class NLPController(BaseController):
         tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
 
         # --- Relevance Grading Disabled for Speed ---
-        # step_id = tracer.start_trace(trace_id, "Relevance Grading")
-        # ... (logic omitted)
-        # tracer.end_trace(trace_id, step_id, grade_result_str)
-
-        # We directly use the Knowledge Base results
-        retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
+        # We directly use the local Knowledge Base results (the documents you uploaded)
+        retrieved_context.append(kb_results)
         sources.append("Documentation")
-            
-        self.template_parser.set_language(language)
-
-        lower_query = query.lower()
-        if "why was i matched" in lower_query or "recommendation" in lower_query:
-            step_id = tracer.start_trace(trace_id, "Matching Rationale Tool")
-            match_rationale = await self.tool_manager.get_matching_rationale(user_id, project_id)
-            retrieved_context.append(f"--- MATCHING RATIONALE ---\n{match_rationale}")
-            sources.append("Matching Algorithm")
-            tracer.end_trace(trace_id, step_id, "Completed")
         
-        if "role" in lower_query or "what should i do" in lower_query:
-            step_id = tracer.start_trace(trace_id, "Team Gaps Tool")
-            role_gaps = await self.tool_manager.get_team_gaps(project_id)
-            retrieved_context.append(f"--- ROLE ANALYSIS ---\n{role_gaps}")
-            sources.append("Project Structure")
-            tracer.end_trace(trace_id, step_id, "Completed")
-
-        if node in [WorkflowNodeEnum.MILESTONE_WARNING, WorkflowNodeEnum.BLOCKER]:
-            step_id = tracer.start_trace(trace_id, "Project Risk Assessment")
-            risks = await self.tool_manager.get_project_risks(project_id)
-            retrieved_context.append(f"--- PROJECT RISKS ---\n{risks}")
-            sources.append("Project Metrics")
-            tracer.end_trace(trace_id, step_id, "Completed")
-
-        if node == WorkflowNodeEnum.GENERAL and len(retrieved_context) < 2:
-            step_id = tracer.start_trace(trace_id, "Wikipedia Jargon Search")
-            wiki = await self.tool_manager.search_wiki(query, lang=language)
-            if wiki:
-                retrieved_context.append(f"--- WIKIPEDIA ---\n{wiki}")
-                sources.append("General Research")
-            tracer.end_trace(trace_id, step_id, "Completed")
+        # Strictly local document retrieval
+        self.template_parser.set_language(language)
 
         system_prompt = self.template_parser.get("rag", "system_prompt", {
             "persona": persona,
@@ -238,11 +205,15 @@ class NLPController(BaseController):
         
         total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
         if language == "ar":
-            total_budget = 6000
+            total_budget = 2000 # Reduced for local model stability
         
         context_string = "\n\n".join(retrieved_context)
         max_context_chars = int(total_budget * 0.5)
         context_string = context_string[:max_context_chars]
+
+        print(f"DEBUG: Retrieved Context Length: {len(context_string)} chars")
+        if len(context_string) == 0:
+            print("WARNING: NO CONTEXT RETRIEVED FROM DATABASE!")
 
         footer_prompt = self.template_parser.get("rag", "footer_prompt", {
             "query": query,
@@ -267,9 +238,9 @@ class NLPController(BaseController):
         
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": False})
 
+
         # Step 6: Generate & Persist
         answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
-        tracer.end_trace(trace_id, step_id, answer)
 
         if self.db_client:
             await self.session_model.append_message(session_id, "user", query, node.value)

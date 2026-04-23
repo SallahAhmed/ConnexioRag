@@ -1,12 +1,12 @@
 $kind: http-request
 name: nlp_index_search
-url: "{{api}}/api/v1/nlp/index/search/6"
+url: "{{api}}/api/v1/nlp/index/search/10"
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"text\": \"What is the highest mountain peak in the Eastern Desert and what is its elevation?\",\r
+    \    \"text\": \"اذكر السهول الثلاثة الفسيحة التي تتصل بسلسلتي جبال لبنان، ومع أي مدينة تنتهي هذه السهول جنوباً؟\",\r
 
     \    \"limit\": 5\r
 

@@ -11,7 +11,11 @@ Start only the essential database and broker services.
 
 ```powershell
 # From the project root
-docker compose -f docker/docker-compose.yml up -d pgvector rabbitmq redis
+docker compose up -d pgvector rabbitmq redis
+```
+
+```powershell
+conda activate mini-rag-app
 ```
 
 ## Phase 2: Local AI (Ollama)
