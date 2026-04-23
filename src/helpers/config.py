@@ -35,6 +35,7 @@ class Settings(BaseSettings):
 
     GENERATION_MODEL_ID_LITERAL: List[str] | None = None
     GENERATION_MODEL_ID: str | None = None
+    UTILITY_MODEL_ID: str | None = "qwen:0.5b"
     EMBEDDING_MODEL_ID: str | None = None
     EMBEDDING_MODEL_SIZE: int | None = None
     INPUT_DEFAULT_MAX_CHARACTERS: int | None = None

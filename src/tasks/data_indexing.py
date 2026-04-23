@@ -31,7 +31,7 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
 
         (db_engine, db_client, llm_provider_factory, 
         vectordb_provider_factory,
-        generation_client, embedding_client,
+        generation_client, utility_client, embedding_client,
         vectordb_client, template_parser) = await get_setup_utils()
 
         logger.warning("Setup utils were loaded!")
@@ -62,6 +62,7 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
         nlp_controller = NLPController(
             vectordb_client=vectordb_client,
             generation_client=generation_client,
+            utility_client=utility_client,
             embedding_client=embedding_client,
             template_parser=template_parser,
         )

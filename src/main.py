@@ -55,6 +55,13 @@ async def startup_span():
     )
     app.generation_client.set_generation_model(model_id=settings.GENERATION_MODEL_ID)
 
+    # --- Utility Client Setup (Fast model for agentic tasks) ---
+    app.utility_client = llm_provider_factory.create(
+        provider=settings.GENERATION_BACKEND,
+        api_url=settings.OPENAI_GENERATION_API_URL
+    )
+    app.utility_client.set_generation_model(model_id=settings.UTILITY_MODEL_ID)
+
     # --- Embedding Client Setup ---
     app.embedding_client = llm_provider_factory.create(
         provider=settings.EMBEDDING_BACKEND,

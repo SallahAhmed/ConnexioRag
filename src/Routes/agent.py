@@ -20,6 +20,7 @@ def get_nlp_controller(request: Request):
     return NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
+        utility_client=request.app.utility_client,
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=getattr(request.app, 'settings', None),

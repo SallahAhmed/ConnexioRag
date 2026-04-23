@@ -29,6 +29,13 @@ async def get_setup_utils():
     )
     generation_client.set_generation_model(model_id = settings.GENERATION_MODEL_ID)
 
+    # utility client
+    utility_client = llm_provider_factory.create(
+        provider=settings.GENERATION_BACKEND,
+        api_url=settings.OPENAI_GENERATION_API_URL
+    )
+    utility_client.set_generation_model(model_id=settings.UTILITY_MODEL_ID)
+
     # embedding client
     embedding_client = llm_provider_factory.create(
         provider=settings.EMBEDDING_BACKEND,
@@ -49,7 +56,7 @@ async def get_setup_utils():
     )
 
     return (db_engine, db_client, llm_provider_factory, vectordb_provider_factory,
-            generation_client, embedding_client, vectordb_client, template_parser)
+            generation_client, utility_client, embedding_client, vectordb_client, template_parser)
 
 # Create Celery application instance
 celery_app = Celery(

@@ -15,11 +15,12 @@ from .helpers.TraceManager import tracer
 class NLPController(BaseController):
 
     def __init__(self, vectordb_client, generation_client, 
-                 embedding_client, template_parser, settings=None, db_client=None, reranker=None):
+                 embedding_client, template_parser, utility_client=None, settings=None, db_client=None, reranker=None):
         super().__init__()
 
         self.vectordb_client = vectordb_client
         self.generation_client = generation_client
+        self.utility_client = utility_client if utility_client else generation_client
         self.embedding_client = embedding_client
         self.template_parser = template_parser
         self.settings = settings
@@ -28,7 +29,7 @@ class NLPController(BaseController):
 
         # Initialize Controllers
         self.workflow_controller = WorkflowController(
-            generation_client=self.generation_client,
+            generation_client=self.utility_client,
             template_parser=self.template_parser
         )
 
@@ -162,35 +163,17 @@ class NLPController(BaseController):
             history = []
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
-        # Step 3: Multi-Source Retrieval (With Query Decomposition & CRAG)
+        # Step 3: Multi-Source Retrieval (Simplified for Speed)
         retrieved_context = []
         sources = []
 
-        step_id = tracer.start_trace(trace_id, "Query Decomposition")
-        print(f"[AGENT] [{now()}] Decomposing Query (Internal Logic)...")
-        self.template_parser.set_language("en")
-        
-        decompose_sys = self.template_parser.get("relevance_grading", "decompose_query_system_prompt")
-        decompose_usr = self.template_parser.get("relevance_grading", "decompose_query_user_prompt", {"query": query})
-        decompose_history = [self.generation_client.construct_prompt(prompt=decompose_sys, role="system")]
-        
-        decomposed_queries_text = await self.generation_client.generate_text(
-            prompt=decompose_usr, chat_history=decompose_history, max_output_tokens=100
-        )
+        # --- Query Decomposition Disabled for Speed ---
+        # step_id = tracer.start_trace(trace_id, "Query Decomposition")
+        # print(f"[AGENT] [{now()}] Decomposing Query (Internal Logic)...")
+        # ... (logic omitted)
+        # tracer.end_trace(trace_id, step_id, queries_to_search)
         
         queries_to_search = [query]
-        if decomposed_queries_text:
-            try:
-                import ast
-                cleaned_text = decomposed_queries_text.strip().replace('```python', '').replace('```', '').strip()
-                parsed = ast.literal_eval(cleaned_text)
-                if isinstance(parsed, list) and len(parsed) > 0:
-                    # Keep the original query and add top 2 decomposed ones
-                    queries_to_search = [query] + parsed[:2]
-                    print(f"[AGENT] [{now()}] Queries decomposed into: {queries_to_search}")
-            except Exception:
-                pass
-        tracer.end_trace(trace_id, step_id, queries_to_search)
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
         print(f"[AGENT] [{now()}] Searching Knowledge Base (Parallel)...")
@@ -207,34 +190,14 @@ class NLPController(BaseController):
             kb_results += f"\n[Results for: {q}]\n{res}\n"
         tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
 
-        step_id = tracer.start_trace(trace_id, "Relevance Grading")
-        print(f"[AGENT] [{now()}] Grading Document Relevance...")
-        grade_sys = self.template_parser.get("relevance_grading", "relevance_grader_system_prompt")
-        grade_usr = self.template_parser.get("relevance_grading", "relevance_grader_user_prompt", {
-            "query": query, "document": kb_results[:6000] # Increased context for grading
-        })
-        grade_history = [self.generation_client.construct_prompt(prompt=grade_sys, role="system")]
-        grade_result = await self.generation_client.generate_text(
-            prompt=grade_usr, chat_history=grade_history, max_output_tokens=10
-        )
-        grade_result_str = (grade_result or "").strip().upper()
-        print(f"[AGENT] [{now()}] Document Grade: {grade_result_str}")
-        tracer.end_trace(trace_id, step_id, grade_result_str)
+        # --- Relevance Grading Disabled for Speed ---
+        # step_id = tracer.start_trace(trace_id, "Relevance Grading")
+        # ... (logic omitted)
+        # tracer.end_trace(trace_id, step_id, grade_result_str)
 
-        # CRAG Logic: Only fallback if strictly IRRELEVANT. 
-        # If RELEVANT or AMBIGUOUS, we trust the internal Knowledge Base.
-        if "IRRELEVANT" in grade_result_str and "RELEVANT" not in grade_result_str:
-            step_id = tracer.start_trace(trace_id, "Wikipedia Fallback")
-            print(f"[AGENT] [{now()}] Knowledge Base judged IRRELEVANT. Triggering Fallback Search...")
-            wiki_fb = await self.tool_manager.search_wiki(query, lang=language)
-            if wiki_fb:
-                retrieved_context.append(f"--- WIKIPEDIA FALLBACK ---\n{wiki_fb}")
-                sources.append("External Fallback")
-            tracer.end_trace(trace_id, step_id, "Completed")
-        else:
-            # If relevant or ambiguous, we use the Knowledge Base results
-            retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
-            sources.append("Documentation")
+        # We directly use the Knowledge Base results
+        retrieved_context.append(f"--- KNOWLEDGE BASE ---\n{kb_results}")
+        sources.append("Documentation")
             
         self.template_parser.set_language(language)
 

@@ -45,6 +45,7 @@ async def get_project_index_info(request: Request, project_id: int):
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
+        utility_client=request.app.utility_client,
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
@@ -74,6 +75,7 @@ async def search_index(request: Request, project_id: int, search_request: Search
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
+        utility_client=request.app.utility_client,
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
@@ -113,6 +115,7 @@ async def answer_rag(request: Request, project_id: int, search_request: SearchRe
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
+        utility_client=request.app.utility_client,
         embedding_client=request.app.embedding_client,
         template_parser=request.app.template_parser,
         settings=request.app.settings,
