@@ -1,12 +1,12 @@
 $kind: http-request
 name: nlp_index_search
-url: "{{api}}/api/v1/nlp/index/search/1"
+url: "{{api}}/api/v1/nlp/index/search/6"
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"text\": \"ما هو معني كلمة لبنان؟\",\r
+    \    \"text\": \"What is the highest mountain peak in the Eastern Desert and what is its elevation?\",\r
 
     \    \"limit\": 5\r
 

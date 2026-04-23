@@ -5,8 +5,12 @@ workspace:
 localResources:
   collections:
     - ..\src\assets\response.json
+    - ..\src\postman\collections\Connexio_Agent_V2.postman_collection.json
   environments:
     - ..\src\postman\environments\local.environment.yaml
+
+# Each entry here maps a local resource to one or more corresponding objects in Postman Cloud
+
 cloudResources:
   collections:
     ..\postman\collections\mini-rag-app: ce321771-1c87-4071-8c37-b6eded1e6d7f

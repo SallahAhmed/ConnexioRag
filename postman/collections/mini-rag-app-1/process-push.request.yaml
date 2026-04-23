@@ -1,18 +1,16 @@
 $kind: http-request
-name: process
-url: "{{api}}/api/v1/data/process/1"
+name: process-push
+url: "{{api}}/api/v1/data/process-push/1"
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    // \"file_id\": \"all\",\r
-
-    \    \"chunk_size\": 300,\r
+    \    \"chunk_size\": 400,\r
 
     \    \"overlap_size\": 20,\r
 
     \    \"do_reset\": 1\r
 
     }"
-order: 5000
+order: 4503237577969679

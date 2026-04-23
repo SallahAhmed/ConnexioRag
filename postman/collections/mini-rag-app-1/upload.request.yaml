@@ -1,6 +1,6 @@
 $kind: http-request
 name: upload
-url: "{{api}}/api/v1/data/upload/1"
+url: "{{api}}/api/v1/data/upload/6"
 method: POST
 body:
   type: formdata
@@ -8,7 +8,7 @@ body:
     - type: file
       key: file
       src:
-        - /C:/Users/salla/Downloads/لبنان-سوريا.txt
+        - /C:/Users/salla/Downloads/eastern_desert.txt
       description: ""
       disabled: false
 order: 4000

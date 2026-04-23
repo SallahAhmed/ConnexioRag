@@ -10,6 +10,9 @@ from models.enums.AssetTypeEnum import AssetTypeEnum
 from controllers import ProcessController
 from controllers import NLPController
 from utils.idempotency_manager import IdempotencyManager
+from tqdm.auto import tqdm
+import sys
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -190,8 +193,11 @@ async def _process_project_files(task_instance, project_id: int,
             _ = await chunk_model.delete_chunks_by_project_id(
                 project_id=project.project_id
             )
+        
+        pbar = tqdm(total=len(project_files_ids), desc="Processing Files", file=sys.stdout)
 
         for asset_id, file_id in project_files_ids.items():
+
 
             file_content = process_controller.get_file_content(file_id=file_id)
 
@@ -224,6 +230,9 @@ async def _process_project_files(task_instance, project_id: int,
 
             no_records += await chunk_model.insert_many_chunks(chunks=file_chunks_records)
             no_files += 1
+            pbar.update(1)
+        
+        pbar.close()
 
         task_instance.update_state(
             state="SUCCESS",

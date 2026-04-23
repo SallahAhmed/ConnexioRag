@@ -5,6 +5,8 @@ from models.ChunkModel import ChunkModel
 from controllers import NLPController
 from models import ResponseSignal
 from tqdm.auto import tqdm
+import sys
+
 
 import logging
 logger = logging.getLogger(__name__)
@@ -80,7 +82,8 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
 
         # setup batching
         total_chunks_count = await chunk_model.get_total_chunks_count(project_id=project.project_id)
-        pbar = tqdm(total=total_chunks_count, desc="Vector Indexing", position=0)
+        pbar = tqdm(total=total_chunks_count, desc="Vector Indexing", position=0, file=sys.stdout, dynamic_ncols=True)
+
 
         while has_records:
             page_chunks = await chunk_model.get_poject_chunks(project_id=project.project_id, page_no=page_no)
@@ -114,6 +117,8 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
 
             pbar.update(len(page_chunks))
             inserted_items_count += len(page_chunks)
+        
+        pbar.close()
         
 
         task_instance.update_state(
