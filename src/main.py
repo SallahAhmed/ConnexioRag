@@ -34,7 +34,7 @@ async def startup_span():
     try:
         async with app.db_engine.begin() as conn:
             print("[AGENT] Initializing database tables...")
-            await asyncio.wait_for(conn.run_sync(SQLAlchemyBase.metadata.create_all), timeout=5.0)
+            await asyncio.wait_for(conn.run_sync(SQLAlchemyBase.metadata.create_all), timeout=30.0)
             print("[AGENT] Database tables initialized or already exist.")
     except Exception as e:
         print(f"[AGENT] Skipping database auto-initialization: {str(e)}")
@@ -67,8 +67,20 @@ async def startup_span():
     app.vectordb_client = vectordb_provider_factory.create(
         provider=settings.VECTOR_DB_BACKEND
     )
-    await app.vectordb_client.connect()
+    try:
+        print("[AGENT] Connecting to Vector Database...")
+        await asyncio.wait_for(app.vectordb_client.connect(), timeout=30.0)
+        print("[AGENT] Vector Database connected.")
+    except Exception as e:
+        print(f"[AGENT] Skipping Vector DB connection: {str(e)}")
     
+
+    # --- Reranker Setup (Disabled to remove sentence-transformers dependency) ---
+    # from stores.vectordb.providers.SentenceTransformerReranker import SentenceTransformerReranker
+    # app.reranker = SentenceTransformerReranker()
+    app.reranker = None
+
+
     # --- Template Parser Setup ---
     app.template_parser = TemplateParser(
         language=settings.PRIMARY_LANG,
