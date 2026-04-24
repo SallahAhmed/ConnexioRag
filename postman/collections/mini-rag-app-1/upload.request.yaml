@@ -1,6 +1,6 @@
 $kind: http-request
 name: upload
-url: "{{api}}/api/v1/data/upload/6"
+url: "{{api}}/api/v1/data/upload/1"
 method: POST
 body:
   type: formdata

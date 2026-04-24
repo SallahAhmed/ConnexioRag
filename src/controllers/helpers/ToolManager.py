@@ -109,12 +109,22 @@ class ToolManager:
             
             query_vector = vectors[0]
 
-            # Fallback to standard vector search (Direct Vector Search is more reliable for this setup)
-            results = await self.vectordb_client.search_by_vector(
-                collection_name=collection_name,
-                vector=query_vector,
-                limit=limit
-            )
+            # Perform Hybrid Search with RRF Ranking
+            try:
+                results = await self.vectordb_client.hybrid_search(
+                    collection_name=collection_name,
+                    query=query,
+                    vector=query_vector,
+                    limit=limit
+                )
+            except Exception as e:
+                self.logger.warning(f"Hybrid search failed, falling back to vector search: {str(e)}")
+                # Fallback to standard vector search (The "Brilliant" search safety net)
+                results = await self.vectordb_client.search_by_vector(
+                    collection_name=collection_name,
+                    vector=query_vector,
+                    limit=limit
+                )
 
             if not results:
                 return "No relevant documents found in the knowledge base."

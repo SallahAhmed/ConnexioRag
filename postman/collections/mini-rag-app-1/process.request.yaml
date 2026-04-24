@@ -1,6 +1,6 @@
 $kind: http-request
 name: process
-url: "{{api}}/api/v1/data/process/6"
+url: "{{api}}/api/v1/data/process/1"
 method: POST
 body:
   type: json

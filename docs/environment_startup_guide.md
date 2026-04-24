@@ -80,7 +80,7 @@ Once all four terminal windows are running without errors, you are fully set up.
 2. Make sure your base URL or host variables are pointing to the correct address (e.g., `127.0.0.1:8080` for your FastAPI endpoints).
 3. You can now execute your requests (e.g., uploading files, pushing to the index, or asking the agent a question) and everything will route correctly through the API, to Celery, and to Ollama!
 
-### if you wanna add a table on the database and you already added it to the models, you have to write the following commands in your terminal(wsl) using alembic in the following project root directory: /mnt/c/Users/salla/Connexio/src
+### if you wanna add a table on the database and you already added it to the models, you have to write the following commands in your terminal(wsl) using alembic in the following project path: /mnt/c/Users/salla/Connexios/src
 
 ```bash
 alembic revision --autogenerate -m "add table X"

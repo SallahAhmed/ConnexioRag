@@ -23,7 +23,7 @@ conda activate mini-rag-app
 Ensure the required models are pulled and ready.
 
 ```powershell
-ollama pull gemma4:e2b
+ollama pull qwen:4b
 ollama pull bge-m3
 ollama pull qwen:0.5b
 ```
@@ -66,14 +66,16 @@ Follow this sequence exactly to verify the system:
 
 - **Endpoint:** `POST /api/v1/data/process/1`
 - **Body:**
-  ```json
-  {
+
+```json
+{
     "file_id": "YOUR_FILE_ID",
     "chunk_size": 512,
     "overlap_size": 50,
     "do_reset": 1
-  }
-  ```
+}
+```
+
 - **Verify:** Look for the "Processing Files" bar in the Celery terminal.
 
 ### 3. Index Push (Vectorizing)

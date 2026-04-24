@@ -199,10 +199,14 @@ async def _process_project_files(task_instance, project_id: int,
         for asset_id, file_id in project_files_ids.items():
 
 
-            file_content = process_controller.get_file_content(file_id=file_id)
-
-            if file_content is None:
-                logger.error(f"Error while processing file: {file_id}")
+            try:
+                file_content = process_controller.get_file_content(file_id=file_id)
+            except FileNotFoundError:
+                logger.error(f"File not found on disk: {file_id}. Removing record from database.")
+                await asset_model.delete_asset_by_id(asset_id=asset_id)
+                continue
+            except Exception as e:
+                logger.error(f"Error while processing file: {file_id}. {str(e)}")
                 continue
 
             file_chunks = process_controller.process_file_content(

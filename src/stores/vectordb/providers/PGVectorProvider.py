@@ -114,6 +114,10 @@ class PGVectorProvider(VectorDBInterface):
             self.logger.info(f"Creating collection: {collection_name}")
             async with self.db_client() as session:
                 async with session.begin():
+                    # Ensure extensions are available
+                    await session.execute(sql_text("CREATE EXTENSION IF NOT EXISTS vector"))
+                    await session.execute(sql_text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+
                     create_sql = sql_text(
                         f'CREATE TABLE {collection_name} ('
                             f'{PgVectorTableSchemeEnums.ID.value} bigserial PRIMARY KEY,'
@@ -126,11 +130,19 @@ class PGVectorProvider(VectorDBInterface):
                     )
                     await session.execute(create_sql)
                     
-                    # Create GIN index for full-text search right away
-                    self.logger.info(f"Creating GIN text index for collection: {collection_name}")
+                    # Create HNSW index for high-speed vector search
+                    self.logger.info(f"Creating HNSW vector index for collection: {collection_name}")
+                    vector_idx_sql = sql_text(
+                        f"CREATE INDEX IF NOT EXISTS {collection_name}_vector_idx ON {collection_name} "
+                        f"USING hnsw ({PgVectorTableSchemeEnums.VECTOR.value} vector_cosine_ops)"
+                    )
+                    await session.execute(vector_idx_sql)
+
+                    # Create GIN index for smart text/keyword search (using Trigrams for Arabic support)
+                    self.logger.info(f"Creating GIN trigram index for collection: {collection_name}")
                     text_idx_sql = sql_text(
-                        f"CREATE INDEX IF NOT EXISTS {collection_name}_text_idx ON {collection_name} "
-                        f"USING GIN (to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}))"
+                        f"CREATE INDEX IF NOT EXISTS {collection_name}_text_trgm_idx ON {collection_name} "
+                        f"USING GIN ({PgVectorTableSchemeEnums.TEXT.value} gin_trgm_ops)"
                     )
                     await session.execute(text_idx_sql)
                     
@@ -313,12 +325,12 @@ class PGVectorProvider(VectorDBInterface):
             
         async with self.db_client() as session:
             async with session.begin():
-                # Using 'simple' config to handle mixed languages without complex stemming
+                # Using pg_trgm similarity for better Arabic/fuzzy keyword matching
                 search_sql = sql_text(f"""
                     SELECT {PgVectorTableSchemeEnums.TEXT.value} as text, 
-                           ts_rank(to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}), plainto_tsquery('simple', :query)) as score
+                           similarity({PgVectorTableSchemeEnums.TEXT.value}, :query) as score
                     FROM {collection_name}
-                    WHERE to_tsvector('simple', {PgVectorTableSchemeEnums.TEXT.value}) @@ plainto_tsquery('simple', :query)
+                    WHERE {PgVectorTableSchemeEnums.TEXT.value} % :query
                     ORDER BY score DESC 
                     LIMIT {limit}
                 """)
@@ -336,21 +348,34 @@ class PGVectorProvider(VectorDBInterface):
 
     async def hybrid_search(self, collection_name: str, query: str, vector: list, limit: int = 10, over_fetch: int = 20):
         """
-        Fetches results from both vector search and full-text search, combining them via generic deduplication.
-        Pass over_fetch > limit to ensure we have enough unique documents to rerank later.
+        Merges results from vector search and keyword search using Reciprocal Rank Fusion (RRF).
         """
         vector_results = await self.search_by_vector(collection_name, vector, over_fetch) or []
         text_results = await self.search_by_text(collection_name, query, over_fetch) or []
         
-        # Combine and deduplicate based on exact text content
-        combined = {}
-        
-        for doc in vector_results:
-            combined[doc.text] = doc
+        # RRF Algorithm Implementation
+        # k=60 is the standard constant used in RRF to balance ranking
+        k = 60
+        scores = {}
+        doc_map = {}
+
+        for rank, doc in enumerate(vector_results):
+            doc_id = doc.text
+            doc_map[doc_id] = doc
+            scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
             
-        for doc in text_results:
-            if doc.text not in combined:
-                combined[doc.text] = doc
-                
-        # Return all unique results to be handled by the reranker step
-        return list(combined.values())
+        for rank, doc in enumerate(text_results):
+            doc_id = doc.text
+            doc_map[doc_id] = doc
+            scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
+            
+        # Sort by RRF score
+        sorted_doc_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
+        
+        final_results = []
+        for doc_id in sorted_doc_ids[:limit]:
+            doc = doc_map[doc_id]
+            doc.score = scores[doc_id]
+            final_results.append(doc)
+            
+        return final_results

@@ -48,7 +48,7 @@ class ProcessController(BaseController):
         if loader:
             return loader.load()
 
-        return None
+        raise FileNotFoundError(f"File not found on disk: {file_id}")
 
     def process_file_content(self, file_content: list, file_id: str,
                             chunk_size: int=100, overlap_size: int=20):

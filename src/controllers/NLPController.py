@@ -241,6 +241,10 @@ class NLPController(BaseController):
 
         # Step 6: Generate & Persist
         answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
+        
+        if not answer or len(answer.strip()) == 0:
+            self.logger.warning(f"AI returned an empty response for trace {trace_id}")
+            answer = "I apologize, but the AI model took too long to generate a response or returned an empty answer. Please try a simpler question or use the streaming endpoint for immediate feedback."
 
         if self.db_client:
             await self.session_model.append_message(session_id, "user", query, node.value)

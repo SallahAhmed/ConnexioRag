@@ -1,6 +1,6 @@
 $kind: http-request
 name: Agentic Chat
-url: "{{api}}/api/v1/nlp/agent/chat/10"
+url: "{{api}}/api/v1/nlp/agent/chat/2"
 method: POST
 body:
   type: json
@@ -8,9 +8,11 @@ body:
 
     \    \"user_id\": 1,\r
 
-    \    \"query\":\"اذكر السهول الثلاثة الفسيحة التي تتصل بسلسلتي جبال لبنان، ومع أي مدينة تنتهي هذه السهول جنوباً؟\",\r
+    \    \"query\":\"ما هو أصل تسمية 'لبنان' وما هي أشهر الأشجار التي تم ذكرها في الملفات؟\",\r
 
-    \    \"persona\": \"طالب\"\r
+    \    \"persona\": \"طالب\",\r
+
+    \    \"limit\": 3\r
 
     }"
 order: 4344731937616382

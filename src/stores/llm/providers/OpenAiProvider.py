@@ -25,7 +25,8 @@ class OpenAIProvider(LLMInterface):
 
         self.client = AsyncOpenAI(
             api_key = self.api_key,
-            base_url = self.api_url if self.api_url and len(self.api_url) else None
+            base_url = self.api_url if self.api_url and len(self.api_url) else None,
+            timeout = 180.0 # 3 minute timeout for local CPU generation
         )
 
         self.enums = OpenAIEnums
