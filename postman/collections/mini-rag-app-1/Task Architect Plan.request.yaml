@@ -6,9 +6,9 @@ body:
   type: json
   content: "{\r
 
-    \    \"query\": \"How do I implement user authentication in this project?\", \r
+    \  \"user_id\": 1,\r
 
-    \    \"user_id\": 1 \r
+    \  \"query\": \"Create a development plan for integrating OAuth2 authentication.\"\r
 
     }"
 order: 4502447530441297

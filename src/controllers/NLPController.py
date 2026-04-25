@@ -185,15 +185,33 @@ class NLPController(BaseController):
         ]
         results = await asyncio.gather(*search_tasks)
         
-        kb_results = ""
-        for q, res in zip(queries_to_search, results):
-            kb_results += f"\n[Results for: {q}]\n{res}\n"
-        tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
-
-        # --- Relevance Grading Disabled for Speed ---
-        # We directly use the local Knowledge Base results (the documents you uploaded)
-        retrieved_context.append(kb_results)
-        sources.append("Documentation")
+        # --- Corrective RAG (CRAG) Logic ---
+        # If KB is empty or irrelevant, we fallback to Wikipedia
+        is_kb_relevant = any(res and "No relevant documents found" not in str(res) for res in results)
+        
+        if not is_kb_relevant:
+            tracer.end_trace(trace_id, step_id, "Irrelevant/Empty")
+            print(f"[AGENT] [{now()}] Knowledge Gap Detected. Refining search for Wikipedia...")
+            step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
+            
+            # Refine the query for better search results
+            refine_prompt = f"Convert this user question into a concise 3-4 word Wikipedia search query: {query}\nReturn ONLY the search terms."
+            refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
+            refined_query = refined_query.strip().strip('"')
+            
+            print(f"[AGENT] [{now()}] Searching Wikipedia for: {refined_query}")
+            wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
+            retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
+            sources.append("Wikipedia")
+            tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
+        else:
+            # KB results are valid
+            kb_results = ""
+            for q, res in zip(queries_to_search, results):
+                kb_results += f"\n[Results for: {q}]\n{res}\n"
+            retrieved_context.append(kb_results)
+            sources.append("Documentation")
+            tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
         
         # Strictly local document retrieval
         self.template_parser.set_language(language)

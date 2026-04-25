@@ -1,6 +1,6 @@
 $kind: http-request
 name: Supervisor Team Risks
-url: "{{api}}/api/v1/nlp/agent/supervisor/risks/"
+url: "{{api}}/api/v1/nlp/agent/supervisor/risks/1"
 method: GET
 body:
   type: json

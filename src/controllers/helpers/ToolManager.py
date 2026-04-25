@@ -41,7 +41,7 @@ class ToolManager:
             self.db = SQLDatabase.from_uri(sync_url)
 
         # Initialize Wikipedia
-        api_wrapper = WikipediaAPIWrapper(top_k_results=3, doc_content_chars_max=1000)
+        api_wrapper = WikipediaAPIWrapper(top_k_results=5, doc_content_chars_max=4000)
         self.wiki_tool = WikipediaQueryRun(api_wrapper=api_wrapper)
 
     async def execute_sql_query(self, query_text: str) -> str:

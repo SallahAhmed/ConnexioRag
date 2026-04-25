@@ -100,7 +100,7 @@ services:
       dockerfile: docker/connexio/Dockerfile
     container_name: flower
     ports:
-      - "5555:5556"
+      - "5556:5556"
     networks:
       - backend
     restart: always
@@ -112,6 +112,8 @@ services:
     environment:
       - CELERY_BROKER_URL=amqp://connexio_user:connexio_rabbitmq_2222@rabbitmq:5672/connexio_vhost
       - CELERY_RESULT_BACKEND=redis://:connexio_redis_2222@redis:6379/0
+      - CELERY_FLOWER_BROKER_API=http://connexio_user:connexio_rabbitmq_2222@rabbitmq:15672/api/
+      - CELERY_FLOWER_STATE_SAVE_INTERVAL=1000
     command: ["python", "-m", "celery", "-A", "celery_app", "flower", "--conf=flowerconfig.py"]
 
   # ========================================================

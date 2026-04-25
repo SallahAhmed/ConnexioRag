@@ -1,18 +1,16 @@
 $kind: http-request
 name: Agentic Chat
-url: "{{api}}/api/v1/nlp/agent/chat/2"
+url: "{{api}}/api/v1/nlp/agent/chat/1"
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"user_id\": 1,\r
+    \  \"user_id\": 1,\r
 
-    \    \"query\":\"ما هو أصل تسمية 'لبنان' وما هي أشهر الأشجار التي تم ذكرها في الملفات؟\",\r
+    \  \"query\": \"Who won the Nobel Prize in Physics in 2024 and what was their discovery?\",\r
 
-    \    \"persona\": \"طالب\",\r
-
-    \    \"limit\": 3\r
+    \  \"persona\": \"student\"\r
 
     }"
 order: 4344731937616382

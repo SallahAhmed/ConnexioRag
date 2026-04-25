@@ -6,6 +6,7 @@ class Settings(BaseSettings):
     APP_NAME: str
     APP_VERSION: str
     OPENAI_API_KEY: str
+    GROQ_API_KEY: str | None = None
 
     FILE_ALLOWED_TYPES: list
     FILE_MAX_SIZE: int
@@ -32,6 +33,8 @@ class Settings(BaseSettings):
     OPENAI_GENERATION_API_URL: str | None = None
     OPENAI_EMBEDDING_API_URL: str | None = None
     COHERE_API_KEY: str | None = None
+    GROQ_API_KEY: str | None = None
+    GROQ_API_URL: str | None = "https://api.groq.com/openai/v1"
 
     GENERATION_MODEL_ID_LITERAL: List[str] | None = None
     GENERATION_MODEL_ID: str | None = None
@@ -59,6 +62,7 @@ class Settings(BaseSettings):
     CELERY_TASK_ACKS_LATE: bool = False
     CELERY_WORKER_CONCURRENCY: int = 2
     CELERY_FLOWER_PASSWORD: str = None
+    CELERY_FLOWER_BROKER_API: str = None
 
     class Config:
         env_file= ".env"
