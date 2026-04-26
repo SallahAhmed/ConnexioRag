@@ -1,0 +1,7 @@
+# Postman VS Code Extension local workspace configuration
+.postman/
+
+# Postman Environments (often contain sensitive API keys or secrets)
+*.environment.json
+*.environment.yaml
+*.postman_environment.json
