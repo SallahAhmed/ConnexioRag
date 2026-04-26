@@ -46,6 +46,7 @@ class NLPController(BaseController):
                 embedding_client=self.embedding_client,
                 template_parser=self.template_parser,
                 serpapi_api_key=settings.SERPAPI_API_KEY,
+                github_token=settings.GITHUB_TOKEN,
                 reranker=self.reranker
             )
 
@@ -198,26 +199,56 @@ class NLPController(BaseController):
             decide the best tool to use.
             - Use "WIKIPEDIA" for general knowledge, definitions, history, or science.
             - Use "GOOGLE" for current events, news, specific technical data, or real-time stats.
+            - Use "GITHUB" for repository status, code history, or issue tracking.
+            - Use "PYTHON" for math, data processing, or algorithmic logic.
             
-            Return ONLY "WIKIPEDIA" or "GOOGLE"."""
+            Return ONLY "WIKIPEDIA", "GOOGLE", "GITHUB", or "PYTHON"."""
             
             choice = await self.utility_client.generate_text(prompt=decision_prompt)
             choice = choice.strip().upper()
             
-            # Step 2: Refine the query
+            # Step 2: Tool Specific Processing
             print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
-            refine_prompt = f"Convert this user question into a concise 3-4 word search query for {choice}: {query}\nReturn ONLY the search terms."
-            refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
-            refined_query = refined_query.strip().strip('"')
+            
+            if "GITHUB" in choice:
+                step_id_github = tracer.start_trace(trace_id, "GitHub Tool Search")
+                refine_prompt = f"Extract the GitHub repository name (e.g., 'owner/repo') and the desired mode ('summary', 'commits', or 'issues') from this query: {query}. Return as JSON: {{\"repo\": \"...\", \"mode\": \"...\"}}. Return ONLY the JSON."
+                gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt)
+                try:
+                    gh_info = json.loads(gh_info_raw.strip().replace("```json", "").replace("```", ""))
+                    github_results = await self.tool_manager.fetch_github_data(repo_name=gh_info.get("repo"), mode=gh_info.get("mode", "summary"))
+                except:
+                    github_results = "Error parsing GitHub request."
+                
+                retrieved_context.append(f"\n[GitHub Repository Data]:\n{github_results}")
+                sources.append("GitHub")
+                tracer.end_trace(trace_id, step_id_github, f"GitHub Length: {len(github_results)}")
 
-            if "GOOGLE" in choice:
+            elif "PYTHON" in choice:
+                step_id_python = tracer.start_trace(trace_id, "Python Interpreter Execution")
+                python_prompt = f"Write a short, efficient Python script to solve or analyze this request: {query}. Return ONLY the Python code block."
+                python_code = await self.utility_client.generate_text(prompt=python_prompt)
+                python_results = await self.tool_manager.execute_python(code=python_code)
+                
+                retrieved_context.append(f"\n[Python Execution Result]:\n{python_results}")
+                sources.append("Python Interpreter")
+                tracer.end_trace(trace_id, step_id_python, f"Python Output Length: {len(python_results)}")
+
+            elif "GOOGLE" in choice:
                 step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
+                refine_prompt = f"Convert this user question into a concise 3-4 word search query for GOOGLE: {query}\nReturn ONLY the search terms."
+                refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
+                refined_query = refined_query.strip().strip('"')
                 web_results = await self.tool_manager.search_google(query=refined_query)
                 retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
                 sources.append("Google Search")
                 tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}")
-            else:
+            
+            else: # WIKIPEDIA
                 step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
+                refine_prompt = f"Convert this user question into a concise 3-4 word search query for WIKIPEDIA: {query}\nReturn ONLY the search terms."
+                refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
+                refined_query = refined_query.strip().strip('"')
                 wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
                 retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
                 sources.append("Wikipedia")

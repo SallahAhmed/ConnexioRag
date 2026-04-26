@@ -36,6 +36,7 @@ class Settings(BaseSettings):
     GROQ_API_KEY: str | None = None
     GROQ_API_URL: str | None = "https://api.groq.com/openai/v1"
     SERPAPI_API_KEY: str | None = None
+    GITHUB_TOKEN: str | None = None
 
     GENERATION_MODEL_ID_LITERAL: List[str] | None = None
     GENERATION_MODEL_ID: str | None = None

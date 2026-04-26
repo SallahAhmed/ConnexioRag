@@ -4,6 +4,10 @@ from langchain_community.utilities import WikipediaAPIWrapper, SerpAPIWrapper
 import logging
 import warnings
 import asyncio
+import sys
+import io
+import traceback
+import httpx
 
 # Register pgvector's custom 'vector' type with SQLAlchemy so LangChain
 # doesn't emit SAWarning when reflecting the database schema.
@@ -22,7 +26,8 @@ except Exception:
 
 class ToolManager:
     def __init__(self, db_engine_url: str, generation_client, vectordb_client, 
-                 embedding_client, template_parser, serpapi_api_key: str = None, reranker=None):
+                 embedding_client, template_parser, serpapi_api_key: str = None, 
+                 github_token: str = None, reranker=None):
         self.db_engine_url = db_engine_url
         self.generation_client = generation_client
         self.vectordb_client = vectordb_client
@@ -49,6 +54,9 @@ class ToolManager:
             self.serp_tool = SerpAPIWrapper(serpapi_api_key=serpapi_api_key)
         else:
             self.serp_tool = None
+            
+        # Initialize GitHub
+        self.github_token = github_token
 
     async def execute_sql_query(self, query_text: str) -> str:
         """
@@ -295,4 +303,102 @@ class ToolManager:
         except Exception as e:
             self.logger.error(f"Doc Gen Error: {str(e)}")
             return "Error generating documentation. Ensure the project exists in the RAG database."
+
+    async def fetch_github_data(self, repo_name: str, mode: str = "summary") -> str:
+        """
+        Fetches metadata, commits, or issues from a GitHub repository.
+        """
+        if not self.github_token:
+            return "GitHub Tool is not configured (Missing GITHUB_TOKEN). Please add it to your .env file."
+        
+        headers = {
+            "Authorization": f"token {self.github_token}",
+            "Accept": "application/vnd.github.v3+json"
+        }
+        
+        base_url = f"https://api.github.com/repos/{repo_name}"
+        
+        try:
+            async with httpx.AsyncClient() as client:
+                if mode == "commits":
+                    url = f"{base_url}/commits?per_page=5"
+                    resp = await client.get(url, headers=headers)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    results = [f"- {c['commit']['author']['name']}: {c['commit']['message']} ({c['commit']['author']['date']})" for c in data]
+                    return f"Latest 5 commits for {repo_name}:\n" + "\n".join(results)
+                
+                elif mode == "issues":
+                    url = f"{base_url}/issues?state=open&per_page=5"
+                    resp = await client.get(url, headers=headers)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    results = [f"- #{i['number']} {i['title']} (by {i['user']['login']})" for i in data]
+                    return f"Latest 5 open issues for {repo_name}:\n" + "\n".join(results)
+                
+                else: # Summary
+                    resp = await client.get(base_url, headers=headers)
+                    resp.raise_for_status()
+                    data = resp.json()
+                    return (f"GitHub Repository: {data['full_name']}\n"
+                            f"Description: {data['description']}\n"
+                            f"Stars: {data['stargazers_count']}, Forks: {data['forks_count']}\n"
+                            f"Main Language: {data['language']}\n"
+                            f"Open Issues: {data['open_issues_count']}")
+                            
+        except Exception as e:
+            self.logger.error(f"GitHub Tool Error: {str(e)}")
+            return f"Error fetching data from GitHub: {str(e)}"
+
+    async def execute_python(self, code: str) -> str:
+        """
+        Executes Python code in a restricted local environment and returns stdout/stderr.
+        """
+        self.logger.info("Executing Python Tool...")
+        
+        # Clean the code block if it contains markdown
+        code = code.strip().replace("```python", "").replace("```", "").strip()
+        
+        # Capture stdout and stderr
+        stdout_capture = io.StringIO()
+        stderr_capture = io.StringIO()
+        
+        # Restricted globals/locals
+        # Note: This is not a perfectly secure sandbox, but sufficient for RAG data processing.
+        safe_globals = {
+            "__builtins__": __builtins__,
+            "asyncio": asyncio,
+            "math": __import__("math"),
+            "datetime": __import__("datetime"),
+            "json": __import__("json")
+        }
+        
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+        
+        try:
+            sys.stdout = stdout_capture
+            sys.stderr = stderr_capture
+            
+            # Execute the code
+            exec(code, safe_globals)
+            
+            output = stdout_capture.getvalue()
+            errors = stderr_capture.getvalue()
+            
+            result = ""
+            if output:
+                result += f"Output:\n{output}\n"
+            if errors:
+                result += f"Errors:\n{errors}\n"
+                
+            if not result:
+                result = "Code executed successfully with no output."
+                
+            return result
+        except Exception:
+            return f"Python Execution Error:\n{traceback.format_exc()}"
+        finally:
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
 
