@@ -45,6 +45,7 @@ class NLPController(BaseController):
                 vectordb_client=self.vectordb_client,
                 embedding_client=self.embedding_client,
                 template_parser=self.template_parser,
+                serpapi_api_key=settings.SERPAPI_API_KEY,
                 reranker=self.reranker
             )
 
@@ -186,24 +187,41 @@ class NLPController(BaseController):
         results = await asyncio.gather(*search_tasks)
         
         # --- Corrective RAG (CRAG) Logic ---
-        # If KB is empty or irrelevant, we fallback to Wikipedia
+        # If KB is empty or irrelevant, we fallback to Web Search
         is_kb_relevant = any(res and "No relevant documents found" not in str(res) for res in results)
         
         if not is_kb_relevant:
             tracer.end_trace(trace_id, step_id, "Irrelevant/Empty")
-            print(f"[AGENT] [{now()}] Knowledge Gap Detected. Refining search for Wikipedia...")
-            step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
             
-            # Refine the query for better search results
-            refine_prompt = f"Convert this user question into a concise 3-4 word Wikipedia search query: {query}\nReturn ONLY the search terms."
+            # Step 1: Decision Logic (The "Brilliant" part)
+            decision_prompt = f"""You are an expert search strategist. Given the user query: "{query}", 
+            decide the best tool to use.
+            - Use "WIKIPEDIA" for general knowledge, definitions, history, or science.
+            - Use "GOOGLE" for current events, news, specific technical data, or real-time stats.
+            
+            Return ONLY "WIKIPEDIA" or "GOOGLE"."""
+            
+            choice = await self.utility_client.generate_text(prompt=decision_prompt)
+            choice = choice.strip().upper()
+            
+            # Step 2: Refine the query
+            print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
+            refine_prompt = f"Convert this user question into a concise 3-4 word search query for {choice}: {query}\nReturn ONLY the search terms."
             refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
             refined_query = refined_query.strip().strip('"')
-            
-            print(f"[AGENT] [{now()}] Searching Wikipedia for: {refined_query}")
-            wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
-            retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
-            sources.append("Wikipedia")
-            tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
+
+            if "GOOGLE" in choice:
+                step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
+                web_results = await self.tool_manager.search_google(query=refined_query)
+                retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
+                sources.append("Google Search")
+                tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}")
+            else:
+                step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
+                wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
+                retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
+                sources.append("Wikipedia")
+                tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
         else:
             # KB results are valid
             kb_results = ""
@@ -223,7 +241,7 @@ class NLPController(BaseController):
         
         total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
         if language == "ar":
-            total_budget = 2000 # Reduced for local model stability
+            total_budget = 5000 # Increased for better utilization of 70B model
         
         context_string = "\n\n".join(retrieved_context)
         max_context_chars = int(total_budget * 0.5)

@@ -1,6 +1,6 @@
 from langchain_community.utilities import SQLDatabase
 from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
-from langchain_community.utilities import WikipediaAPIWrapper
+from langchain_community.utilities import WikipediaAPIWrapper, SerpAPIWrapper
 import logging
 import warnings
 import asyncio
@@ -22,7 +22,7 @@ except Exception:
 
 class ToolManager:
     def __init__(self, db_engine_url: str, generation_client, vectordb_client, 
-                 embedding_client, template_parser, reranker=None):
+                 embedding_client, template_parser, serpapi_api_key: str = None, reranker=None):
         self.db_engine_url = db_engine_url
         self.generation_client = generation_client
         self.vectordb_client = vectordb_client
@@ -43,6 +43,12 @@ class ToolManager:
         # Initialize Wikipedia
         api_wrapper = WikipediaAPIWrapper(top_k_results=5, doc_content_chars_max=4000)
         self.wiki_tool = WikipediaQueryRun(api_wrapper=api_wrapper)
+
+        # Initialize Google Search (SerpApi)
+        if serpapi_api_key:
+            self.serp_tool = SerpAPIWrapper(serpapi_api_key=serpapi_api_key)
+        else:
+            self.serp_tool = None
 
     async def execute_sql_query(self, query_text: str) -> str:
         """
@@ -93,6 +99,22 @@ class ToolManager:
         except Exception as e:
             self.logger.error(f"Wiki Tool Error: {str(e)}")
             return "Unable to perform Wikipedia search at this time."
+
+    async def search_google(self, query: str) -> str:
+        """
+        Searches Google using SerpApi.
+        """
+        if not self.serp_tool:
+            return "Google Search is not configured (Missing API Key)."
+        
+        try:
+            res = await asyncio.to_thread(self.serp_tool.run, query)
+            if len(res) > 2000:
+                res = res[:2000] + "\n[...google truncated...]"
+            return res
+        except Exception as e:
+            self.logger.error(f"Google Search Tool Error: {str(e)}")
+            return "Unable to perform Google Search at this time."
 
     async def search_knowledge_base(self, project_id: str, query: str, limit: int = 5):
         """
