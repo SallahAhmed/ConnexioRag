@@ -1,8 +1,7 @@
 $kind: http-request
 name: Skill Coach Path
-url: "{{api}}/api/v1/nlp/agent/coach/path/1"
+url: "{{api}}/api/v1/nlp/agent/coach/path/?user_id=1"
 method: GET
-body:
-  type: json
-  content: "{\r\n    \"user_id\":1\r\n}"
+queryParams:
+  user_id: "1"
 order: 4499314264332607

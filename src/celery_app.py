@@ -91,11 +91,13 @@ celery_app.conf.update(
 
     # Worker settings
     worker_concurrency=settings.CELERY_WORKER_CONCURRENCY,
+    worker_prefetch_multiplier=1,
 
     # Connection settings for better reliability
     broker_connection_retry_on_startup=True,
     broker_connection_retry=True,
     broker_connection_max_retries=10,
+    broker_heartbeat=None, # Disable heartbeats to prevent timeouts during long blocking tasks
     worker_cancel_long_running_tasks_on_connection_loss=True,
 
     # Enable remote control and events for monitoring (e.g. Flower)

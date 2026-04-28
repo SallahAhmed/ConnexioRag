@@ -1,11 +1,11 @@
 $kind: http-request
 name: SSE Streaming
-url: "{{api}}/api/v1/nlp/agent/chat/stream/1?query=Explain how the Groq LPU architecture makes AI so fast&user_id=1&persona=early_career"
+url: "{{api}}/api/v1/nlp/agent/chat/stream/1?query=Tell me a long story about a project manager who used AI to save a failing project&user_id=1&persona=student"
 method: GET
 queryParams:
-  query: Explain how the Groq LPU architecture makes AI so fast
+  query: Tell me a long story about a project manager who used AI to save a failing project
   user_id: "1"
-  persona: early_career
+  persona: student
 body:
   type: json
   content: ""

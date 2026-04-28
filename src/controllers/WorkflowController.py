@@ -77,3 +77,20 @@ class WorkflowController(BaseController):
         if re.search(r'[\u0600-\u06FF]', query):
             return "ar"
         return "en"
+
+    async def grade_relevance(self, query: str, context: str) -> bool:
+        """
+        Grades whether the retrieved context is relevant to the query.
+        Returns True if relevant, False if a search fallback is needed.
+        """
+        if not context or "No relevant documents found" in context:
+            return False
+
+        prompt = f"""Evaluate if the following context contains information that can answer the user's query.
+        Query: "{query}"
+        Context: "{context[:2000]}"
+        
+        Answer ONLY "YES" if it is relevant and contains specific info to answer the question, or "NO" if it is irrelevant or insufficient.
+        """
+        response = await self.generation_client.generate_text(prompt=prompt)
+        return "YES" in response.strip().upper()

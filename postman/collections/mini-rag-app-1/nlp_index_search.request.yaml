@@ -1,12 +1,12 @@
 $kind: http-request
 name: nlp_index_search
-url: "{{api}}/api/v1/nlp/index/search/2"
+url: "{{api}}/api/v1/nlp/index/search/1"
 method: POST
 body:
   type: json
   content: "{\r
 
-    \    \"text\": \"اذكر السهول الثلاثة الفسيحة التي تتصل بسلسلتي جبال لبنان، ومع أي مدينة تنتهي هذه السهول جنوباً؟\",\r
+    \    \"text\": \"According to Adrienne Watt, what are the five components of a Project Management plan?\",\r
 
     \    \"limit\": 5\r
 

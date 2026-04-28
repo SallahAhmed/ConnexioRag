@@ -6,11 +6,13 @@ body:
   type: json
   content: "{\r
 
-    \  \"user_id\": 1,\r
+    \    \"user_id\": 1,\r
 
-    \  \"query\": \"Who won the Nobel Prize in Physics in 2024 and what was their discovery?\",\r
+    \    \"query\": \"I am completely stuck on my project. My team isn't communicating and we are falling behind schedule. What should I do?\",\r
 
-    \  \"persona\": \"student\"\r
+    \  //\"session_id\": 3,   \r
+
+    \    \"persona\": \"student\"\r
 
     }"
 order: 4344731937616382

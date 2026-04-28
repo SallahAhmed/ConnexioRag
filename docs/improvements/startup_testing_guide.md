@@ -11,7 +11,7 @@ Start only the essential database and broker services.
 
 ```powershell
 # From the project root
-docker compose up -d pgvector rabbitmq redis
+docker compose up pgvector rabbitmq redis
 ```
 
 ```powershell
@@ -41,7 +41,8 @@ python -m uvicorn main:app --reload --host 0.0.0.0 --port 8080
 ### Terminal 2: Celery Worker
 
 ```bash
-python -m celery -A celery_app worker --loglevel=info --queues=file_processing,default,data_indexing --without-mingle --without-gossip --without-heartbeat
+# python -m celery -A celery_app worker --loglevel=info --queues=file_processing,default,data_indexing --without-mingle --without-gossip --without-heartbeat
+celery -A celery_app worker -Q file_processing,data_indexing,default --loglevel=info --pool=solo -E
 ```
 
 ### Terminal 3: Flower Monitoring
@@ -69,10 +70,10 @@ Follow this sequence exactly to verify the system:
 
 ```json
 {
-    "file_id": "YOUR_FILE_ID",
-    "chunk_size": 512,
-    "overlap_size": 50,
-    "do_reset": 1
+  "file_id": "YOUR_FILE_ID",
+  "chunk_size": 512,
+  "overlap_size": 50,
+  "do_reset": 1
 }
 ```
 

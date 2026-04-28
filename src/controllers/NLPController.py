@@ -189,20 +189,23 @@ class NLPController(BaseController):
         
         # --- Corrective RAG (CRAG) Logic ---
         # If KB is empty or irrelevant, we fallback to Web Search
-        is_kb_relevant = any(res and "No relevant documents found" not in str(res) for res in results)
+        kb_results = ""
+        for q, res in zip(queries_to_search, results):
+            kb_results += f"\n[Results for: {q}]\n{res}\n"
+
+        is_kb_relevant = await self.workflow_controller.grade_relevance(query, kb_results)
         
         if not is_kb_relevant:
-            tracer.end_trace(trace_id, step_id, "Irrelevant/Empty")
+            tracer.end_trace(trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)")
             
             # Step 1: Decision Logic (The "Brilliant" part)
-            decision_prompt = f"""You are an expert search strategist. Given the user query: "{query}", 
-            decide the best tool to use.
-            - Use "WIKIPEDIA" for general knowledge, definitions, history, or science.
-            - Use "GOOGLE" for current events, news, specific technical data, or real-time stats.
-            - Use "GITHUB" for repository status, code history, or issue tracking.
-            - Use "PYTHON" for math, data processing, or algorithmic logic.
+            decision_prompt = f"""Analyze the user query: "{query}" and select the single best tool.
+            - "WIKIPEDIA": General knowledge, history, science, definitions.
+            - "GOOGLE": News, recent events, technical stats, product info.
+            - "GITHUB": Code, repositories, issues.
+            - "PYTHON": Math, logic, data processing.
             
-            Return ONLY "WIKIPEDIA", "GOOGLE", "GITHUB", or "PYTHON"."""
+            IMPORTANT: Return ONLY one word from the list above. No explanation."""
             
             choice = await self.utility_client.generate_text(prompt=decision_prompt)
             choice = choice.strip().upper()
@@ -236,9 +239,9 @@ class NLPController(BaseController):
 
             elif "GOOGLE" in choice:
                 step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
-                refine_prompt = f"Convert this user question into a concise 3-4 word search query for GOOGLE: {query}\nReturn ONLY the search terms."
+                refine_prompt = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
                 refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
-                refined_query = refined_query.strip().strip('"')
+                refined_query = refined_query.strip().strip('"').strip("'")
                 web_results = await self.tool_manager.search_google(query=refined_query)
                 retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
                 sources.append("Google Search")
@@ -246,18 +249,15 @@ class NLPController(BaseController):
             
             else: # WIKIPEDIA
                 step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
-                refine_prompt = f"Convert this user question into a concise 3-4 word search query for WIKIPEDIA: {query}\nReturn ONLY the search terms."
+                refine_prompt = f"Create a 2-word Wikipedia search term for: {query}. Return ONLY the term."
                 refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
-                refined_query = refined_query.strip().strip('"')
+                refined_query = refined_query.strip().strip('"').strip("'")
                 wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
                 retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
                 sources.append("Wikipedia")
                 tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
         else:
             # KB results are valid
-            kb_results = ""
-            for q, res in zip(queries_to_search, results):
-                kb_results += f"\n[Results for: {q}]\n{res}\n"
             retrieved_context.append(kb_results)
             sources.append("Documentation")
             tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
