@@ -72,7 +72,7 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 | **Relational DB**    | [PostgreSQL](https://www.postgresql.org/)                                         | Project metadata, session management, and chat history. |
 | **Task Queue**       | [Celery](https://docs.celeryq.dev/)                                               | Asynchronous indexing and document processing.          |
 | **Message Broker**   | [RabbitMQ](https://www.rabbitmq.com/)                                             | Handling background task distributions.                 |
-| **LLM Providers**    | Groq, OpenAI, Cohere                                                              | Multimodal intelligence and high-quality embeddings.    |
+| **LLM Providers**    | Groq, OpenAI, Cohere, Ollama                                                      | Multimodal intelligence and high-quality embeddings.    |
 | **Monitoring**       | Prometheus & Grafana                                                              | Real-time performance metrics and dashboards.           |
 
 ---
@@ -111,6 +111,14 @@ GROQ_API_KEY="your_key"
 OPENAI_API_KEY="your_key"
 COHERE_API_KEY="your_key"
 SERPAPI_API_KEY="your_key"
+
+# Local AI Providers (Ollama via OpenAI API Compatibility)
+# GENERATION_BACKEND="OPENAI"
+# EMBEDDING_BACKEND="OPENAI"
+# OPENAI_API_URL="http://localhost:11434/v1" # Use http://host.docker.internal:11434/v1 in Docker
+# OPENAI_API_KEY="ollama"
+# GENERATION_MODEL_ID="llama3"
+# EMBEDDING_MODEL_ID="nomic-embed-text"
 
 # Vector Search
 VECTOR_DB_BACKEND="QDRANT" # Options: QDRANT, PGVECTOR

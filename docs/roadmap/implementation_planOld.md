@@ -5,9 +5,11 @@ This plan outlines the transition from a verified RAG backend to a production-re
 ---
 
 ## 🛠 Phase 1: Real-Time Data Synchronization (The Foundation)
+
 **Goal:** Populate the `projects`, `tasks`, and `users` tables with real data from the main Connexio application.
 
 ### Proposed Changes:
+
 - **[NEW] Sync Service:** Create a background worker that replicates data from the main PostgreSQL database.
 - **[NEW] Webhook Endpoints:** Add `/api/v1/sync/task` and `/api/v1/sync/project` for real-time updates when a user creates a task in the main app.
 - **[MODIFY] ToolManager.py:** Update matching and risk logic to use these "live" records instead of returning fallback notes.
@@ -15,9 +17,11 @@ This plan outlines the transition from a verified RAG backend to a production-re
 ---
 
 ## 🧠 Phase 2: Advanced Retrieval & Intelligence (The Brain Upgrade)
+
 **Goal:** Improve the accuracy of answers for complex, long-form queries.
 
 ### Proposed Changes:
+
 - **[NEW] Parent-Document Retriever:** Implement a strategy where the vector DB searches small chunks but the LLM receives the full surrounding section (Parent) for context.
 - **[MODIFY] Reranker Integration:** Enable the Cross-Encoder reranker to ensure the Top-3 results passed to the LLM are the most semantically relevant.
 - **[NEW] Multi-Query Retrieval:** Generate 3 variations of the user's question to capture more diverse snippets from the vector store.
@@ -25,9 +29,11 @@ This plan outlines the transition from a verified RAG backend to a production-re
 ---
 
 ## 🎨 Phase 3: Frontend Experience & Streaming (The Face)
+
 **Goal:** Bring the "Streaming Chat" to life in the actual user dashboard.
 
 ### Proposed Changes:
+
 - **[NEW] SSE Consumer:** Build a JavaScript/React component that listens to the `/chat/stream` endpoint.
 - **[NEW] Markdown Renderer:** Implement a beautiful UI component to render the agent's Markdown output (with tables, code blocks, and bold text).
 - **[NEW] Feedback Loop:** Add "Thumbs Up/Down" buttons to the UI to collect human feedback for the AI.
@@ -35,15 +41,18 @@ This plan outlines the transition from a verified RAG backend to a production-re
 ---
 
 ## ⚖️ Phase 4: Governance & Evaluation (The Safety)
+
 **Goal:** Quantify the AI's performance and ensure it never hallucinates.
 
 ### Proposed Changes:
+
 - **[NEW] RAGAS Integration:** Create a suite of automated tests using the RAGAS library to measure **Faithfulness** and **Context Precision**.
 - **[NEW] Admin Dashboard:** A simple internal view to see "Knowledge Gaps" (e.g., questions where the AI had to fallback to Google) so you can upload more documents to fill those gaps.
 
 ---
 
 ## ❓ Open Questions for Phase 1 & 3
+
 To refine this plan, I need a bit more detail about your current ecosystem:
 
 1.  **Architecture:** Is the "Main Connexio App" running on the same server/database as this RAG module, or is it a completely separate project?
@@ -52,5 +61,6 @@ To refine this plan, I need a bit more detail about your current ecosystem:
 4.  **Persona Depth:** Do you have specific "Rules of Conduct" or "Evaluation Rubrics" for the **Educator** persona to follow when judging student work?
 
 ---
+
 > [!TIP]
 > I recommend starting with **Phase 1** and **Phase 3** in parallel. One makes the AI "Smart" with real data, and the other makes it "Beautiful" for the user.
