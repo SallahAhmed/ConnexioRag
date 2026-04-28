@@ -72,7 +72,7 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 | **Relational DB**    | [PostgreSQL](https://www.postgresql.org/)                                         | Project metadata, session management, and chat history. |
 | **Task Queue**       | [Celery](https://docs.celeryq.dev/)                                               | Asynchronous indexing and document processing.          |
 | **Message Broker**   | [RabbitMQ](https://www.rabbitmq.com/)                                             | Handling background task distributions.                 |
-| **LLM Providers**    | Groq, OpenAI, Cohere, Ollama                                                      | Multimodal intelligence and high-quality embeddings.    |
+| **LLM Providers**    | Groq (gpt-oss-120b), OpenAI, Cohere, Ollama                    | Multimodal intelligence and high-quality embeddings.    |
 | **Monitoring**       | Prometheus & Grafana                                                              | Real-time performance metrics and dashboards.           |
 
 ---

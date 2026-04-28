@@ -11,12 +11,14 @@ import asyncio
 from datetime import datetime
 import uuid
 from .helpers.TraceManager import tracer
+import logging
 
 class NLPController(BaseController):
 
     def __init__(self, vectordb_client, generation_client, 
                  embedding_client, template_parser, utility_client=None, settings=None, db_client=None, reranker=None):
         super().__init__()
+        self.logger = logging.getLogger(__name__)
 
         self.vectordb_client = vectordb_client
         self.generation_client = generation_client
@@ -219,13 +221,17 @@ class NLPController(BaseController):
                 gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt)
                 try:
                     gh_info = json.loads(gh_info_raw.strip().replace("```json", "").replace("```", ""))
-                    github_results = await self.tool_manager.fetch_github_data(repo_name=gh_info.get("repo"), mode=gh_info.get("mode", "summary"))
+                    repo_name = gh_info.get("repo")
+                    if repo_name and "/" in repo_name:
+                        github_results = await self.tool_manager.fetch_github_data(repo_name=repo_name, mode=gh_info.get("mode", "summary"))
+                    else:
+                        github_results = "No specific GitHub repository was identified in the query."
                 except:
                     github_results = "Error parsing GitHub request."
                 
                 retrieved_context.append(f"\n[GitHub Repository Data]:\n{github_results}")
                 sources.append("GitHub")
-                tracer.end_trace(trace_id, step_id_github, f"GitHub Length: {len(github_results)}")
+                tracer.end_trace(trace_id, step_id_github, f"GitHub Result: {github_results[:50]}...")
 
             elif "PYTHON" in choice:
                 step_id_python = tracer.start_trace(trace_id, "Python Interpreter Execution")

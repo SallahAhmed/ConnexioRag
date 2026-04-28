@@ -62,7 +62,7 @@ The app follows a microservices architecture coordinated by a FastAPI gateway.
   - **Redis**: Result backend for Celery.
 - **Task Queue**: Celery with RabbitMQ (Broker).
 - **AI/LLM**:
-  - **Generation**: Ollama (gemma2), OpenAI (GPT-3.5/4).
+  - **Generation**: Groq (gpt-oss-120b, llama-3.3-70b), Ollama (gemma4e2b), OpenAI (GPT-3.5/4).
   - **Embeddings**: `nomic-embed-text` (Ollama).
 - **DevOps**: Docker Compose, Nginx (Reverse Proxy), Prometheus/Grafana (Monitoring).
 

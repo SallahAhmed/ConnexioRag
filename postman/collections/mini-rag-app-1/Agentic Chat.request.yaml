@@ -8,9 +8,9 @@ body:
 
     \    \"user_id\": 1,\r
 
-    \    \"query\": \"I am completely stuck on my project. My team isn't communicating and we are falling behind schedule. What should I do?\",\r
+    \    \"query\": \"No, that's it! thank you so much!!\",\r
 
-    \  //\"session_id\": 3,   \r
+    \    \"session_id\": 3,   \r
 
     \    \"persona\": \"student\"\r
 
