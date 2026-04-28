@@ -249,12 +249,15 @@ class NLPController(BaseController):
             
             else: # WIKIPEDIA
                 step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
-                refine_prompt = f"Create a 2-word Wikipedia search term for: {query}. Return ONLY the term."
+                refine_prompt = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
                 refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
                 refined_query = refined_query.strip().strip('"').strip("'")
                 wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
-                retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
-                sources.append("Wikipedia")
+                if wiki_results and "Unable to perform" not in wiki_results:
+                    retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
+                    sources.append("Wikipedia")
+                else:
+                    retrieved_context.append("\n[Global Knowledge]: No external information found.")
                 tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
         else:
             # KB results are valid

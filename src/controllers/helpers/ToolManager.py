@@ -101,10 +101,20 @@ class ToolManager:
             # Update the language for the current search
             self.wiki_tool.api_wrapper.lang = lang
             res = await asyncio.to_thread(self.wiki_tool.run, query)
+            
+            # Fallback to English if no results found in local language
+            if (not res or "No relevant information" in res or "Page not found" in res) and lang != "en":
+                self.logger.info(f"Wiki search failed for {lang}, retrying in English...")
+                self.wiki_tool.api_wrapper.lang = "en"
+                res = await asyncio.to_thread(self.wiki_tool.run, query)
+
             if len(res) > 2000:
                 res = res[:2000] + "\n[...wiki truncated...]"
             return res
         except Exception as e:
+            # Handle the specific "Expecting value" error which usually means a blocked/empty response
+            if "Expecting value" in str(e):
+                return "No relevant information found on Wikipedia for this specific term."
             self.logger.error(f"Wiki Tool Error: {str(e)}")
             return "Unable to perform Wikipedia search at this time."
 
