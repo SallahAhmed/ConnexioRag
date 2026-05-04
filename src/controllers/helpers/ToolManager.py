@@ -58,6 +58,10 @@ class ToolManager:
         # Initialize GitHub
         self.github_token = github_token
 
+    def _get_collection_name(self, project_id) -> str:
+        """Single source of truth for vector collection naming."""
+        return f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
+
     async def execute_sql_query(self, query_text: str) -> str:
         """
         Translates Natural Language to SQL and executes it.
@@ -139,8 +143,8 @@ class ToolManager:
         Wraps current vector search logic to find relevant document chunks using hybrid search and reranking.
         """
         try:
-            # Replicate collection name logic
-            collection_name = f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
+            # Use shared helper for collection name
+            collection_name = self._get_collection_name(project_id)
 
             # Embed the query
             vectors = await self.embedding_client.embed_text(text=query, document_type="query")

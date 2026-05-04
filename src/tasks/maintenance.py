@@ -23,9 +23,9 @@ async def _clean_celery_executions_table(task_instance):
     
     try:
 
-        (db_engine, db_client, llm_provider_factory, 
+        (db_engine, db_client, llm_provider_factory,
         vectordb_provider_factory,
-        generation_client, embedding_client,
+        generation_client, utility_client, embedding_client,
         vectordb_client, template_parser) = await get_setup_utils()
 
         # Create idempotency manager

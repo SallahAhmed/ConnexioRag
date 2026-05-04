@@ -3,9 +3,10 @@ from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 import re
 
 class WorkflowController(BaseController):
-    def __init__(self, generation_client, template_parser):
+    def __init__(self, generation_client, template_parser, utility_client=None):
         super().__init__()
         self.generation_client = generation_client
+        self.utility_client = utility_client if utility_client else generation_client
         self.template_parser = template_parser
 
     async def detect_node(self, query: str) -> WorkflowNodeEnum:
@@ -14,25 +15,42 @@ class WorkflowController(BaseController):
         Uses a Fast-Path for short queries, then Keywords, then falls back to LLM.
         """
         query_lower = query.lower().strip()
-        
+
         # 1. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly.
-        # This bypasses all keyword and LLM checks for maximum speed.
         if len(query_lower) < 50:
             return WorkflowNodeEnum.GENERAL
 
-        # 2. KEYWORD MAPPING: Priority ordered
+        # 2. KEYWORD MAPPING: Specific nodes are checked BEFORE GENERAL to avoid false positives.
+        #    Order matters: most specific triggers first, GENERAL is the final fallback.
         keywords = {
-            # Check General first to avoid false positives in specialized nodes
-            WorkflowNodeEnum.GENERAL: [
-                "hello", "hi", "hey", "greeting", "how are you", "good morning", "good afternoon",
-                "who are you", "what can you do", "help me", "how can you help", "your name",
-                "مرحبا", "سلام", "اهلا", "كيف حالك", "من انت", "ماذا تفعل", "ساعدني"
+            WorkflowNodeEnum.BLOCKER: [
+                "stuck", "not responding", "error", "problem", "help fix",
+                "help me fix", "not working", "broken", "crash", "exception",
+                "عالق", "مشكلة", "خطأ", "لا يعمل"
             ],
-            WorkflowNodeEnum.ONBOARDING: ["where do i start", "new here", "how it works", "start"],
-            WorkflowNodeEnum.TEAM_FORMATION: ["find teammate", "need a dev", "looking for", "join team"],
-            WorkflowNodeEnum.PHASE_TRANSITION: ["next phase", "done with", "advance", "transition"],
-            WorkflowNodeEnum.BLOCKER: ["stuck", "not responding", "error", "help", "problem"],
-            WorkflowNodeEnum.MILESTONE_WARNING: ["behind", "overdue", "late", "deadline"],
+            WorkflowNodeEnum.MILESTONE_WARNING: [
+                "behind", "overdue", "late", "deadline", "missed milestone",
+                "متأخر", "موعد نهائي", "تأخر"
+            ],
+            WorkflowNodeEnum.PHASE_TRANSITION: [
+                "next phase", "done with", "advance", "transition", "move to",
+                "المرحلة التالية", "الانتقال", "الانتهاء من"
+            ],
+            WorkflowNodeEnum.TEAM_FORMATION: [
+                "find teammate", "need a dev", "looking for", "join team",
+                "find a designer", "need someone", "recruit",
+                "ابحث عن", "أحتاج مطور", "فريق"
+            ],
+            WorkflowNodeEnum.ONBOARDING: [
+                "where do i start", "new here", "how it works", "how do i start",
+                "getting started", "first time", "بداية", "كيف أبدأ", "جديد هنا"
+            ],
+            # GENERAL is checked last — only conversational triggers, no ambiguous words
+            WorkflowNodeEnum.GENERAL: [
+                "hello", "hi", "hey", "good morning", "good afternoon",
+                "who are you", "what can you do", "your name",
+                "مرحبا", "سلام", "اهلا", "كيف حالك", "من انت", "ماذا تفعل"
+            ],
         }
 
         for node, triggers in keywords.items():
@@ -47,10 +65,15 @@ class WorkflowController(BaseController):
         user_prompt = self.template_parser.get("workflow", "classification_user_prompt", {"query": query[:2000]})
 
         chat_history = [
-            self.generation_client.construct_prompt(prompt=system_prompt, role=self.generation_client.enums.SYSTEM.value)
+            self.generation_client.construct_prompt(
+                prompt=system_prompt,
+                role=self.generation_client.enums.SYSTEM.value
+            )
         ]
 
-        response = await self.generation_client.generate_text(prompt=user_prompt, chat_history=chat_history)
+        response = await self.generation_client.generate_text(
+            prompt=user_prompt, chat_history=chat_history
+        )
 
         if response:
             try:
@@ -63,17 +86,13 @@ class WorkflowController(BaseController):
     async def detect_persona(self, query: str, chat_history: list = None) -> str:
         """
         Detects if the user is a student, early_career, educator, or company.
-        Defaults to student for now or pulls from session.
         """
-        # Logic to extract persona from context or session
-        # For now, we'll keep it simple: defaults to 'student'
         return "student"
 
     async def detect_language(self, query: str) -> str:
         """
         Detects if the language is English or Arabic.
         """
-        # Simple Arabic char detection
         if re.search(r'[\u0600-\u06FF]', query):
             return "ar"
         return "en"
@@ -81,16 +100,18 @@ class WorkflowController(BaseController):
     async def grade_relevance(self, query: str, context: str) -> bool:
         """
         Grades whether the retrieved context is relevant to the query.
+        Uses the utility (fast/small) model to avoid adding heavy LLM latency.
         Returns True if relevant, False if a search fallback is needed.
         """
         if not context or "No relevant documents found" in context:
             return False
 
         prompt = f"""Evaluate if the following context contains information that can answer the user's query.
-        Query: "{query}"
-        Context: "{context[:2000]}"
-        
-        Answer ONLY "YES" if it is relevant and contains specific info to answer the question, or "NO" if it is irrelevant or insufficient.
-        """
-        response = await self.generation_client.generate_text(prompt=prompt)
+Query: "{query}"
+Context: "{context[:2000]}"
+
+Answer ONLY "YES" if it is relevant and contains specific info to answer the question, or "NO" if it is irrelevant or insufficient.
+"""
+        # Use utility_client (small/fast model) — NOT the heavy generation_client
+        response = await self.utility_client.generate_text(prompt=prompt)
         return "YES" in response.strip().upper()

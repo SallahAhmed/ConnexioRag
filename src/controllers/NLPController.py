@@ -31,8 +31,9 @@ class NLPController(BaseController):
 
         # Initialize Controllers
         self.workflow_controller = WorkflowController(
-            generation_client=self.utility_client,
-            template_parser=self.template_parser
+            generation_client=self.generation_client,
+            template_parser=self.template_parser,
+            utility_client=self.utility_client
         )
 
         if self.db_client:
@@ -53,6 +54,7 @@ class NLPController(BaseController):
             )
 
     def create_collection_name(self, project_id: str):
+        """Single source of truth for vector collection naming. Keep in sync with ToolManager."""
         return f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
     
     async def reset_vector_db_collection(self, project: Project):
@@ -281,7 +283,9 @@ class NLPController(BaseController):
         
         total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
         if language == "ar":
-            total_budget = 5000 # Increased for better utilization of 70B model
+            # Arabic is token-expensive (~1 char ≈ 1+ token), so we apply a tighter cap
+            # to stay within local model limits, but never below 8000 for usable context.
+            total_budget = min(total_budget, 8000)
         
         context_string = "\n\n".join(retrieved_context)
         max_context_chars = int(total_budget * 0.5)

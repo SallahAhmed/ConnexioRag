@@ -16,14 +16,14 @@ class DataController(BaseController):
         print("Validating file: ", file.content_type)
 
         allowed_types = self.app_settings.FILE_ALLOWED_TYPES
-        allowed_exts = [ext.lower() for ext in [getattr(self.app_settings, 'FILE_ALLOWED_EXTENSIONS', None)] if ext]  # fallback if you add FILE_ALLOWED_EXTENSIONS
         filename = file.filename or ""
         file_ext = os.path.splitext(filename)[-1].lower()
+        ALLOWED_EXTENSIONS = ['.txt', '.pdf']  # Keep in sync with FILE_ALLOWED_TYPES
 
         # If content_type is application/octet-stream, check extension
         if file.content_type == "application/octet-stream":
             # Accept only if extension is allowed (txt, pdf, etc.)
-            if file_ext not in ['.txt', '.pdf']:
+            if file_ext not in ALLOWED_EXTENSIONS:
                 return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
         else:
             if file.content_type not in allowed_types:

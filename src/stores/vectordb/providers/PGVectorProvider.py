@@ -49,7 +49,7 @@ class PGVectorProvider(VectorDBInterface):
                 results = await session.execute(list_tbl, {"collection_name": collection_name})
                 record = results.scalar_one_or_none()
 
-        return record
+        return record is not None
     
     async def list_all_collections(self) -> List:
         records = []
