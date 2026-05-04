@@ -1,7 +1,48 @@
-# Postman VS Code Extension local workspace configuration
-.postman/
+# --- Environments & Secrets ---
+src/.env
+.env
+*.env
+!.env.example
+!src/.env.example
 
-# Postman Environments (often contain sensitive API keys or secrets)
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+env/
+.pytest_cache/
+.coverage
+htmlcov/
+.mypy_cache/
+.ruff_cache/
+
+# --- Project Specific Assets ---
+src/assets/files/*
+!src/assets/files/.gitignore
+qdrant_db/
+mnesia/
+rabbitmq/
+rabbitmq-data/
+activemq-data/
+
+# --- Logs & Celery ---
+*.log
+src/*.log
+celerybeat-schedule
+celerybeat.pid
+
+# --- IDEs & OS ---
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+
+# --- Postman ---
+.postman/
 *.environment.json
 *.environment.yaml
 *.postman_environment.json
