@@ -125,7 +125,7 @@ class SessionModel(BaseDataModel):
             await session.execute(stmt)
             await session.commit()
 
-    async def get_recent_history(self, session_id: int, last_n: int = 10) -> list:
+    async def get_recent_history(self, session_id: int, last_n: int = 50) -> list:
         """Returns the last N messages from the chat history."""
         chat_session = await self.get_session(session_id)
         if not chat_session or not chat_session.chat_history:

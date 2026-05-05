@@ -64,16 +64,16 @@ graph TD
 
 Connexio leverages a curated selection of premium technologies to ensure performance and reliability:
 
-| Category             | Technology                                                                        | Role                                                    |
-| :------------------- | :-------------------------------------------------------------------------------- | :------------------------------------------------------ |
-| **Framework**        | [FastAPI](https://fastapi.tiangolo.com/)                                          | High-performance async API development.                 |
-| **AI Orchestration** | [LangChain](https://www.langchain.com/)                                           | Document loading, splitting, and tool management.       |
-| **Vector DB**        | [Qdrant](https://qdrant.tech/) & [pgvector](https://github.com/pgvector/pgvector) | Semantic search and long-term memory.                   |
-| **Relational DB**    | [PostgreSQL](https://www.postgresql.org/)                                         | Project metadata, session management, and chat history. |
-| **Task Queue**       | [Celery](https://docs.celeryq.dev/)                                               | Asynchronous indexing and document processing.          |
-| **Message Broker**   | [RabbitMQ](https://www.rabbitmq.com/)                                             | Handling background task distributions.                 |
-| **LLM Providers**    | Groq (gpt-oss-120b), OpenAI, Cohere, Ollama                    | Multimodal intelligence and high-quality embeddings.    |
-| **Monitoring**       | Prometheus & Grafana                                                              | Real-time performance metrics and dashboards.           |
+| Category             | Technology                                                                        | Role                                                                |
+| :------------------- | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------ |
+| **Framework**        | [FastAPI](https://fastapi.tiangolo.com/)                                          | High-performance async API development.                             |
+| **AI Orchestration** | [LangChain](https://www.langchain.com/)                                           | Document loading, splitting, and tool management.                   |
+| **Vector DB**        | [Qdrant](https://qdrant.tech/) & [pgvector](https://github.com/pgvector/pgvector) | Semantic search and long-term memory.                               |
+| **Relational DB**    | [PostgreSQL](https://www.postgresql.org/)                                         | Project metadata, session management, and chat history.             |
+| **Task Queue**       | [Celery](https://docs.celeryq.dev/)                                               | Asynchronous indexing and document processing.                      |
+| **Message Broker**   | [RabbitMQ](https://www.rabbitmq.com/)                                             | Handling background task distributions.                             |
+| **LLM Providers**    | Groq (Llama 3.3 70B, Llama 3.1 8B), OpenAI, Cohere                                | Multimodal intelligence, tool selection, and intent classification. |
+| **Monitoring**       | Prometheus & Grafana                                                              | Real-time performance metrics and dashboards.                       |
 
 ---
 
@@ -241,12 +241,14 @@ Connexio uses **Reciprocal Rank Fusion (RRF)** to combine results from multiple 
 
 The `NLPController` manages the conversation flow:
 
-- **Intent Detection**: Categorizes queries into nodes (e.g., ONBOARDING, BLOCKER, GENERAL).
+- **Intent Detection & Guardrails**: Categorizes queries into nodes (e.g., ONBOARDING, BLOCKER, GENERAL). A dedicated `OUT_OF_SCOPE` node acts as a strict guardrail, automatically rejecting off-topic queries (e.g., trivia, history) to keep the AI focused exclusively on professional/project topics.
 - **Language Detection**: Automatically switches between English and Arabic prompts.
+- **Deep Conversational Memory**: Retains up to 40,000 characters (~16k dedicated to chat history) per session, enabling deep, continuous, multi-turn technical discussions without losing context.
 - **Persona Mapping**: Adjusts the tone and depth of the answer based on the user's role.
-- **Corrective RAG (CRAG)**: If the internal knowledge base is insufficient, the system
-  automatically triggers external tools like **Wikipedia** and **SerpApi (Google Search)**
-  to provide a comprehensive, real-time fallback answer.
+- **Corrective RAG (CRAG)**: If the internal knowledge base is insufficient or the user asks a specialized question, the system dynamically extracts context and triggers external tools:
+  - **Wikipedia & Google (SerpApi)** for live web search and general definitions.
+  - **GitHub API** for extracting repository issues, commits, and summaries.
+  - **Python Interpreter** for executing logic, math, and data processing.
 - **Internal Tracing**: Every step is logged by the `TraceManager`, allowing developers to visualize the "thought process" and latency of the AI.
 
 ---

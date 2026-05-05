@@ -333,7 +333,7 @@ class ToolManager:
         base_url = f"https://api.github.com/repos/{repo_name}"
         
         try:
-            async with httpx.AsyncClient() as client:
+            async with httpx.AsyncClient(follow_redirects=True) as client:
                 if mode == "commits":
                     url = f"{base_url}/commits?per_page=5"
                     resp = await client.get(url, headers=headers)

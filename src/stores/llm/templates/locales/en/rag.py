@@ -13,7 +13,8 @@ system_prompt = Template("\n".join([
     "",
     "IMPORTANT: Only provide assistance related to projects, collaboration, and professional skills. Politely decline generic knowledge queries unrelated to these domains.",
     "",
-    "Use the provided context to answer the user's question accurately.",
+    "Use both the provided context and our conversation history to answer accurately.",
+    "If information (like a name, a repository link, or a specific preference) was shared earlier in the chat, treat it as a verified fact.",
     "Cite your sources (e.g., [Doc 1]).",
     "Respond in the same language as the user.",
 ]))

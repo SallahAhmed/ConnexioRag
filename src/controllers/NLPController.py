@@ -12,6 +12,7 @@ from datetime import datetime
 import uuid
 from .helpers.TraceManager import tracer
 import logging
+import os
 
 class NLPController(BaseController):
 
@@ -144,7 +145,7 @@ class NLPController(BaseController):
         language = await self.workflow_controller.detect_language(query)
         self.template_parser.set_language(language)
         node = await self.workflow_controller.detect_node(query)
-        tracer.end_trace(trace_id, step_id, {"node": node.value, "language": language})
+        tracer.end_trace(trace_id, step_id, {"node": node.value, "language": language}, usage=self.utility_client.last_usage)
 
         print(f"[AGENT] [{now()}] Node: {node}")
         
@@ -169,17 +170,18 @@ class NLPController(BaseController):
             history = []
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
-        # Step 3: Multi-Source Retrieval (Simplified for Speed)
+        # Step 3: Multi-Source Retrieval
         retrieved_context = []
         sources = []
-
-        # --- Query Decomposition Disabled for Speed ---
-        # step_id = tracer.start_trace(trace_id, "Query Decomposition")
-        # print(f"[AGENT] [{now()}] Decomposing Query (Internal Logic)...")
-        # ... (logic omitted)
-        # tracer.end_trace(trace_id, step_id, queries_to_search)
-        
         queries_to_search = [query]
+
+        # Pre-process history for use in tool extraction/refinement
+        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 40000)
+        max_history_chars = int(total_budget * 0.4)
+        truncated_history = self._get_truncated_history(history, max_history_chars)
+        utility_history = []
+        for msg in truncated_history:
+            utility_history.append(self.utility_client.construct_prompt(prompt=msg['content'], role=msg['role']))
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
@@ -200,9 +202,10 @@ class NLPController(BaseController):
             kb_results += f"\n[Results for: {q}]\n{res}\n"
 
         is_kb_relevant = await self.workflow_controller.grade_relevance(query, kb_results)
+        kb_usage = self.utility_client.last_usage
         
         if not is_kb_relevant and node != WorkflowNodeEnum.OUT_OF_SCOPE:
-            tracer.end_trace(trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)")
+            tracer.end_trace(trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)", usage=kb_usage)
             
             # Step 1: Decision Logic (The "Brilliant" part)
             decision_prompt = f"""Analyze the user query: "{query}" and select the single best tool.
@@ -210,7 +213,7 @@ class NLPController(BaseController):
             - "GOOGLE": News, recent events, technical stats, product info.
             - "GITHUB": Code, repositories, issues.
             - "PYTHON": Math, logic, data processing.
-            - "NONE": If the query is unrelated to projects, technology, or professional skills.
+            - "NONE": Use this if the query is conversational, asks about previous chat history, or if no tool is required.
             
             IMPORTANT: Return ONLY one word from the list above. No explanation."""
             
@@ -227,7 +230,7 @@ class NLPController(BaseController):
             if "GITHUB" in choice:
                 step_id_github = tracer.start_trace(trace_id, "GitHub Tool Search")
                 refine_prompt = f"Extract the GitHub repository name (e.g., 'owner/repo') and the desired mode ('summary', 'commits', or 'issues') from this query: {query}. Return as JSON: {{\"repo\": \"...\", \"mode\": \"...\"}}. Return ONLY the JSON."
-                gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt)
+                gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
                 try:
                     gh_info = json.loads(gh_info_raw.strip().replace("```json", "").replace("```", ""))
                     repo_name = gh_info.get("repo")
@@ -240,7 +243,7 @@ class NLPController(BaseController):
                 
                 retrieved_context.append(f"\n[GitHub Repository Data]:\n{github_results}")
                 sources.append("GitHub")
-                tracer.end_trace(trace_id, step_id_github, f"GitHub Result: {github_results[:50]}...")
+                tracer.end_trace(trace_id, step_id_github, f"GitHub Result: {github_results[:50]}...", usage=self.utility_client.last_usage)
 
             elif "PYTHON" in choice:
                 step_id_python = tracer.start_trace(trace_id, "Python Interpreter Execution")
@@ -250,22 +253,22 @@ class NLPController(BaseController):
                 
                 retrieved_context.append(f"\n[Python Execution Result]:\n{python_results}")
                 sources.append("Python Interpreter")
-                tracer.end_trace(trace_id, step_id_python, f"Python Output Length: {len(python_results)}")
+                tracer.end_trace(trace_id, step_id_python, f"Python Output Length: {len(python_results)}", usage=self.utility_client.last_usage)
 
             elif "GOOGLE" in choice:
                 step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
                 refine_prompt = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
-                refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
+                refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
                 refined_query = refined_query.strip().strip('"').strip("'")
                 web_results = await self.tool_manager.search_google(query=refined_query)
                 retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
                 sources.append("Google Search")
-                tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}")
+                tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}", usage=self.utility_client.last_usage)
             
             elif "WIKIPEDIA" in choice:
                 step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
                 refine_prompt = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
-                refined_query = await self.utility_client.generate_text(prompt=refine_prompt)
+                refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
                 refined_query = refined_query.strip().strip('"').strip("'")
                 wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
                 if wiki_results and "Unable to perform" not in wiki_results:
@@ -273,12 +276,15 @@ class NLPController(BaseController):
                     sources.append("Wikipedia")
                 else:
                     retrieved_context.append("\n[Global Knowledge]: No external information found.")
-                tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}")
-        else:
-            # KB results are valid
+                tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}", usage=self.utility_client.last_usage)
+        elif node != WorkflowNodeEnum.OUT_OF_SCOPE:
+            # KB results are valid (or at least we are in a valid node)
             retrieved_context.append(kb_results)
-            sources.append("Documentation")
-            tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}")
+            if kb_results.strip():
+                sources.append("Documentation")
+            tracer.end_trace(trace_id, step_id, f"Total Length: {len(kb_results)}", usage=kb_usage)
+        else:
+            tracer.end_trace(trace_id, step_id, "Skipped (Out of Scope)")
         
         # Strictly local document retrieval
         self.template_parser.set_language(language)
@@ -288,11 +294,11 @@ class NLPController(BaseController):
             "node": node.value
         })
         
-        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 15000)
+        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 40000)
         if language == "ar":
             # Arabic is token-expensive (~1 char ≈ 1+ token), so we apply a tighter cap
-            # to stay within local model limits, but never below 8000 for usable context.
-            total_budget = min(total_budget, 8000)
+            # to stay within local model limits, but never below 25000 for usable context.
+            total_budget = min(total_budget, 25000)
         
         context_string = "\n\n".join(retrieved_context)
         max_context_chars = int(total_budget * 0.5)
@@ -306,9 +312,6 @@ class NLPController(BaseController):
             "query": query,
             "context": context_string
         })
-
-        max_history_chars = int(total_budget * 0.3)
-        truncated_history = self._get_truncated_history(history, max_history_chars)
 
         chat_history = [self.generation_client.construct_prompt(prompt=system_prompt, role="system")]
         for msg in truncated_history:
@@ -328,6 +331,7 @@ class NLPController(BaseController):
 
         # Step 6: Generate & Persist
         answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
+        tracer.end_trace(trace_id, step_id, answer[:100], usage=self.generation_client.last_usage)
         
         if not answer or len(answer.strip()) == 0:
             self.logger.warning(f"AI returned an empty response for trace {trace_id}")
@@ -337,13 +341,21 @@ class NLPController(BaseController):
             await self.session_model.append_message(session_id, "user", query, node.value)
             await self.session_model.append_message(session_id, "assistant", answer, node.value)
 
+        # Save trace to local file for developer auditing (hidden from end-user)
+        try:
+            os.makedirs("traces", exist_ok=True)
+            with open(f"traces/trace_{trace_id}.json", "w", encoding="utf-8") as f:
+                f.write(tracer.export_trace(trace_id))
+        except Exception as e:
+            self.logger.error(f"Failed to save trace to file: {str(e)}")
+
         return {
             "answer": answer,
             "node": node.value,
             "language": language,
             "sources": sources,
-            "session_id": session_id,
-            "trace": tracer.export_trace(trace_id)
+            "session_id": session_id
+            # "trace" is now hidden from end-user
         }
 
     async def answer_agent_chat_stream(self, user_id: int, project_id: Optional[int], query: str, 
@@ -379,8 +391,16 @@ class NLPController(BaseController):
         
         tracer.end_trace(trace_id, step_id, full_answer)
         
-        # Finally send the full trace summary in a final event
-        yield f"data: {json.dumps({'event': 'trace', 'data': tracer.export_trace(trace_id)})}\n\n"
+        # Save trace to local file for developer auditing (hidden from end-user)
+        try:
+            os.makedirs("traces", exist_ok=True)
+            with open(f"traces/trace_{trace_id}.json", "w", encoding="utf-8") as f:
+                f.write(tracer.export_trace(trace_id))
+        except Exception as e:
+            self.logger.error(f"Failed to save trace to file: {str(e)}")
+        
+        # We no longer yield the full trace summary in a final event to the end user
+        # yield f"data: {json.dumps({'event': 'trace', 'data': tracer.export_trace(trace_id)})}\n\n"
 
         # When done streaming, persist to DB.
         if self.db_client:

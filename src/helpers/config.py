@@ -46,7 +46,7 @@ class Settings(BaseSettings):
     INPUT_DEFAULT_MAX_CHARACTERS: int | None = None
     GENERATION_DEFAULT_MAX_TOKENS: int | None = None
     GENERATION_DEFAULT_TEMPERATURE: float | None = None
-    TOTAL_CONTEXT_CHAR_BUDGET: int = 15000
+    TOTAL_CONTEXT_CHAR_BUDGET: int = 25000
 
     VECTOR_DB_BACKEND_LITERAL: List[str] | None = None
     VECTOR_DB_BACKEND : str

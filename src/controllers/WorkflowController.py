@@ -129,4 +129,9 @@ class WorkflowController(BaseController):
         response = await self.utility_client.generate_text(prompt=user_prompt, chat_history=chat_history)
         
         grade = response.strip().upper()
+        
+        # CRITICAL FIX: "RELEVANT" is a substring of "IRRELEVANT"
+        if "IRRELEVANT" in grade or "NO" in grade:
+            return False
+            
         return "RELEVANT" in grade or "AMBIGUOUS" in grade or "YES" in grade

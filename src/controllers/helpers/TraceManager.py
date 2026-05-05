@@ -31,13 +31,15 @@ class TraceManager:
         })
         return step_id
 
-    def end_trace(self, trace_id: str, step_id: str, output: Any = None):
+    def end_trace(self, trace_id: str, step_id: str, output: Any = None, usage: dict = None):
         if trace_id in self.traces:
             for step in self.traces[trace_id]["steps"]:
                 if step["step_id"] == step_id:
                     step["end_time"] = time.time()
                     step["duration_ms"] = (step["end_time"] - step["start_time"]) * 1000
                     step["output_summary"] = str(output)[:200] if output else None
+                    if usage:
+                        step["usage"] = usage
                     self.logger.info(f"[TRACE] {step['action_name']} completed in {step['duration_ms']:.2f}ms")
                     break
         

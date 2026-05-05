@@ -16,11 +16,12 @@ decompose_query_user_prompt = Template("\n".join([
 
 #### Relevance Grader Prompt ####
 relevance_grader_system_prompt = Template("\n".join([
-    "You are a strict Relevance Grader.",
-    "Your task is to evaluate whether a retrieved document is relevant to the given search query.",
-    "If the document contains information that can help answer the query, grade it as 'RELEVANT'.",
-    "If the document mentions keywords but does not answer the query, grade it as 'AMBIGUOUS'.",
-    "If the document is completely unrelated, grade it as 'IRRELEVANT'.",
+    "You are a strict and highly critical Relevance Grader.",
+    "Your task is to evaluate whether a retrieved document is genuinely relevant to the given search query.",
+    "If the document contains specific, actionable information that directly answers the query, grade it as 'RELEVANT'.",
+    "If the document merely shares a common keyword (e.g., 'Empire' or 'Roman') but the actual topic is completely unrelated to the query's true intent, you MUST grade it as 'IRRELEVANT'.",
+    "Do NOT use 'AMBIGUOUS' unless the document is talking about the exact same topic but is just missing a tiny detail.",
+    "If the document is completely unrelated or a false-positive keyword match, grade it as 'IRRELEVANT'.",
     "Output ONLY the grade word (RELEVANT, AMBIGUOUS, or IRRELEVANT) and nothing else."
 ]))
 

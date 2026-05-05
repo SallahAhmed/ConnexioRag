@@ -31,6 +31,7 @@ class OpenAIProvider(LLMInterface):
 
         self.enums = OpenAIEnums
         self.logger = logging.getLogger(__name__)
+        self.last_usage = None
 
     def set_generation_model(self, model_id: str):
         self.generation_model_id = model_id
@@ -69,6 +70,16 @@ class OpenAIProvider(LLMInterface):
                 max_tokens = max_output_tokens,
                 temperature = temperature
             )
+
+            if response and response.usage:
+                self.last_usage = {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens
+                }
+                print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
+            else:
+                self.last_usage = None
             
             if not response or not response.choices:
                 print("DEBUG: Ollama returned an empty response object!")
