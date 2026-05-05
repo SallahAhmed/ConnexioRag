@@ -12,16 +12,11 @@ class WorkflowController(BaseController):
     async def detect_node(self, query: str) -> WorkflowNodeEnum:
         """
         Detects the workflow node from the user query.
-        Uses a Fast-Path for short queries, then Keywords, then falls back to LLM.
+        Uses Keywords first, then a Fast-Path for short noise, then falls back to LLM.
         """
         query_lower = query.lower().strip()
 
-        # 1. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly.
-        if len(query_lower) < 50:
-            return WorkflowNodeEnum.GENERAL
-
-        # 2. KEYWORD MAPPING: Specific nodes are checked BEFORE GENERAL to avoid false positives.
-        #    Order matters: most specific triggers first, GENERAL is the final fallback.
+        # 1. KEYWORD MAPPING: Catch specific triggers early (including OUT_OF_SCOPE)
         keywords = {
             WorkflowNodeEnum.BLOCKER: [
                 "stuck", "not responding", "error", "problem", "help fix",
@@ -45,7 +40,11 @@ class WorkflowController(BaseController):
                 "where do i start", "new here", "how it works", "how do i start",
                 "getting started", "first time", "بداية", "كيف أبدأ", "جديد هنا"
             ],
-            # GENERAL is checked last — only conversational triggers, no ambiguous words
+            WorkflowNodeEnum.OUT_OF_SCOPE: [
+                "capital of", "weather in", "who is the president", "tell me a joke",
+                "عاصمة", "الطقس", "من هو رئيس", "قل لي نكتة"
+            ],
+            # GENERAL conversational triggers
             WorkflowNodeEnum.GENERAL: [
                 "hello", "hi", "hey", "good morning", "good afternoon",
                 "who are you", "what can you do", "your name",
@@ -56,6 +55,10 @@ class WorkflowController(BaseController):
         for node, triggers in keywords.items():
             if any(trigger in query_lower for trigger in triggers):
                 return node
+
+        # 2. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly if no keywords matched.
+        if len(query_lower) < 50:
+            return WorkflowNodeEnum.GENERAL
 
         # 3. Fallback to LLM for complex classification
         language = await self.detect_language(query)
@@ -106,12 +109,24 @@ class WorkflowController(BaseController):
         if not context or "No relevant documents found" in context:
             return False
 
-        prompt = f"""Evaluate if the following context contains information that can answer the user's query.
-Query: "{query}"
-Context: "{context[:2000]}"
+        language = await self.detect_language(query)
+        self.template_parser.set_language(language)
 
-Answer ONLY "YES" if it is relevant and contains specific info to answer the question, or "NO" if it is irrelevant or insufficient.
-"""
+        system_prompt = self.template_parser.get("relevance_grading", "relevance_grader_system_prompt")
+        user_prompt = self.template_parser.get("relevance_grading", "relevance_grader_user_prompt", {
+            "query": query,
+            "document": context[:2000]
+        })
+
+        chat_history = [
+            self.generation_client.construct_prompt(
+                prompt=system_prompt,
+                role=self.generation_client.enums.SYSTEM.value
+            )
+        ]
+
         # Use utility_client (small/fast model) — NOT the heavy generation_client
-        response = await self.utility_client.generate_text(prompt=prompt)
-        return "YES" in response.strip().upper()
+        response = await self.utility_client.generate_text(prompt=user_prompt, chat_history=chat_history)
+        
+        grade = response.strip().upper()
+        return "RELEVANT" in grade or "AMBIGUOUS" in grade or "YES" in grade

@@ -9,7 +9,8 @@ Your task is to classify the user's message into exactly one of the following wo
 - PHASE_TRANSITION: User is ready to move to the next project phase (Ideation -> MVP -> Development).
 - BLOCKER: User is stuck, reporting a technical issue, or communication problem.
 - MILESTONE_WARNING: User is concerned about deadlines, late tasks, or missing milestones.
-- GENERAL: Any other message, general knowledge, or conversational queries.
+- GENERAL: Conversational queries about the assistant, the platform, or software/project fields.
+- OUT_OF_SCOPE: Generic knowledge, history, geography, celebrities, or anything unrelated to projects, technology, or professional skills.
 
 Respond ONLY with the name of the node in CAPITALS.
 """)

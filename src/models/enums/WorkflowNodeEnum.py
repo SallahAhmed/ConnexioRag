@@ -7,3 +7,4 @@ class WorkflowNodeEnum(Enum):
     BLOCKER = "blocker"
     MILESTONE_WARNING = "milestone_warning"
     GENERAL = "general"
+    OUT_OF_SCOPE = "out_of_scope"

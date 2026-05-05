@@ -182,14 +182,16 @@ class NLPController(BaseController):
         queries_to_search = [query]
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
-        print(f"[AGENT] [{now()}] Searching Knowledge Base (Parallel)...")
-        
-        # Search all decomposed queries (and the original one) in parallel
-        search_tasks = [
-            self.tool_manager.search_knowledge_base(project_id=project_id, query=q, limit=limit)
-            for q in queries_to_search
-        ]
-        results = await asyncio.gather(*search_tasks)
+        if node == WorkflowNodeEnum.OUT_OF_SCOPE:
+            print(f"[AGENT] [{now()}] Query is OUT OF SCOPE. Skipping retrieval.")
+            results = [[]] # Mock empty results for parallel search
+        else:
+            # Search all decomposed queries (and the original one) in parallel
+            search_tasks = [
+                self.tool_manager.search_knowledge_base(project_id=project_id, query=q, limit=limit)
+                for q in queries_to_search
+            ]
+            results = await asyncio.gather(*search_tasks)
         
         # --- Corrective RAG (CRAG) Logic ---
         # If KB is empty or irrelevant, we fallback to Web Search
@@ -199,7 +201,7 @@ class NLPController(BaseController):
 
         is_kb_relevant = await self.workflow_controller.grade_relevance(query, kb_results)
         
-        if not is_kb_relevant:
+        if not is_kb_relevant and node != WorkflowNodeEnum.OUT_OF_SCOPE:
             tracer.end_trace(trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)")
             
             # Step 1: Decision Logic (The "Brilliant" part)
@@ -208,6 +210,7 @@ class NLPController(BaseController):
             - "GOOGLE": News, recent events, technical stats, product info.
             - "GITHUB": Code, repositories, issues.
             - "PYTHON": Math, logic, data processing.
+            - "NONE": If the query is unrelated to projects, technology, or professional skills.
             
             IMPORTANT: Return ONLY one word from the list above. No explanation."""
             
@@ -215,7 +218,11 @@ class NLPController(BaseController):
             choice = choice.strip().upper()
             
             # Step 2: Tool Specific Processing
-            print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
+            if "NONE" in choice:
+                print(f"[AGENT] [{now()}] Query determined to be out of domain. Skipping fallback.")
+                retrieved_context.append("\n[Global Knowledge]: No relevant information found in project domain.")
+            else:
+                print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
             
             if "GITHUB" in choice:
                 step_id_github = tracer.start_trace(trace_id, "GitHub Tool Search")
@@ -255,7 +262,7 @@ class NLPController(BaseController):
                 sources.append("Google Search")
                 tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}")
             
-            else: # WIKIPEDIA
+            elif "WIKIPEDIA" in choice:
                 step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
                 refine_prompt = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
                 refined_query = await self.utility_client.generate_text(prompt=refine_prompt)

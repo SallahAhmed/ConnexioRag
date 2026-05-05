@@ -34,11 +34,16 @@ async def startup_span():
     try:
         async with app.db_engine.begin() as conn:
             print("[AGENT] Initializing database tables...")
-            await asyncio.wait_for(conn.run_sync(SQLAlchemyBase.metadata.create_all), timeout=30.0)
+            await asyncio.wait_for(
+                conn.run_sync(SQLAlchemyBase.metadata.create_all), 
+                timeout=30.0
+            )
             print("[AGENT] Database tables initialized or already exist.")
     except Exception as e:
         print(f"[AGENT] Skipping database auto-initialization: {str(e)}")
-        print("[AGENT] (The server will still start, but some database features might fail until fixed).")
+        print(
+            "[AGENT] (The server will still start, but some database features might fail until fixed)."
+        )
 
     app.db_client = sessionmaker(
         app.db_engine, class_=AsyncSession, expire_on_commit=False
