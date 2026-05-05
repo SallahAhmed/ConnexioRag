@@ -1,8 +1,8 @@
 $kind: http-request
-name: nlp_index_push
+name: Index Project Assets
 url: "{{api}}/api/v1/nlp/index/push/"
 method: POST
 body:
   type: json
   content: "{ \r\n    \"do_reset\": 1\r\n}"
-order: 2525833123072147
+order: 1778018521201
