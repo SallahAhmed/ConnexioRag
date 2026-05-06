@@ -23,7 +23,7 @@ The core vision of Connexio is to bridge the gap between raw project documentati
 
 ## 🏗️ High-Level Architecture
 
-Connexio is built on a modular, service-oriented architecture designed for scalability and observability.
+Connexio is built on a modular, service-oriented architecture designed for scalability and observability, featuring an advanced agentic workflow with intent detection and corrective RAG capabilities.
 
 ```mermaid
 graph TD
@@ -32,8 +32,18 @@ graph TD
 
     subgraph "Logic & Orchestration"
         API <--> Controller[NLP Controller]
-        Controller <--> Workflow[Workflow Manager]
+        Controller <--> Workflow[Intent Detection & Workflow Manager]
         Controller <--> Tools[Tool Manager]
+
+        subgraph "Workflow Nodes[Specialized Agents]"
+            ONB[ONBOARDING]
+            TEAM[TEAM_FORMATION]
+            PHASE[PHASE_TRANSITION]
+            BLOCK[BLOCKER]
+            MILE[MILESTONE_WARNING]
+            GEN[GENERAL]
+            OUT[OUT_OF_SCOPE]
+        end
     end
 
     subgraph "AI Services"
@@ -41,6 +51,15 @@ graph TD
         LLM --- Groq[Groq / Llama 3]
         LLM --- OpenAI[OpenAI / GPT-4]
         LLM --- Cohere[Cohere / Embeddings]
+    end
+
+    subgraph "Knowledge Sources"
+        Tools --> SQL[PostgreSQL Database]
+        Tools --> Vector[Vector Database (Qdrant/PGVector)]
+        Tools --> Wiki[Wikipedia API]
+        Tools --> Google[Google Search]
+        Tools --> Github[GitHub API]
+        Tools --> Python[Python Interpreter]
     end
 
     subgraph "Asynchronous Processing"
@@ -64,16 +83,19 @@ graph TD
 
 Connexio leverages a curated selection of premium technologies to ensure performance and reliability:
 
-| Category             | Technology                                                                        | Role                                                                |
-| :------------------- | :-------------------------------------------------------------------------------- | :------------------------------------------------------------------ |
-| **Framework**        | [FastAPI](https://fastapi.tiangolo.com/)                                          | High-performance async API development.                             |
-| **AI Orchestration** | [LangChain](https://www.langchain.com/)                                           | Document loading, splitting, and tool management.                   |
-| **Vector DB**        | [Qdrant](https://qdrant.tech/) & [pgvector](https://github.com/pgvector/pgvector) | Semantic search and long-term memory.                               |
-| **Relational DB**    | [PostgreSQL](https://www.postgresql.org/)                                         | Project metadata, session management, and chat history.             |
-| **Task Queue**       | [Celery](https://docs.celeryq.dev/)                                               | Asynchronous indexing and document processing.                      |
-| **Message Broker**   | [RabbitMQ](https://www.rabbitmq.com/)                                             | Handling background task distributions.                             |
-| **LLM Providers**    | Groq (Llama 3.3 70B, Llama 3.1 8B), OpenAI, Cohere                                | Multimodal intelligence, tool selection, and intent classification. |
-| **Monitoring**       | Prometheus & Grafana                                                              | Real-time performance metrics and dashboards.                       |
+| Category              | Technology                                                                                                                              | Role                                                                |
+| :-------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------ |
+| **Framework**         | [FastAPI](https://fastapi.tiangolo.com/)                                                                                                | High-performance async API development.                             |
+| **AI Orchestration**  | [LangChain](https://www.langchain.com/)                                                                                                 | Document loading, splitting, and tool management.                   |
+| **Vector DB**         | [Qdrant](https://qdrant.tech/) & [pgvector](https://github.com/pgvector/pgvector)                                                       | Semantic search and long-term memory.                               |
+| **Relational DB**     | [PostgreSQL](https://www.postgresql.org/)                                                                                               | Project metadata, session management, and chat history.             |
+| **Task Queue**        | [Celery](https://docs.celeryq.dev/)                                                                                                     | Asynchronous indexing and document processing.                      |
+| **Message Broker**    | [RabbitMQ](https://www.rabbitmq.com/)                                                                                                   | Handling background task distributions.                             |
+| **Database Drivers**  | [SQLAlchemy](https://www.sqlalchemy.org/), [asyncpg](https://github.com/MagicStack/asyncpg), [alembic](https://alembic.sqlalchemy.org/) | ORM, async PostgreSQL driver, and migration tooling.                |
+| **LLM Providers**     | Groq (Llama 3.3 70B, Llama 3.1 8B), OpenAI, Cohere                                                                                      | Multimodal intelligence, tool selection, and intent classification. |
+| **External APIs**     | Wikipedia API, [Google Search](https://serpapi.com/) (SerpApi), [GitHub API](https://docs.github.com/en/rest)                           | External knowledge sources for Corrective RAG.                      |
+| **Monitoring**        | Prometheus & Grafana                                                                                                                    | Real-time performance metrics and dashboards.                       |
+| **Worker Monitoring** | [Flower](https://github.com/mher/flower)                                                                                                | Celery worker monitoring and management.                            |
 
 ---
 
@@ -94,36 +116,106 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 Connexio is highly configurable via environment variables. Key sections in your `.env` file include:
 
 ```ini
-# Core App Settings
+# --- Application Settings ---
 APP_NAME="Connexio"
 APP_VERSION="0.1"
+FILE_ALLOWED_TYPES=["application/pdf","text/plain"]
+FILE_MAX_SIZE=10
+FILE_DEFAULT_CHUNK_SIZE=1024
+PRIMARY_LANG="en"
+DEFAULT_LANG="en"
+INPUT_DEFAULT_MAX_CHARACTERS=500
 
-# Database Connections
-POSTGRES_HOST=pgvector
-POSTGRES_PORT=5432
-REDIS_HOST=redis
-REDIS_PORT=6379
+# --- Database Configuration ---
+POSTGRES_USERNAME="your_postgres_username"
+POSTGRES_PASSWORD="your_postgres_password"
+POSTGRES_HOST="your_postgres_host"
+POSTGRES_PORT=your_postgres_port
+POSTGRES_MAIN_DATABASE="your_postgres_database"
 
-# AI Providers
-GENERATION_BACKEND="GROQ" # Options: GROQ, OPENAI, COHERE
-EMBEDDING_BACKEND="COHERE"
-GROQ_API_KEY="your_key"
-OPENAI_API_KEY="your_key"
-COHERE_API_KEY="your_key"
-SERPAPI_API_KEY="your_key"
-
-# Local AI Providers (Ollama via OpenAI API Compatibility)
+# --- LLM & AI Configuration ---
+# ========================= LLM Config =========================
 # GENERATION_BACKEND="OPENAI"
-# EMBEDDING_BACKEND="OPENAI"
-# OPENAI_API_URL="http://localhost:11434/v1" # Use http://host.docker.internal:11434/v1 in Docker
-# OPENAI_API_KEY="ollama"
-# GENERATION_MODEL_ID="llama3"
-# EMBEDDING_MODEL_ID="nomic-embed-text"
+# OPENAI_API_KEY="your_openrouter_api_key"
+# OPENAI_GENERATION_API_URL="https://openrouter.ai/api/v1"
+GENERATION_BACKEND="GROQ" # Options: GROQ, OPENAI, COHERE
+EMBEDDING_BACKEND="OPENAI" # Options: OPENAI, COHERE
+OPENAI_API_KEY="your_openai_api_key"
+OPENAI_GENERATION_API_URL="http://your_ollama_ip:11434/v1" # Use http://host.docker.internal:11434/v1 in Docker
+OPENAI_EMBEDDING_API_URL="http://your_ollama_ip:11434/v1"
+COHERE_API_KEY="your_cohere_api_key"
+GROQ_API_KEY="your_groq_api_key"
+GROQ_API_URL="https://api.groq.com/openai/v1"
+SERPAPI_API_KEY="your_serpapi_api_key"
+GITHUB_TOKEN="your_github_token"
 
-# Vector Search
-VECTOR_DB_BACKEND="QDRANT" # Options: QDRANT, PGVECTOR
+# ========================= Model IDs =========================
+GENERATION_MODEL_ID_LITERAL=["qwen:4b","gemma4:e2b","llama-3.3-70b-versatile","openai/gpt-oss-120b","inclusionai/ling-2.6-1t:free", "qwen/qwen-3-coder-480b:free", "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free","openrouter/free"]
+GENERATION_MODEL_ID="your_generation_model_id"
+UTILITY_MODEL_ID="your_utility_model_id"
+EMBEDDING_MODEL_ID="bge-m3"
+EMBEDDING_MODEL_SIZE=1024
+
+# ========================= Generation Defaults =========================
+INPUT_DEFAULT_MAX_CHARACTERS=500
+GENERATION_DEFAULT_MAX_TOKENS=1024
+GENERATION_DEFAULT_TEMPERATURE=0.1
+TOTAL_CONTEXT_CHAR_BUDGET=12000
+
+# --- Vector DB Configuration ---
+# ========================= Vector DB Config =========================
+VECTOR_DB_BACKEND_LITERAL=["QDRANT", "PGVECTOR"]
+VECTOR_DB_BACKEND="PGVECTOR" # Options: QDRANT, PGVECTOR
+VECTOR_DB_PATH="qdrant_db"
 VECTOR_DB_DISTANCE_METHOD="cosine"
+VECTOR_DB_PGVEC_INDEX_THRESHOLD=400
+
+# --- Celery & Task Queue Configuration ---
+# ========================= Celery Task Queue Config =========================
+CELERY_BROKER_URL="amqp://your_user:your_pass@your_host:5672/your_vhost"
+CELERY_RESULT_BACKEND="redis://:your_pass@your_host:6379/0"
+
+CELERY_TASK_SERIALIZER="json"
+CELERY_TASK_TIME_LIMIT=600
+CELERY_TASK_ACKS_LATE=false
+CELERY_WORKER_CONCURRENCY=2
+CELERY_FLOWER_PASSWORD="your_flower_password"
+
+# --- Deprecated or Commented Out ---
+# MONGODB_URL="mongodb://admin:admin@localhost:27007"
+# MONGODB_DATABASE="Anything"   
+# REDIS_HOST="localhost"
+# REDIS_PORT=6379
+# REDIS_DB=0
 ```
+
+### 🧠 Intelligent Features
+
+Connexio implements advanced intelligent capabilities beyond basic RAG:
+
+- **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
+  - ONBOARDING: Guidance for new users
+  - TEAM_FORMATION: Intelligent teammate matching logic
+  - PHASE_TRANSITION: Validating deliverables before project advancement
+  - BLOCKER: Troubleshooting and technical problem resolution
+  - MILESTONE_WARNING: Proactive reporting on deadlines and late tasks
+  - GENERAL: Conversational AI grounded in project context
+  - OUT_OF_SCOPE: Guardrail that rejects off-topic queries (trivia, history, etc.)
+
+- **Corrective RAG (CRAG)**: When internal knowledge is insufficient, the system dynamically extracts context and triggers external tools:
+  - Wikipedia & Google (SerpApi) for live web search and general definitions
+  - GitHub API for extracting repository issues, commits, and summaries
+  - Python Interpreter for executing logic, math, and data processing
+
+- **Multi-Source Intelligence**: Combines information from:
+  - SQL Database: Real-time project metrics, user skills, and task history
+  - Vector Knowledge Base: Semantic search through project documentation
+  - External APIs: Wikipedia, Google, GitHub for additional context
+
+- **Language Support**: Automatic detection and switching between English and Arabic prompts
+- **Persona Mapping**: Adjusts tone and depth based on user role (student, educator, company representative, early-career professional)
+- **Deep Conversational Memory**: Retains conversation history (configurable, currently 12,000 characters) for context continuity
+- **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization
 
 ---
 
@@ -131,7 +223,7 @@ VECTOR_DB_DISTANCE_METHOD="cosine"
 
 ### 🐳 Docker Deployment (Recommended)
 
-The easiest way to run Connexio is using the provided Docker Compose configuration which spins up all 11+ services (API, Workers, DBs, Monitoring):
+The easiest way to run Connexio is using the provided Docker Compose configuration which spins up all services (API, Workers, DBs, Monitoring):
 
 ```bash
 # Clone the repository
@@ -140,9 +232,10 @@ cd Connexio
 
 # Setup your environment
 cp src/.env.example src/.env
+# Edit .env file with your configuration (API keys, etc.)
 
 # Spin up the infrastructure
-docker-compose -f docker/docker-compose.yml up --build -d
+docker compose -f docker/docker-compose.yml up --build -d
 ```
 
 ### 🐍 Local Development
@@ -171,6 +264,9 @@ If you prefer running locally:
    celery -A celery_app worker --loglevel=info
    ```
 
+> [!NOTE]
+> For local development with Ollama models, uncomment the relevant sections in your `.env` file and ensure Ollama is running locally.
+
 ---
 
 > [!TIP]
@@ -180,15 +276,15 @@ If you prefer running locally:
 
 ### 🔹 Agent Endpoints
 
-| Endpoint                                             | Method | Description                                                                                    |
-| :--------------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------- |
-| `/api/v1/nlp/agent/chat/{project_id}`                | `POST` | Engage in a persona-based conversation with the AI agent using project context.                |
-| `/api/v1/nlp/agent/chat/stream/{project_id}`         | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction.                  |
-| `/api/v1/nlp/agent/portfolio/{project_id}`           | `POST` | Generate a summary of a user's contributions and tasks for their professional portfolio.       |
-| `/api/v1/nlp/agent/supervisor/risks/{project_id}`    | `GET`  | Identify potential project risks, stalled tasks, and milestone delays for supervisors.         |
-| `/api/v1/nlp/agent/coach/path/{project_id}`          | `GET`  | Provide motivational quotes and recommended learning paths based on user progress.             |
-| `/api/v1/nlp/agent/doc-gen/{project_id}`             | `POST` | Automatically generate project documentation like READMEs or Retrospectives from project data. |
-| `/api/v1/nlp/agent/task-architect/plan/{project_id}` | `POST` | Break down complex user queries into a structured step-by-step task resolution plan.           |
+| Endpoint                                             | Method | Description                                                                                                                                                                                          |
+| :--------------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/v1/nlp/agent/chat/{project_id}`                | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
+| `/api/v1/nlp/agent/chat/stream/{project_id}`         | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
+| `/api/v1/nlp/agent/portfolio/{project_id}`           | `POST` | Generate a comprehensive summary of a user's contributions, tasks, and achievements for their professional portfolio by querying the project database.                                               |
+| `/api/v1/nlp/agent/supervisor/risks/{project_id}`    | `GET`  | Analyze project progress metrics and identify high-risk areas including stalled tasks, missed deadlines, and resource bottlenecks for supervisory oversight.                                         |
+| `/api/v1/nlp/agent/coach/path/{project_id}`          | `GET`  | Provide personalized motivational quotes and recommended learning paths based on user progress, field of experience, and project context.                                                            |
+| `/api/v1/nlp/agent/doc-gen/{project_id}`             | `POST` | Automatically generate structured project documentation (README, Retrospective, etc.) by analyzing project data, tasks, and team contributions.                                                      |
+| `/api/v1/nlp/agent/task-architect/plan/{project_id}` | `POST` | Break down complex user queries into detailed, step-by-step resolution plans by combining knowledge base search with task resolution logic.                                                          |
 
 ### 🔹 Base Endpoints
 
@@ -217,15 +313,15 @@ If you prefer running locally:
 
 ## 🔍 The Brain: RAG Pipeline & Logic
 
-Connexio doesn't just search; it understands and reasons. The pipeline is divided into three critical stages:
+Connexio doesn't just search; it understands and reasons through an advanced agentic workflow. The pipeline is divided into three critical stages:
 
 ### 1. Document Ingestion & Hybrid Indexing
 
 When documents are uploaded:
 
 - **Smart Chunking**: Text is split into manageable chunks using `RecursiveCharacterTextSplitter` with configurable overlap to preserve context.
-- **Multimodal Embedding**: Chunks are transformed into 384-dimensional vectors using `Cohere` or `OpenAI`.
-- **Hybrid Storage**: Chunks are stored in **Qdrant** for semantic search and **PostgreSQL (Trigrams)** for keyword-based search. This ensures that terms like "FastAPI" (keyword) and "Web Frameworks" (semantic) both find the right result.
+- **Multimodal Embedding**: Chunks are transformed into vectors using the configured embedding model (currently 1024-dimensional with bge-m3).
+- **Hybrid Storage**: Chunks are stored in the vector database (Qdrant or PGVector) for semantic search and in PostgreSQL for metadata. This enables both semantic and keyword-based search capabilities.
 
 ### 2. Intelligent Retrieval (Hybrid Search + RRF)
 
@@ -239,17 +335,25 @@ Connexio uses **Reciprocal Rank Fusion (RRF)** to combine results from multiple 
 
 ### 3. Agentic Workflow
 
-The `NLPController` manages the conversation flow:
+The `NLPController` manages the conversation flow through a sophisticated agentic loop:
 
-- **Intent Detection & Guardrails**: Categorizes queries into nodes (e.g., ONBOARDING, BLOCKER, GENERAL). A dedicated `OUT_OF_SCOPE` node acts as a strict guardrail, automatically rejecting off-topic queries (e.g., trivia, history) to keep the AI focused exclusively on professional/project topics.
-- **Language Detection**: Automatically switches between English and Arabic prompts.
-- **Deep Conversational Memory**: Retains up to 40,000 characters (~16k dedicated to chat history) per session, enabling deep, continuous, multi-turn technical discussions without losing context.
-- **Persona Mapping**: Adjusts the tone and depth of the answer based on the user's role.
-- **Corrective RAG (CRAG)**: If the internal knowledge base is insufficient or the user asks a specialized question, the system dynamically extracts context and triggers external tools:
-  - **Wikipedia & Google (SerpApi)** for live web search and general definitions.
-  - **GitHub API** for extracting repository issues, commits, and summaries.
-  - **Python Interpreter** for executing logic, math, and data processing.
-- **Internal Tracing**: Every step is logged by the `TraceManager`, allowing developers to visualize the "thought process" and latency of the AI.
+- **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
+  - **ONBOARDING**: Guidance for new users getting started with the project
+  - **TEAM_FORMATION**: Intelligent teammate matching logic based on skills and availability
+  - **PHASE_TRANSITION**: Validating deliverables before project advancement
+  - **BLOCKER**: Troubleshooting and technical problem resolution
+  - **MILESTONE_WARNING**: Proactive reporting on deadlines and late tasks
+  - **GENERAL**: Conversational AI grounded in project context
+  - **OUT_OF_SCOPE**: Guardrail that automatically rejects off-topic queries (trivia, history, etc.) to maintain focus on professional/project topics
+
+- **Language Detection**: Automatically switches between English and Arabic prompts based on user input.
+- **Deep Conversational Memory**: Retains conversation history (currently limited to 12,000 characters) for context continuity, enabling deep, continuous, multi-turn technical discussions.
+- **Persona Mapping**: Adjusts the tone, depth, and terminology of the answer based on the user's role (student, educator, company representative, or early-career professional).
+- **Corrective RAG (CRAG)**: When the internal knowledge base is insufficient or irrelevant, the system dynamically extracts context and triggers external tools:
+  - **Wikipedia & Google (SerpApi)** for live web search, general definitions, and current information
+  - **GitHub API** for extracting repository issues, commits, and code summaries
+  - **Python Interpreter** for executing logic, mathematical calculations, and data processing tasks
+- **Internal Tracing**: Every step is logged by the `TraceManager`, allowing developers to visualize the AI's "thought process", latency, and decision-making for debugging and optimization.
 
 ---
 

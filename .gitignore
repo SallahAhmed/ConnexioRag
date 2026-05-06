@@ -46,3 +46,7 @@ Thumbs.db
 *.environment.json
 *.environment.yaml
 *.postman_environment.json
+*.postman_collection.json
+
+# --- RAG Traces ---
+traces/

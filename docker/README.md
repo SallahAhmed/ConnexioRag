@@ -1,17 +1,22 @@
-# Docker Setup for MiniRAG Application
+# Docker Setup for Connexio Application
 
-This directory contains the Docker setup for the MiniRAG application, including all necessary services for development and monitoring.
+This directory contains the Docker setup for the Connexio application, including all necessary services for development, monitoring, and production deployment.
 
 ## Services
 
-- **FastAPI Application**: Main application running on Uvicorn
-- **Nginx**: Web server for serving the FastAPI application
-- **PostgreSQL (pgvector)**: Vector-enabled database for storing embeddings
-- **Postgres-Exporter**: Exports PostgreSQL metrics for Prometheus
-- **Qdrant**: Vector database for similarity search
-- **Prometheus**: Metrics collection
+- **FastAPI Application**: Main application running on Uvicorn with hot-reloading
+- **Nginx**: Web server for serving the FastAPI application (can serve directly or reverse proxy)
+- **PostgreSQL (pgvector)**: Vector-enabled PostgreSQL database for storing embeddings and metadata
+- **Qdrant**: Vector database for similarity search (alternative/backup to pgvector)
+- **RabbitMQ**: Message broker for Celery task distribution
+- **Redis**: Results backend and cache for Celery
+- **Celery Worker**: Background task processor for file processing, data indexing, and maintenance
+- **Celery Beat**: Scheduler for periodic Celery tasks
+- **Flower**: Web-based tool for monitoring and administering Celery clusters
+- **Prometheus**: Metrics collection and storage system
 - **Grafana**: Visualization dashboard for metrics
-- **Node-Exporter**: System metrics collection
+- **Node-Exporter**: System metrics collector for Prometheus
+- **Postgres-Exporter**: Exports PostgreSQL metrics for Prometheus
 
 ## Setup Instructions
 
@@ -19,41 +24,51 @@ This directory contains the Docker setup for the MiniRAG application, including 
 
 Create your environment files from the examples:
 
-````bash
+```bash
 # Create all required .env files from examples
 cd docker/env
 cp .env.example.app .env.app
 cp .env.example.postgres .env.postgres
 cp .env.example.grafana .env.grafana
 cp .env.example.postgres-exporter .env.postgres-exporter
+cp .env.example.rabbitmq .env.rabbitmq
+cp .env.example.redis .env.redis
 
 # Setup the Alembic configuration for the FastAPI application
 cd ..
-cd docker/minirag
+cd docker/connexio
 cp alembic.example.ini alembic.ini
+```
 
-### 2. Start the services
+### 2. Configure your environment
+
+Edit the `.env.app` file to set your configuration:
+
+- Set your API keys (OPENAI_API_KEY, etc.)
+- Adjust database credentials if needed
+- Modify any other settings as required for your environment
+
+To start only specific services (e.g., just the core application):
 
 ```bash
-cd docker
-docker compose up --build -d
-````
-
-To start only specific services:
-
-```bash
-docker compose up -d fastapi nginx pgvector qdrant
+docker compose up -d fastapi nginx pgvector redis rabbitmq
 ```
 
 If you encounter connection issues, you may want to start the database services first and let them initialize before starting the application:
 
 ```bash
-# Start databases first
-docker compose up -d pgvector qdrant postgres-exporter
-# Wait for databases to be healthy
+# Start databases and message brokers first
+docker compose up -d pgvector qdrant redis rabbitmq postgres-exporter
+# Wait for services to be healthy (adjust time as needed)
 sleep 30
 # Start the application services
-docker compose up fastapi nginx prometheus grafana node-exporter --build -d
+docker compose up fastapi nginx celery-worker celery-beat flower prometheus grafana node-exporter --build -d
+```
+
+To start with monitoring only:
+
+```bash
+docker compose up -d prometheus grafana node-exporter postgres-exporter
 ```
 
 In case deleting all containers and volumes is necessary, you can run:
@@ -67,9 +82,13 @@ docker compose down -v --remove-orphans
 - FastAPI Application: http://localhost:8000
 - FastAPI Documentation: http://localhost:8000/docs
 - Nginx (serving FastAPI): http://localhost
+- PostgreSQL (pgvector): localhost:5433 (host port mapped to container's 5432)
 - Prometheus: http://localhost:9090
 - Grafana: http://localhost:3000
 - Qdrant UI: http://localhost:6333/dashboard
+- Node Exporter Metrics: http://localhost:9100/metrics
+- Postgres Exporter Metrics: http://localhost:9187/metrics
+- RabbitMQ Management UI: http://localhost:15672 (uses credentials from .env.rabbitmq)
 
 ## Volume Management
 
@@ -138,21 +157,27 @@ Prometheus is configured to scrape these metrics automatically.
 
 1. Log into Grafana at http://localhost:3000 (default credentials: admin/admin_password)
 2. Add Prometheus as a data source (URL: http://prometheus:9090)
-3. Import dashboards for FastAPI, PostgreSQL, and Qdrant
+3. Import dashboards for FastAPI, PostgreSQL, Qdrant, and system metrics
 
 #### Dashboards URLs
 
-https://grafana.com/grafana/dashboards/18739-fastapi-observability/
-
-https://grafana.com/grafana/dashboards/1860-node-exporter-full/
-
-https://grafana.com/grafana/dashboards/23033-qdrant/
-
-https://grafana.com/grafana/dashboards/12485-postgresql-exporter/
+- FastAPI Observability: https://grafana.com/grafana/dashboards/18739-fastapi-observability/
+- Node Exporter Full: https://grafana.com/grafana/dashboards/1860-node-exporter-full/
+- Qdrant Monitoring: https://grafana.com/grafana/dashboards/23033-qdrant/
+- PostgreSQL Exporter: https://grafana.com/grafana/dashboards/12485-postgresql-exporter/
+- Celery Monitoring: https://grafana.com/grafana/dashboards/7562-celery-monitoring/
 
 ## Development Workflow
 
 The FastAPI application is configured with hot-reloading. Any changes to the code in the `src/` directory will automatically reload the application.
+
+For development with Ollama models:
+
+1. Ensure Ollama is running locally
+2. Uncomment the OPENAI sections in your `.env.app` file
+3. Set OPENAI_API_KEY="ollama"
+4. Set OPENAI_GENERATION_API_URL="http://host.docker.internal:11434/v1"
+5. Set OPENAI_EMBEDDING_API_URL="http://host.docker.internal:11434/v1"
 
 ## Troubleshooting
 
