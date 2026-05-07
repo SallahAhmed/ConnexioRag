@@ -45,3 +45,7 @@ google-search-results==2.4.2
 # --- Monitoring & Observability ---
 prometheus-client==0.25.0
 starlette-exporter==0.23.0
+
+# --- Modern AI Tools ---
+tiktoken==0.12.0
+guidance==0.3.1

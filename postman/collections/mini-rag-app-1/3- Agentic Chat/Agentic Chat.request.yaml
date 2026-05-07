@@ -8,12 +8,9 @@ body:
 
     \    \"user_id\": 1,\r
 
-    \    \"query\": \"How do I implement a REST API in Python using
-    FastAPI?\",\r
+    \    \"persona\": \"student\",\r
 
-    \    \"session_id\": 3,   \r
+    \    \"query\": \"How do I make a chocolate cake with vanilla frosting?\"\r
 
-    \    \"persona\": \"student\"\r
-
-    }"
+    }\r\n"
 order: 2066882634810611

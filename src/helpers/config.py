@@ -5,8 +5,6 @@ class Settings(BaseSettings):
     
     APP_NAME: str
     APP_VERSION: str
-    OPENAI_API_KEY: str
-    GROQ_API_KEY: str | None = None
 
     FILE_ALLOWED_TYPES: list
     FILE_MAX_SIZE: int
@@ -40,13 +38,14 @@ class Settings(BaseSettings):
 
     GENERATION_MODEL_ID_LITERAL: List[str] | None = None
     GENERATION_MODEL_ID: str | None = None
-    UTILITY_MODEL_ID: str | None = "qwen:0.5b"
+    UTILITY_MODEL_ID: str | None = "llama-3.1-8b-instant"
     EMBEDDING_MODEL_ID: str | None = None
     EMBEDDING_MODEL_SIZE: int | None = None
     INPUT_DEFAULT_MAX_CHARACTERS: int | None = None
     GENERATION_DEFAULT_MAX_TOKENS: int | None = None
     GENERATION_DEFAULT_TEMPERATURE: float | None = None
-    TOTAL_CONTEXT_CHAR_BUDGET: int = 25000
+    TOTAL_CONTEXT_TOKEN_BUDGET: int = 4000
+    TOTAL_CONTEXT_CHAR_BUDGET: int = 12000
 
     VECTOR_DB_BACKEND_LITERAL: List[str] | None = None
     VECTOR_DB_BACKEND : str

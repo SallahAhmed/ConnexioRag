@@ -1,7 +1,0 @@
-$kind: http-request
-name: Skill Coach Path
-url: "{{api}}/api/v1/nlp/agent/coach/path/?user_id=1"
-method: GET
-queryParams:
-  user_id: "1"
-order: 4498742904934201

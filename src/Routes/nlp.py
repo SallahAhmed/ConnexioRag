@@ -100,38 +100,3 @@ async def search_index(request: Request, project_id: int, search_request: Search
             "results": [ result.dict()  for result in results ]
         }
     )
-
-@nlp_router.post("/index/answer/{project_id}")
-async def answer_rag(request: Request, project_id: int, search_request: SearchRequest):
-    
-    project_model = await ProjectModel.create_instance(
-        db_client=request.app.db_client
-    )
-
-    project = await project_model.get_project_or_create_one(
-        project_id=project_id
-    )
-
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_client=request.app.generation_client,
-        utility_client=request.app.utility_client,
-        embedding_client=request.app.embedding_client,
-        template_parser=request.app.template_parser,
-        settings=request.app.settings,
-        db_client=request.app.db_client
-    )
-
-    result = await nlp_controller.answer_agent_chat(
-        user_id=1, # Default for legacy RAG endpoint
-        project_id=project_id,
-        query=search_request.text,
-        limit=search_request.limit,
-    )
-
-    return JSONResponse(
-        content={
-            "signal": ResponseSignal.RAG_ANSWER_SUCCESS.value,
-            **result
-        }
-    )

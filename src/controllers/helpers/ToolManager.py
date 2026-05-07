@@ -244,79 +244,9 @@ class ToolManager:
             self.logger.error(f"Team Gap Error: {str(e)}")
             return "Error assessing team gaps."
 
-    async def get_user_portfolio(self, user_id: int) -> str:
-        """
-        Summarizes a user's task history and deliverables for their portfolio.
-        """
-        try:
-            query = f"""
-            SELECT t.TaskName, t.TaskDesc, p.PName
-            FROM task t
-            JOIN project p ON t.PID = p.PID
-            WHERE t.UID = {user_id}
-            """
-            tasks = await asyncio.to_thread(self.db.run, query)
-            prompt = f"Summarize the following project contributions for a professional portfolio entry:\n{tasks}"
-            return await self.generation_client.generate_text(prompt=prompt)
-        except Exception as e:
-            if "relation" in str(e).lower() and ("task" in str(e).lower() or "project" in str(e).lower()):
-                return "Note: Task history is currently stored in the main application database and hasn't been synced to the RAG context yet. I can summarize PDF/text documents in the meantime."
-            self.logger.error(f"Portfolio Error: {str(e)}")
-            return "Error generating portfolio summary."
 
-    async def get_streak_quote(self, user_id: int) -> str:
-        """
-        Fetches or generates a domain-aware motivational quote for the user.
-        """
-        try:
-            # Check if quotes table exists (mocked or real)
-            # If not found, LLM generates one based on user's field
-            field_query = f"SELECT fieldExperience FROM \"user\" WHERE UID = {user_id}"
-            field = await asyncio.to_thread(self.db.run, field_query)
-            
-            prompt = f"Generate a short, powerful motivational one-liner for a professional in the field of {field}. Make it inspiring."
-            return await self.generation_client.generate_text(prompt=prompt)
-        except Exception as e:
-            return "Keep pushing forward! Every small step is progress."
 
-    async def get_project_risks(self, project_id: int = None) -> str:
-        """
-        Aggregates risk metrics (missed deadlines, stalled progress) for supervisors.
-        """
-        try:
-            filter_str = f"WHERE project_id = {project_id}" if project_id else ""
-            query = f"SELECT project_id, project_name, progress FROM projects {filter_str} ORDER BY progress ASC"
-            metrics = await asyncio.to_thread(self.db.run, query)
-            
-            prompt = f"Analyze these project progress metrics and identify which are at high risk of failing this sprint:\n{metrics}"
-            return await self.generation_client.generate_text(prompt=prompt)
-        except Exception as e:
-            if "relation" in str(e).lower() and "projects" in str(e).lower():
-                return "Project tracking data is not yet available in the database."
-            self.logger.error(f"Risk Assessment Error: {str(e)}")
-            return "Error performing risk assessment."
 
-    async def generate_project_docs(self, project_id: int, doc_type: str = "readme") -> str:
-        """
-        Generates structured documentation (README, Retrospective) from project data.
-        """
-        try:
-            query = f"SELECT * FROM projects WHERE project_id = {project_id}"
-            proj_data = await asyncio.to_thread(self.db.run, query)
-            
-            # Tasks are core app data, handle missing gracefully
-            tasks = "No synchronized task heartbeats found for this project yet."
-            try:
-                task_query = f"SELECT TaskId, TaskName, TaskDesc FROM task WHERE PID = {project_id}"
-                tasks = await asyncio.to_thread(self.db.run, task_query)
-            except Exception:
-                pass 
-            
-            prompt = f"Generate a high-quality Markdown {doc_type} for this project using this data:\nProject: {proj_data}\nTasks: {tasks}"
-            return await self.generation_client.generate_text(prompt=prompt)
-        except Exception as e:
-            self.logger.error(f"Doc Gen Error: {str(e)}")
-            return "Error generating documentation. Ensure the project exists in the RAG database."
 
     async def fetch_github_data(self, repo_name: str, mode: str = "summary") -> str:
         """
@@ -367,52 +297,61 @@ class ToolManager:
     async def execute_python(self, code: str) -> str:
         """
         Executes Python code in a restricted local environment and returns stdout/stderr.
+        Includes a safety timeout to prevent infinite loops.
         """
         self.logger.info("Executing Python Tool...")
         
         # Clean the code block if it contains markdown
         code = code.strip().replace("```python", "").replace("```", "").strip()
         
-        # Capture stdout and stderr
-        stdout_capture = io.StringIO()
-        stderr_capture = io.StringIO()
-        
-        # Restricted globals/locals
-        # Note: This is not a perfectly secure sandbox, but sufficient for RAG data processing.
-        safe_globals = {
-            "__builtins__": __builtins__,
-            "asyncio": asyncio,
-            "math": __import__("math"),
-            "datetime": __import__("datetime"),
-            "json": __import__("json")
-        }
-        
-        original_stdout = sys.stdout
-        original_stderr = sys.stderr
-        
+        def _execute():
+            # Capture stdout and stderr
+            stdout_capture = io.StringIO()
+            stderr_capture = io.StringIO()
+            
+            # Restricted globals/locals
+            safe_globals = {
+                "__builtins__": __builtins__,
+                "asyncio": asyncio,
+                "math": __import__("math"),
+                "datetime": __import__("datetime"),
+                "json": __import__("json")
+            }
+            
+            original_stdout = sys.stdout
+            original_stderr = sys.stderr
+            
+            try:
+                sys.stdout = stdout_capture
+                sys.stderr = stderr_capture
+                
+                # Execute the code
+                exec(code, safe_globals)
+                
+                output = stdout_capture.getvalue()
+                errors = stderr_capture.getvalue()
+                
+                result = ""
+                if output:
+                    result += f"Output:\n{output}\n"
+                if errors:
+                    result += f"Errors:\n{errors}\n"
+                    
+                if not result:
+                    result = "Code executed successfully with no output."
+                    
+                return result
+            except Exception:
+                return f"Python Execution Error:\n{traceback.format_exc()}"
+            finally:
+                sys.stdout = original_stdout
+                sys.stderr = original_stderr
+
         try:
-            sys.stdout = stdout_capture
-            sys.stderr = stderr_capture
-            
-            # Execute the code
-            exec(code, safe_globals)
-            
-            output = stdout_capture.getvalue()
-            errors = stderr_capture.getvalue()
-            
-            result = ""
-            if output:
-                result += f"Output:\n{output}\n"
-            if errors:
-                result += f"Errors:\n{errors}\n"
-                
-            if not result:
-                result = "Code executed successfully with no output."
-                
-            return result
-        except Exception:
-            return f"Python Execution Error:\n{traceback.format_exc()}"
-        finally:
-            sys.stdout = original_stdout
-            sys.stderr = original_stderr
+            # Run the execution in a thread with a 5-second timeout
+            return await asyncio.wait_for(asyncio.to_thread(_execute), timeout=5.0)
+        except asyncio.TimeoutError:
+            return "Python Execution Error: The script took too long to execute (Timeout: 5s). Ensure your code doesn't contain infinite loops."
+        except Exception as e:
+            return f"Python Execution Error: {str(e)}"
 

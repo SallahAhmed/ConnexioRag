@@ -13,6 +13,8 @@ import uuid
 from .helpers.TraceManager import tracer
 import logging
 import os
+# pyrefly: ignore [missing-import]
+import tiktoken
 
 class NLPController(BaseController):
 
@@ -165,7 +167,14 @@ class NLPController(BaseController):
                 user_id=user_id, project_id=project_id, persona=persona, language=language
             )
             session_id = chat_session.session_id
-            history = await self.session_model.get_recent_history(session_id)
+            
+            # Smart History Management
+            if any(cmd in query.lower() for cmd in ["clear history", "forget everything", "نظف السجل", "نسيان السجل"]):
+                await self.session_model.append_message(session_id, "system", "History cleared by user.")
+                history = []
+                print(f"[AGENT] [{now()}] History cleared for session {session_id}")
+            else:
+                history = await self.session_model.get_recent_history(session_id)
         else:
             history = []
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
@@ -175,10 +184,26 @@ class NLPController(BaseController):
         sources = []
         queries_to_search = [query]
 
+        # Step 4: Token Budgeting (Tiktoken with Graceful Fallback)
+        try:
+            encoding = tiktoken.get_encoding("cl100k_base")
+        except Exception as e:
+            self.logger.error(f"Tiktoken error: {e}. Falling back to character-based estimation.")
+            encoding = None
+
+        total_token_budget = getattr(self.settings, "TOTAL_CONTEXT_TOKEN_BUDGET", 4000)
+        
+        # Aggressive budget for short technical queries
+        if len(query) < 200:
+            total_token_budget = min(total_token_budget, 2500)
+            
+        def count_tokens(text):
+            if encoding:
+                return len(encoding.encode(text))
+            return len(text) // 4 # Rough fallback: 4 chars per token
+
         # Pre-process history for use in tool extraction/refinement
-        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 40000)
-        max_history_chars = int(total_budget * 0.4)
-        truncated_history = self._get_truncated_history(history, max_history_chars)
+        truncated_history = self._get_truncated_history(history, total_token_budget // 3, encoding)
         utility_history = []
         for msg in truncated_history:
             utility_history.append(self.utility_client.construct_prompt(prompt=msg['content'], role=msg['role']))
@@ -198,85 +223,109 @@ class NLPController(BaseController):
         # --- Corrective RAG (CRAG) Logic ---
         # If KB is empty or irrelevant, we fallback to Web Search
         kb_results = ""
+        has_kb_content = False
         for q, res in zip(queries_to_search, results):
-            kb_results += f"\n[Results for: {q}]\n{res}\n"
+            if res:
+                kb_results += f"\n[Results for: {q}]\n{res}\n"
+                has_kb_content = True
 
-        is_kb_relevant = await self.workflow_controller.grade_relevance(query, kb_results)
-        kb_usage = self.utility_client.last_usage
+        # SPEED OPTIMIZATION: If KB is empty, skip LLM grading entirely (saves 5-10s)
+        if not has_kb_content:
+            is_kb_relevant = False
+            kb_usage = {}
+        else:
+            is_kb_relevant = await self.workflow_controller.grade_relevance(query, kb_results)
+            kb_usage = self.utility_client.last_usage
+        
+        # Platform-specific nodes should NOT fall back to Google (risk of wrong product)
+        PLATFORM_NODES = {
+            WorkflowNodeEnum.ONBOARDING,
+            WorkflowNodeEnum.TEAM_FORMATION,
+            WorkflowNodeEnum.PHASE_TRANSITION
+        }
         
         if not is_kb_relevant and node != WorkflowNodeEnum.OUT_OF_SCOPE:
             tracer.end_trace(trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)", usage=kb_usage)
             
-            # Step 1: Decision Logic (The "Brilliant" part)
-            decision_prompt = f"""Analyze the user query: "{query}" and select the single best tool.
+            # Platform Node Guard — if the KB has nothing for a platform question, use a safe canned response
+            if node in PLATFORM_NODES and not has_kb_content:
+                print(f"[AGENT] [{now()}] Platform node '{node.value}' with empty KB. Using canned response.")
+                if language == "ar":
+                    retrieved_context.append("\n[Platform Guide]: لا تتوفر لديّ وثائق منصة محددة حول هذا الموضوع بعد. يُرجى الرجوع إلى أدلة منصة Connexio أو التواصل مع مشرف مشروعك للحصول على إرشادات.")
+                else:
+                    retrieved_context.append("\n[Platform Guide]: I don't have specific Connexio platform documentation on this topic yet. Please check the Connexio platform guides or contact your project supervisor for guidance.")
+                sources.append("Platform Guide")
+            else:
+                # Step 1: Decision Logic (The "Brilliant" part)
+                decision_prompt = f"""Analyze the user query: "{query}" and select the single best tool.
             - "WIKIPEDIA": General knowledge, history, science, definitions.
             - "GOOGLE": News, recent events, technical stats, product info.
-            - "GITHUB": Code, repositories, issues.
-            - "PYTHON": Math, logic, data processing.
+            - "GITHUB": Searching repositories, finding specific open-source files.
+            - "PYTHON": EXECUTING code snippets, math, logic, data processing, or "can you run this".
             - "NONE": Use this if the query is conversational, asks about previous chat history, or if no tool is required.
             
-            IMPORTANT: Return ONLY one word from the list above. No explanation."""
-            
-            choice = await self.utility_client.generate_text(prompt=decision_prompt)
-            choice = choice.strip().upper()
-            
-            # Step 2: Tool Specific Processing
-            if "NONE" in choice:
-                print(f"[AGENT] [{now()}] Query determined to be out of domain. Skipping fallback.")
-                retrieved_context.append("\n[Global Knowledge]: No relevant information found in project domain.")
-            else:
-                print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
-            
-            if "GITHUB" in choice:
-                step_id_github = tracer.start_trace(trace_id, "GitHub Tool Search")
-                refine_prompt = f"Extract the GitHub repository name (e.g., 'owner/repo') and the desired mode ('summary', 'commits', or 'issues') from this query: {query}. Return as JSON: {{\"repo\": \"...\", \"mode\": \"...\"}}. Return ONLY the JSON."
-                gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
-                try:
-                    gh_info = json.loads(gh_info_raw.strip().replace("```json", "").replace("```", ""))
-                    repo_name = gh_info.get("repo")
-                    if repo_name and "/" in repo_name:
-                        github_results = await self.tool_manager.fetch_github_data(repo_name=repo_name, mode=gh_info.get("mode", "summary"))
-                    else:
-                        github_results = "No specific GitHub repository was identified in the query."
-                except:
-                    github_results = "Error parsing GitHub request."
+            IMPORTANT: Return ONLY one word from the list above. No explanation. If the user asks to "RUN" code, pick PYTHON. """
                 
-                retrieved_context.append(f"\n[GitHub Repository Data]:\n{github_results}")
-                sources.append("GitHub")
-                tracer.end_trace(trace_id, step_id_github, f"GitHub Result: {github_results[:50]}...", usage=self.utility_client.last_usage)
-
-            elif "PYTHON" in choice:
-                step_id_python = tracer.start_trace(trace_id, "Python Interpreter Execution")
-                python_prompt = f"Write a short, efficient Python script to solve or analyze this request: {query}. Return ONLY the Python code block."
-                python_code = await self.utility_client.generate_text(prompt=python_prompt)
-                python_results = await self.tool_manager.execute_python(code=python_code)
+                choice = await self.utility_client.generate_text(prompt=decision_prompt)
+                choice = choice.strip().upper()
                 
-                retrieved_context.append(f"\n[Python Execution Result]:\n{python_results}")
-                sources.append("Python Interpreter")
-                tracer.end_trace(trace_id, step_id_python, f"Python Output Length: {len(python_results)}", usage=self.utility_client.last_usage)
-
-            elif "GOOGLE" in choice:
-                step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
-                refine_prompt = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
-                refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
-                refined_query = refined_query.strip().strip('"').strip("'")
-                web_results = await self.tool_manager.search_google(query=refined_query)
-                retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
-                sources.append("Google Search")
-                tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}", usage=self.utility_client.last_usage)
-            
-            elif "WIKIPEDIA" in choice:
-                step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
-                refine_prompt = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
-                refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
-                refined_query = refined_query.strip().strip('"').strip("'")
-                wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
-                if wiki_results and "Unable to perform" not in wiki_results:
-                    retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
-                    sources.append("Wikipedia")
+                # Step 2: Tool Specific Processing
+                if "NONE" in choice:
+                    print(f"[AGENT] [{now()}] Query determined to be out of domain. Skipping fallback.")
+                    retrieved_context.append("\n[Global Knowledge]: No relevant information found in project domain.")
                 else:
-                    retrieved_context.append("\n[Global Knowledge]: No external information found.")
-                tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}", usage=self.utility_client.last_usage)
+                    print(f"[AGENT] [{now()}] Knowledge Gap Detected. Using {choice} for fallback...")
+                
+                if "GITHUB" in choice:
+                    step_id_github = tracer.start_trace(trace_id, "GitHub Tool Search")
+                    refine_prompt = f"Extract the GitHub repository name (e.g., 'owner/repo') and the desired mode ('summary', 'commits', or 'issues') from this query: {query}. Return as JSON: {{\"repo\": \"...\", \"mode\": \"...\"}}. Return ONLY the JSON."
+                    gh_info_raw = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
+                    try:
+                        gh_info = json.loads(gh_info_raw.strip().replace("```json", "").replace("```", ""))
+                        repo_name = gh_info.get("repo")
+                        if repo_name and "/" in repo_name:
+                            github_results = await self.tool_manager.fetch_github_data(repo_name=repo_name, mode=gh_info.get("mode", "summary"))
+                        else:
+                            github_results = "No specific GitHub repository was identified in the query."
+                    except:
+                        github_results = "Error parsing GitHub request."
+                    
+                    retrieved_context.append(f"\n[GitHub Repository Data]:\n{github_results}")
+                    sources.append("GitHub")
+                    tracer.end_trace(trace_id, step_id_github, f"GitHub Result: {github_results[:50]}...", usage=self.utility_client.last_usage)
+
+                elif "PYTHON" in choice:
+                    step_id_python = tracer.start_trace(trace_id, "Python Interpreter Execution")
+                    python_prompt = f"Write a short, efficient Python script to solve or analyze this request: {query}. Return ONLY the Python code block."
+                    python_code = await self.utility_client.generate_text(prompt=python_prompt)
+                    python_results = await self.tool_manager.execute_python(code=python_code)
+                    
+                    retrieved_context.append(f"\n[Python Execution Result]:\n{python_results}")
+                    sources.append("Python Interpreter")
+                    tracer.end_trace(trace_id, step_id_python, f"Python Output Length: {len(python_results)}", usage=self.utility_client.last_usage)
+
+                elif "GOOGLE" in choice:
+                    step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
+                    refine_prompt = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
+                    refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
+                    refined_query = refined_query.strip().strip('"').strip("'")
+                    web_results = await self.tool_manager.search_google(query=refined_query)
+                    retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_results}")
+                    sources.append("Google Search")
+                    tracer.end_trace(trace_id, step_id_web, f"Google Length: {len(web_results)}", usage=self.utility_client.last_usage)
+                
+                elif "WIKIPEDIA" in choice:
+                    step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
+                    refine_prompt = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
+                    refined_query = await self.utility_client.generate_text(prompt=refine_prompt, chat_history=utility_history)
+                    refined_query = refined_query.strip().strip('"').strip("'")
+                    wiki_results = await self.tool_manager.search_wiki(query=refined_query, lang=language)
+                    if wiki_results and "Unable to perform" not in wiki_results:
+                        retrieved_context.append(f"\n[Global Knowledge (Wikipedia)]:\n{wiki_results}")
+                        sources.append("Wikipedia")
+                    else:
+                        retrieved_context.append("\n[Global Knowledge]: No external information found.")
+                    tracer.end_trace(trace_id, step_id_wiki, f"Wiki Length: {len(wiki_results)}", usage=self.utility_client.last_usage)
         elif node != WorkflowNodeEnum.OUT_OF_SCOPE:
             # KB results are valid (or at least we are in a valid node)
             retrieved_context.append(kb_results)
@@ -294,19 +343,15 @@ class NLPController(BaseController):
             "node": node.value
         })
         
-        total_budget = getattr(self.settings, "TOTAL_CONTEXT_CHAR_BUDGET", 40000)
-        if language == "ar":
-            # Arabic is token-expensive (~1 char ≈ 1+ token), so we apply a tighter cap
-            # to stay within local model limits, but never below 25000 for usable context.
-            total_budget = min(total_budget, 25000)
-        
+        # Step 5: Final Prompt Construction (Token-Aware)
         context_string = "\n\n".join(retrieved_context)
-        max_context_chars = int(total_budget * 0.5)
-        context_string = context_string[:max_context_chars]
-
-        print(f"DEBUG: Retrieved Context Length: {len(context_string)} chars")
-        if len(context_string) == 0:
-            print("WARNING: NO CONTEXT RETRIEVED FROM DATABASE!")
+        
+        # Recalculate budget for chat history after tools/context are loaded
+        base_tokens = count_tokens(system_prompt) + count_tokens(context_string)
+        history_budget = total_token_budget - base_tokens - 200 # Reserve 200 for safety
+        
+        # Re-truncate history if needed based on final budget
+        final_history = self._get_truncated_history(history, history_budget, encoding)
 
         footer_prompt = self.template_parser.get("rag", "footer_prompt", {
             "query": query,
@@ -314,7 +359,7 @@ class NLPController(BaseController):
         })
 
         chat_history = [self.generation_client.construct_prompt(prompt=system_prompt, role="system")]
-        for msg in truncated_history:
+        for msg in final_history:
             chat_history.append(self.generation_client.construct_prompt(prompt=msg['content'], role=msg['role']))
 
         return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id
@@ -322,6 +367,30 @@ class NLPController(BaseController):
     async def answer_agent_chat(self, user_id: int, project_id: Optional[int], query: str, 
                                 persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
         
+        # Fast Path: Clear History
+        clear_commands = ["clear history", "forget everything", "new topic", "نظف السجل", "نسيان السجل", "موضوع جديد"]
+        if any(cmd in query.lower() for cmd in clear_commands):
+            # We still need a session ID to save the "History cleared" system message
+            if self.db_client:
+                chat_session = await self.session_model.get_or_create_session(
+                    user_id=user_id, project_id=project_id, persona=persona, language="en"
+                )
+                await self.session_model.append_message(chat_session.session_id, "system", "History cleared by user.")
+                sid = chat_session.session_id
+            else:
+                sid = 0
+            
+            # Detect language for the response
+            lang = "ar" if any("\u0600" <= c <= "\u06FF" for c in query) else "en"
+            msg = "تم مسح سجل المحادثة بنجاح!" if lang == "ar" else "Chat history cleared successfully!"
+            return {
+                "answer": msg,
+                "node": "general",
+                "language": lang,
+                "sources": [],
+                "session_id": sid
+            }
+
         chat_history, footer_prompt, session_id, node, language, sources, trace_id = await self._prepare_chat_context(
             user_id, project_id, query, persona, session_id, limit
         )
@@ -331,7 +400,14 @@ class NLPController(BaseController):
 
         # Step 6: Generate & Persist
         answer = await self.generation_client.generate_text(prompt=footer_prompt, chat_history=chat_history)
-        tracer.end_trace(trace_id, step_id, answer[:100], usage=self.generation_client.last_usage)
+        
+        # Enhanced Logging
+        usage = self.generation_client.last_usage
+        prompt_tokens = usage.get("prompt_tokens", 0)
+        completion_tokens = usage.get("completion_tokens", 0)
+        self.logger.info(f"[TOKEN USAGE] Node: {node.value} | In: {prompt_tokens} | Out: {completion_tokens} | Total: {prompt_tokens + completion_tokens}")
+        
+        tracer.end_trace(trace_id, step_id, answer[:100], usage=usage)
         
         if not answer or len(answer.strip()) == 0:
             self.logger.warning(f"AI returned an empty response for trace {trace_id}")
@@ -361,6 +437,21 @@ class NLPController(BaseController):
     async def answer_agent_chat_stream(self, user_id: int, project_id: Optional[int], query: str, 
                                 persona: str = "student", session_id: Optional[int] = None, limit: int = 5):
         
+        # Fast Path: Clear History
+        clear_commands = ["clear history", "forget everything", "new topic", "نظف السجل", "نسيان السجل", "موضوع جديد"]
+        if any(cmd in query.lower() for cmd in clear_commands):
+            if self.db_client:
+                chat_session = await self.session_model.get_or_create_session(user_id=user_id, project_id=project_id, persona=persona)
+                await self.session_model.append_message(chat_session.session_id, "system", "History cleared by user.")
+                sid = chat_session.session_id
+            else:
+                sid = 0
+            lang = "ar" if any("\u0600" <= c <= "\u06FF" for c in query) else "en"
+            msg = "تم مسح سجل المحادثة بنجاح!" if lang == "ar" else "Chat history cleared successfully!"
+            yield f"data: {json.dumps({'answer': msg, 'session_id': sid, 'node': 'general', 'language': lang})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
         chat_history, footer_prompt, session_id, node, language, sources, trace_id = await self._prepare_chat_context(
             user_id, project_id, query, persona, session_id, limit
         )
@@ -409,39 +500,28 @@ class NLPController(BaseController):
             
         yield "data: [DONE]\n\n"
 
-    def _get_truncated_history(self, history: list, total_char_limit: int) -> list:
+    def _get_truncated_history(self, history: list, total_token_limit: int, encoding=None) -> list:
         """
         Works backward from the most recent messages. 
-        Ensures the total character count across history messages doesn't exceed the limit.
+        Ensures the total token count across history messages doesn't exceed the limit.
         """
         truncated = []
-        current_chars = 0
+        current_tokens = 0
         
-        # Reverse to get newest first, then reverse back at the end
         for msg in reversed(history):
-            content = msg['content'][:2000] # Truncate individual massive messages
-            if current_chars + len(content) > total_char_limit:
+            content = msg.get('content', '')
+            if encoding:
+                msg_tokens = len(encoding.encode(content))
+            else:
+                msg_tokens = len(content) // 4
+                
+            if current_tokens + msg_tokens > total_token_limit:
                 break
             
-            truncated.append({"role": msg['role'], "content": content})
-            current_chars += len(content)
+            truncated.insert(0, msg)
+            current_tokens += msg_tokens
             
-        return list(reversed(truncated))
+        return truncated
 
-    async def get_user_portfolio(self, user_id: int):
-        return await self.tool_manager.get_user_portfolio(user_id)
-
-    async def get_coach_path(self, user_id: int, project_id: Optional[int]):
-        return await self.tool_manager.get_streak_quote(user_id) # Example placeholder for now
-
-    async def get_supervisor_risks(self, project_id: Optional[int]):
-        return await self.tool_manager.get_project_risks(project_id)
-
-    async def get_doc_gen(self, project_id: int, doc_type: str):
-        return await self.tool_manager.generate_project_docs(project_id, doc_type)
-
-    async def get_task_architect_plan(self, query: str, user_id: int, project_id: int):
-        # Combines knowledge base search with task resolution logic
-        kb_context = await self.tool_manager.search_knowledge_base(project_id, query)
-        prompt = f"As a Task Architect, provide a step-by-step resolution plan for: {query}\n\nContext:\n{kb_context}"
-        return await self.generation_client.generate_text(prompt=prompt)
+    # Legacy agentic methods removed.
+    # Portfolio, Coach, Supervisor, Doc Gen, and Task Architect are now handled by the MasarX framework.

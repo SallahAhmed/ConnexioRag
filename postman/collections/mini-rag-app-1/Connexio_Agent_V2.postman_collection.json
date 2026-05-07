@@ -24,7 +24,7 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/chat",
+							"raw": "{{baseUrl}}/api/v1/nlp/agent/chat/1",
 							"host": [
 								"{{baseUrl}}"
 							],
@@ -33,7 +33,8 @@
 								"v1",
 								"nlp",
 								"agent",
-								"chat"
+								"chat",
+								"1"
 							]
 						}
 					},
@@ -64,167 +65,6 @@
 								"nlp",
 								"agent",
 								"chat"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Portfolio Generation",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"user_id\": 1,\n    \"format\": \"linkedin\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/portfolio",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"nlp",
-								"agent",
-								"portfolio"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Coach Path Recommendations",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/coach/path?user_id=1&project_id=1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"nlp",
-								"agent",
-								"coach",
-								"path"
-							],
-							"query": [
-								{
-									"key": "user_id",
-									"value": "1"
-								},
-								{
-									"key": "project_id",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Supervisor & Educator Persona",
-			"item": [
-				{
-					"name": "Project Risk Assessment",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/supervisor/risks?project_id=1",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"nlp",
-								"agent",
-								"supervisor",
-								"risks"
-							],
-							"query": [
-								{
-									"key": "project_id",
-									"value": "1"
-								}
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Documentation Tools",
-			"item": [
-				{
-					"name": "Generate README",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"project_id\": 1,\n    \"doc_type\": \"readme\"\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/doc-gen",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"nlp",
-								"agent",
-								"doc-gen"
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "Task Architect Plan",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"body": {
-							"mode": "raw",
-							"raw": "{\n    \"query\": \"How do I implement OAuth2 with FastAPI and PostgreSQL?\",\n    \"user_id\": 1,\n    \"project_id\": 1\n}",
-							"options": {
-								"raw": {
-									"language": "json"
-								}
-							}
-						},
-						"url": {
-							"raw": "{{baseUrl}}/api/v1/nlp/agent/task-architect/plan",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"api",
-								"v1",
-								"nlp",
-								"agent",
-								"task-architect",
-								"plan"
 							]
 						}
 					},

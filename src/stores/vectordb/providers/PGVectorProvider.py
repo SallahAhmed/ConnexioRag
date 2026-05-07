@@ -71,14 +71,15 @@ class PGVectorProvider(VectorDBInterface):
                     WHERE tablename = :collection_name
                 ''')
 
-                count_sql = sql_text(f'SELECT COUNT(*) FROM {collection_name}')
-
                 table_info = await session.execute(table_info_sql, {"collection_name": collection_name})
-                record_count = await session.execute(count_sql)
-
                 table_data = table_info.fetchone()
+                
                 if not table_data:
                     return None
+                
+                # Only execute COUNT if the table actually exists
+                count_sql = sql_text(f'SELECT COUNT(*) FROM {collection_name}')
+                record_count = await session.execute(count_sql)
                 
                 return {
                     "table_info": {
@@ -378,4 +379,4 @@ class PGVectorProvider(VectorDBInterface):
             doc.score = scores[doc_id]
             final_results.append(doc)
             
-        return final_results
+        return final_results

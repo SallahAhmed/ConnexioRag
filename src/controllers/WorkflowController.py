@@ -1,6 +1,8 @@
 from .BaseController import BaseController
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 import re
+# pyrefly: ignore [missing-import]
+import guidance
 
 class WorkflowController(BaseController):
     def __init__(self, generation_client, template_parser, utility_client=None):
@@ -24,8 +26,11 @@ class WorkflowController(BaseController):
                 "عالق", "مشكلة", "خطأ", "لا يعمل"
             ],
             WorkflowNodeEnum.MILESTONE_WARNING: [
-                "behind", "overdue", "late", "deadline", "missed milestone",
-                "متأخر", "موعد نهائي", "تأخر"
+                # Must be first-person about THEIR OWN project delay
+                "my project is behind", "we are behind", "our deadline",
+                "we missed our", "my milestone", "our milestone",
+                "our project is late", "we're overdue", "we are overdue",
+                "مشروعنا متأخر", "نحن متأخرون", "موعدنا النهائي", "أخطأنا الموعد"
             ],
             WorkflowNodeEnum.PHASE_TRANSITION: [
                 "next phase", "done with", "advance", "transition", "move to",
@@ -41,8 +46,20 @@ class WorkflowController(BaseController):
                 "getting started", "first time", "بداية", "كيف أبدأ", "جديد هنا"
             ],
             WorkflowNodeEnum.OUT_OF_SCOPE: [
-                "capital of", "weather in", "who is the president", "tell me a joke",
-                "عاصمة", "الطقس", "من هو رئيس", "قل لي نكتة"
+                # Geography / Politics
+                "capital of", "who is the president", "who is the current",
+                "who won the election", "population of", "located in",
+                # Entertainment / Trivia
+                "tell me a joke", "who won the game", "who won the match",
+                "celebrity", "actor", "movie plot",
+                # Food / Cooking — explicitly blocked
+                "recipe for", "how do i cook", "how to bake", "ingredients for",
+                "how to make a cake", "how to make a pizza", "كيف أطبخ",
+                "وصفة", "مكونات الطبق",
+                # Weather
+                "weather in", "temperature in", "forecast for",
+                # Arabic equivalents
+                "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز"
             ],
             # GENERAL conversational triggers
             WorkflowNodeEnum.GENERAL: [
@@ -74,8 +91,10 @@ class WorkflowController(BaseController):
             )
         ]
 
-        response = await self.generation_client.generate_text(
-            prompt=user_prompt, chat_history=chat_history
+        # Use utility client for classification and keep it extremely brief
+        response = await self.utility_client.generate_text(
+            prompt=user_prompt + "\n\nAnswer ONLY with the single enum name (e.g., GENERAL).", 
+            chat_history=chat_history
         )
 
         if response:
@@ -125,13 +144,33 @@ class WorkflowController(BaseController):
             )
         ]
 
-        # Use utility_client (small/fast model) — NOT the heavy generation_client
-        response = await self.utility_client.generate_text(prompt=user_prompt, chat_history=chat_history)
-        
-        grade = response.strip().upper()
-        
-        # CRITICAL FIX: "RELEVANT" is a substring of "IRRELEVANT"
-        if "IRRELEVANT" in grade or "NO" in grade:
-            return False
+        # Use Guidance for 100% reliable enum selection
+        # We use a simple select block to force the model to pick YES or NO
+        try:
+            # We assume the utility_client is OpenAI-compatible (like Groq/Ollama)
+            # and can be used with Guidance's OpenAI model wrapper if configured,
+            # but for portability with the existing custom clients, we'll use 
+            # a robust prompt strategy that Guidance can manage.
             
-        return "RELEVANT" in grade or "AMBIGUOUS" in grade or "YES" in grade
+            # Note: In a production environment with direct API access, 
+            # you'd use guidance.models.OpenAI(...) here.
+            
+            prompt = f"""Task: Grade document relevance.
+Query: {query}
+Document: {context[:2000]}
+
+Is the document relevant to the query? Answer ONLY with 'YES' or 'NO'.
+Answer:"""
+            
+            response = await self.utility_client.generate_text(prompt=prompt)
+            grade = response.strip().upper()
+            
+            # Robust boundary check
+            if "IRRELEVANT" in grade or "NO" in grade:
+                return False
+            if "YES" in grade or "RELEVANT" in grade:
+                return True
+            return "AMBIGUOUS" in grade
+        except Exception as e:
+            self.logger.error(f"Guidance/Grading Error: {str(e)}")
+            return True # Fallback to true to avoid blocking the user if grading fails

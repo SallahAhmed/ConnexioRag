@@ -280,11 +280,6 @@ If you prefer running locally:
 | :--------------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/api/v1/nlp/agent/chat/{project_id}`                | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
 | `/api/v1/nlp/agent/chat/stream/{project_id}`         | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
-| `/api/v1/nlp/agent/portfolio/{project_id}`           | `POST` | Generate a comprehensive summary of a user's contributions, tasks, and achievements for their professional portfolio by querying the project database.                                               |
-| `/api/v1/nlp/agent/supervisor/risks/{project_id}`    | `GET`  | Analyze project progress metrics and identify high-risk areas including stalled tasks, missed deadlines, and resource bottlenecks for supervisory oversight.                                         |
-| `/api/v1/nlp/agent/coach/path/{project_id}`          | `GET`  | Provide personalized motivational quotes and recommended learning paths based on user progress, field of experience, and project context.                                                            |
-| `/api/v1/nlp/agent/doc-gen/{project_id}`             | `POST` | Automatically generate structured project documentation (README, Retrospective, etc.) by analyzing project data, tasks, and team contributions.                                                      |
-| `/api/v1/nlp/agent/task-architect/plan/{project_id}` | `POST` | Break down complex user queries into detailed, step-by-step resolution plans by combining knowledge base search with task resolution logic.                                                          |
 
 ### 🔹 Base Endpoints
 
@@ -307,7 +302,6 @@ If you prefer running locally:
 | `/api/v1/nlp/index/push/{project_id}`   | `POST` | Manually trigger the indexing of existing project chunks into the vector database. |
 | `/api/v1/nlp/index/info/{project_id}`   | `GET`  | Retrieve information about the vector database collection for a specific project.  |
 | `/api/v1/nlp/index/search/{project_id}` | `POST` | Perform a semantic search query against the project's indexed data.                |
-| `/api/v1/nlp/index/answer/{project_id}` | `POST` | Direct RAG endpoint to get an AI-generated answer based on project context.        |
 
 ---
 
