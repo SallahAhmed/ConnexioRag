@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Request
+from fastapi import APIRouter, status, Request, Depends
 from fastapi.responses import JSONResponse
 from .schemas.nlp import PushRequest, SearchRequest
 from models.ProjectModel import ProjectModel
@@ -6,16 +6,17 @@ from models.ChunkModel import ChunkModel
 from controllers import NLPController
 from models import ResponseSignal
 from tasks.data_indexing import index_data_content
-# from tasks.celery_app import AsyncResult
-from tqdm.auto import tqdm
+from utils.security import verify_api_key
 import logging
-
 
 logger = logging.getLogger('uvicorn.error')
 
 nlp_router = APIRouter(
     prefix="/api/v1/nlp",
     tags=["api_v1", "nlp"],
+    # Protect all NLP/indexing routes — these are called by the main
+    # backend or by an admin, never directly by an unauthenticated user.
+    dependencies=[Depends(verify_api_key)],
 )
 
 @nlp_router.post("/index/push/{project_id}")

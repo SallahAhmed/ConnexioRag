@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Request
+from fastapi import APIRouter, status, Request, Depends
 from typing import Optional
 from fastapi.responses import JSONResponse, StreamingResponse
 from .schemas.agent import (
@@ -6,6 +6,7 @@ from .schemas.agent import (
 )
 from controllers import NLPController
 from models import ResponseSignal
+from utils.security import verify_api_key
 import logging
 
 logger = logging.getLogger('uvicorn.error')
@@ -13,9 +14,12 @@ logger = logging.getLogger('uvicorn.error')
 agent_router = APIRouter(
     prefix="/api/v1/nlp/agent",
     tags=["api_v1", "agent"],
+    # Every route in this router requires a valid X-API-Key header.
+    # The main Connexio backend adds this header when proxying user requests.
+    dependencies=[Depends(verify_api_key)],
 )
 
-def get_nlp_controller(request: Request):
+def get_nlp_controller(request: Request) -> NLPController:
     return NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
@@ -24,7 +28,10 @@ def get_nlp_controller(request: Request):
         template_parser=request.app.template_parser,
         settings=getattr(request.app, 'settings', None),
         db_client=getattr(request.app, 'db_client', None),
-        reranker=getattr(request.app, 'reranker', None)
+        reranker=getattr(request.app, 'reranker', None),
+        # Single BackendApiClient instance created at startup — shared across
+        # requests so its in-memory cache is effective.
+        backend_client=getattr(request.app, 'backend_client', None),
     )
 
 @agent_router.post("/chat/{project_id}")

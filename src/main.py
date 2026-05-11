@@ -1,6 +1,5 @@
 # --- Framework & Core Imports ---
 from fastapi import FastAPI
-from motor.motor_asyncio import AsyncIOMotorClient
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
 import asyncio
@@ -17,9 +16,18 @@ from stores.llm.templates.template_parser import TemplateParser
 # --- Models & Utils ---
 from models.db_schemas.connexio.schemas import SQLAlchemyBase
 from utils.metrics import setup_metrics
+from utils.backend_client import BackendApiClient
 
 # --- App Initialization ---
-app = FastAPI()
+app = FastAPI(
+    title="Connexios RAG API",
+    description=(
+        "Agentic RAG system for the Connexio platform. "
+        "All endpoints are protected by X-API-Key and must be called "
+        "exclusively by the main Connexio backend (service-to-service)."
+    ),
+    version="1.0.0",
+)
 setup_metrics(app)
 
 async def startup_span():
@@ -99,6 +107,22 @@ async def startup_span():
         language=settings.PRIMARY_LANG,
         default_language=settings.DEFAULT_LANG,
     )
+
+    app.backend_client = BackendApiClient(
+        base_url=settings.MAIN_BACKEND_URL,
+        api_key=settings.CONNEXIO_INTERNAL_API_KEY or "",
+    )
+ 
+    if settings.CONNEXIO_INTERNAL_API_KEY:
+        print(
+            f"[AGENT] X-API-Key authentication ENABLED. "
+            f"Backend URL: {settings.MAIN_BACKEND_URL}"
+        )
+    else:
+        print(
+            "[AGENT] WARNING: CONNEXIO_INTERNAL_API_KEY is not set. "
+            "X-API-Key validation is DISABLED. Set this before any shared deployment."
+        )
 
 async def shutdown_span():
     await app.db_engine.dispose()

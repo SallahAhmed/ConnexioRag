@@ -15,12 +15,16 @@ from models.enums.AssetTypeEnum import AssetTypeEnum
 from controllers import NLPController
 from tasks.file_processing import process_project_files
 from tasks.process_workflow import process_and_push_workflow
+from utils.security import verify_api_key
 
 logger = logging.getLogger('uvicorn.error')
 
 data_router = APIRouter(
-    prefix ="/api/v1/data",
-    tags=["api_v1", "data"]
+    prefix="/api/v1/data",
+    tags=["api_v1", "data"],
+    # Document upload and processing endpoints are called by the main backend
+    # or by an authorized admin — never by an unauthenticated user directly.
+    dependencies=[Depends(verify_api_key)],
 )
 
 @data_router.post("/upload/{project_id}")
@@ -115,16 +119,12 @@ async def process_endpoint(request: Request, project_id: int, process_request: P
 @data_router.post("/process-and-push/{project_id}")
 async def process_and_push_endpoint(request: Request, project_id: int, process_request: ProcessRequest):
 
-    chunk_size = process_request.chunk_size
-    overlap_size = process_request.overlap_size
-    do_reset = process_request.do_reset
-
     workflow_task = process_and_push_workflow.delay(
         project_id=project_id,
         file_id=process_request.file_id,
-        chunk_size=chunk_size,
-        overlap_size=overlap_size,
-        do_reset=do_reset,
+        chunk_size=process_request.chunk_size,
+        overlap_size=process_request.overlap_size,
+        do_reset=process_request.do_reset,
     )
 
     return JSONResponse(
