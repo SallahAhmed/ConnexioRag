@@ -1,0 +1,54 @@
+from enum import Enum
+
+class ResponseSignal(Enum):
+
+    FILE_VALIDATED_SUCCESS = "file_validate_successfully"
+    FILE_TYPE_NOT_SUPPORTED = "file_type_not_supported"
+    FILE_SIZE_EXCEEDED = "file_size_exceeded"
+    FILE_UPLOAD_SUCCESS = "file_upload_success"
+    FILE_UPLOAD_FAILED = "file_upload_failed"
+    PROCESSING_FAILED= "processing_failed"
+    PROCESSING_SUCCESS= "processing_success"
+    NO_FILES_FOUND = "no_files_found"
+    FILE_ID_ERROR = "no_file_found_with_this_id"
+    INSERT_INTO_VECTORDB_ERROR = "insert_into_vector_db_error"
+    INSERT_INTO_VECTORDB_SUCCESS = "insert_into_vector_db_success"
+    VECTORDB_COLLECTION_RETRIEVED = "vector_db_collection_retrieved"
+    VECTORDB_SEARCH_ERROR = "vector_db_search_error"
+    VECTORDB_SEARCH_SUCCESS = "vector_db_search_success"
+    RAG_ANSWER_ERROR = "rag_answer_error"
+    RAG_ANSWER_SUCCESS = "rag_answer_success"
+    PROJECT_NOT_FOUND_ERROR = "project_not_found_error"
+    GENERATION_CLIENT_ERROR = "generation_client_error"
+    EMBEDDING_CLIENT_ERROR = "embedding_client_error"
+    VECTORDB_CLIENT_ERROR = "vector_db_client_error"
+    TEMPLATE_PARSER_ERROR = "template_parser_error"
+
+
+    
+
+    # ============ Agent V2 Signals ============
+    AGENT_CHAT_SUCCESS = "agent_chat_success"
+    AGENT_CHAT_ERROR = "agent_chat_error"
+    AGENT_PORTFOLIO_SUCCESS = "agent_portfolio_success"
+    AGENT_PORTFOLIO_ERROR = "agent_portfolio_error"
+    AGENT_SUPERVISOR_SUCCESS = "agent_supervisor_risks_success"
+    AGENT_SUPERVISOR_ERROR = "agent_supervisor_risks_error"
+    AGENT_COACH_SUCCESS = "agent_coach_path_success"
+    AGENT_COACH_ERROR = "agent_coach_path_error"
+    AGENT_DOCGEN_SUCCESS = "agent_doc_gen_success"
+    AGENT_DOCGEN_ERROR = "agent_doc_gen_error"
+    AGENT_SESSION_NOT_FOUND = "agent_session_not_found"
+    AGENT_MATCHING_ERROR = "agent_matching_rationale_error"
+    AGENT_ARCHITECT_SUCCESS = "agent_task_architect_success"
+    AGENT_ARCHITECT_ERROR = "agent_task_architect_error"
+    AGENT_TASK_DISPATCH_SUCCESS = "agent_task_dispatch_success"
+    AGENT_TASK_DISPATCH_ERROR = "agent_task_dispatch_error"
+    DATA_INDEXING_STARTED = "data_indexing_started"
+    DATA_INDEXING_ERROR = "data_indexing_error"
+    DATA_INDEXING_SUCCESS = "data_indexing_success"
+    DATA_INDEXING_PROGRESS = "data_indexing_progress"
+
+    PROCESS_AND_PUSH_WORKFLOW_READY = "process_and_push_workflow_ready"
+    NO_FILES_ERROR = "no_files_error"
+    

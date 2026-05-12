@@ -1,0 +1,4 @@
+- [x] Create migration script for `project_name` and `progress`
+- [/] Rebuild Docker image to include the new migration
+- [ ] Run the migration inside the container
+- [ ] Verify the application starts successfully

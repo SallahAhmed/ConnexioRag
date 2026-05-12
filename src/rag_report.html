@@ -1,0 +1,172 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Connexio RAG Trace Report</title>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+        <style>
+            :root {
+                --bg: #0f172a;
+                --card: #1e293b;
+                --primary: #38bdf8;
+                --text: #f8fafc;
+                --accent: #818cf8;
+            }
+            body {
+                font-family: 'Inter', sans-serif;
+                background-color: var(--bg);
+                color: var(--text);
+                margin: 0;
+                padding: 40px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+            .container { max-width: 800px; width: 100%; }
+            h1 { font-weight: 800; font-size: 2.5rem; margin-bottom: 10px; color: var(--primary); }
+            .summary-bar {
+                display: flex;
+                gap: 20px;
+                margin-bottom: 40px;
+                background: var(--card);
+                padding: 20px;
+                border-radius: 16px;
+                border: 1px solid #334155;
+            }
+            .stat { flex: 1; text-align: center; }
+            .stat-val { display: block; font-size: 1.5rem; font-weight: 800; color: var(--accent); }
+            .stat-label { font-size: 0.8rem; text-transform: uppercase; opacity: 0.6; }
+            .step-card {
+                background: var(--card);
+                border-radius: 16px;
+                padding: 24px;
+                margin-bottom: 20px;
+                border: 1px solid #334155;
+                transition: transform 0.2s;
+            }
+            .step-card:hover { transform: translateY(-4px); border-color: var(--primary); }
+            .step-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 16px;
+                border-bottom: 1px solid #334155;
+                padding-bottom: 12px;
+            }
+            .step-name { font-weight: 800; font-size: 1.1rem; }
+            .step-duration { opacity: 0.5; font-size: 0.9rem; }
+            .usage-pill {
+                display: flex;
+                gap: 12px;
+                margin-top: 16px;
+                font-size: 0.85rem;
+            }
+            .usage-pill span {
+                background: #0f172a;
+                padding: 4px 12px;
+                border-radius: 20px;
+                border: 1px solid #334155;
+            }
+            .usage-pill .total { background: var(--primary); color: #000; font-weight: 800; border: none; }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <h1>RAG Trace Report</h1>
+            <p style="opacity: 0.6">Trace ID: 9f77bc24-efce-4fce-a720-fb8167ffc147</p>
+            
+            <div class="summary-bar">
+                <div class="stat">
+                    <span class="stat-val">4778</span>
+                    <span class="stat-label">Total Tokens</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-val">7814ms</span>
+                    <span class="stat-label">Latency</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-val">5</span>
+                    <span class="stat-label">Total Steps</span>
+                </div>
+            </div>
+
+            
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-name">Intent & Language Detection</span>
+                <span class="step-duration">4ms</span>
+            </div>
+            <div class="step-body">
+                <p><strong>Output:</strong> {'node': 'general', 'language': 'en'}</p>
+                
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-name">Session Management</span>
+                <span class="step-duration">60ms</span>
+            </div>
+            <div class="step-body">
+                <p><strong>Output:</strong> {'session_id': 3}</p>
+                
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-name">Knowledge Base Retrieval</span>
+                <span class="step-duration">4732ms</span>
+            </div>
+            <div class="step-body">
+                <p><strong>Output:</strong> Irrelevant/Empty (Fallback Triggered)</p>
+                
+            <div class="usage-pill">
+                <span>Prompt: 673</span>
+                <span>Completion: 5</span>
+                <span class="total">Total: 678</span>
+            </div>
+            
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-name">Python Interpreter Execution</span>
+                <span class="step-duration">540ms</span>
+            </div>
+            <div class="step-body">
+                <p><strong>Output:</strong> Python Output Length: 308</p>
+                
+            <div class="usage-pill">
+                <span>Prompt: 64</span>
+                <span>Completion: 395</span>
+                <span class="total">Total: 459</span>
+            </div>
+            
+            </div>
+        </div>
+        
+        <div class="step-card">
+            <div class="step-header">
+                <span class="step-name">LLM Generation</span>
+                <span class="step-duration">2477ms</span>
+            </div>
+            <div class="step-body">
+                <p><strong>Output:</strong> ### How to Become a Data Analyst - A Step-by-Step Roadmap for a Student. Below is a practical, stu</p>
+                
+            <div class="usage-pill">
+                <span>Prompt: 2617</span>
+                <span>Completion: 1024</span>
+                <span class="total">Total: 3641</span>
+            </div>
+            
+            </div>
+        </div>
+        
+        </div>
+    </body>
+    </html>
+    

@@ -1,0 +1,15 @@
+$kind: http-request
+name: SSE Streaming
+url: "{{api}}/api/v1/nlp/agent/chat/stream/1?query=Tell me a long story about a
+  project manager who used AI to save a failing
+  project&user_id=1&persona=student"
+method: GET
+queryParams:
+  query: Tell me a long story about a project manager who used AI to save a
+    failing project
+  user_id: "1"
+  persona: student
+body:
+  type: json
+  content: ""
+order: 1778018551165

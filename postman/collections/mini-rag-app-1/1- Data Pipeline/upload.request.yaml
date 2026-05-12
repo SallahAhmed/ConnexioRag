@@ -1,0 +1,14 @@
+$kind: http-request
+name: upload
+url: "{{api}}/api/v1/data/upload/5"
+method: POST
+body:
+  type: formdata
+  content:
+    - type: file
+      key: file
+      src:
+        - /C:/Users/salla/Connexios/docs/Idea.txt
+      description: ""
+      disabled: false
+order: 1778018472462

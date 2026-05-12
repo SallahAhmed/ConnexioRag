@@ -1,0 +1,16 @@
+$kind: http-request
+name: Agentic Chat
+url: "{{api}}/api/v1/nlp/agent/chat/1"
+method: POST
+body:
+  type: json
+  content: "{\r
+
+    \    \"user_id\": 1,\r
+
+    \    \"persona\": \"student\",\r
+
+    \    \"query\": \"How do I make a chocolate cake with vanilla frosting?\"\r
+
+    }\r\n"
+order: 2066882634810611
