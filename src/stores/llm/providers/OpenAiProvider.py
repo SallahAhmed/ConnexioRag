@@ -1,5 +1,6 @@
 from ..LLMInterface import LLMInterface
 from ..LLMEnums import OpenAIEnums
+# pyrefly: ignore [missing-import]
 from openai import AsyncOpenAI
 import logging
 from typing import List, Union
@@ -167,4 +168,4 @@ class OpenAIProvider(LLMInterface):
         return {
             "role": role,
             "content": prompt,
-        }
+        }
