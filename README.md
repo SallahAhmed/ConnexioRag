@@ -1,3 +1,12 @@
+---
+title: ConnexioRag
+emoji: 🦀
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+---
+
 # 🚀 Connexio: Advanced Agentic RAG Framework
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi)](https://fastapi.tiangolo.com/)
@@ -183,7 +192,7 @@ CELERY_FLOWER_PASSWORD="your_flower_password"
 
 # --- Deprecated or Commented Out ---
 # MONGODB_URL="mongodb://admin:admin@localhost:27007"
-# MONGODB_DATABASE="Anything"   
+# MONGODB_DATABASE="Anything"
 # REDIS_HOST="localhost"
 # REDIS_PORT=6379
 # REDIS_DB=0
@@ -276,10 +285,10 @@ If you prefer running locally:
 
 ### 🔹 Agent Endpoints
 
-| Endpoint                                             | Method | Description                                                                                                                                                                                          |
-| :--------------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/v1/nlp/agent/chat/{project_id}`                | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
-| `/api/v1/nlp/agent/chat/stream/{project_id}`         | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
+| Endpoint                                     | Method | Description                                                                                                                                                                                          |
+| :------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/v1/nlp/agent/chat/{project_id}`        | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
+| `/api/v1/nlp/agent/chat/stream/{project_id}` | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
 
 ### 🔹 Base Endpoints
 
