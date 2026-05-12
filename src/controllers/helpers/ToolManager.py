@@ -20,12 +20,15 @@ import warnings
 from typing import Optional
 
 import httpx
-from langchain_community.tools.wikipedia.tool import WikipediaQueryRun
+# pyrefly: ignore [missing-import]
+from langchain_community.tools import WikipediaQueryRun
+# pyrefly: ignore [missing-import]
 from langchain_community.utilities import (
     SerpAPIWrapper,
     SQLDatabase,
     WikipediaAPIWrapper,
 )
+
 
 # Register pgvector's custom 'vector' type with SQLAlchemy so LangChain
 # doesn't emit SAWarning when reflecting the database schema.
