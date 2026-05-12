@@ -1,11 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T19:36:39.340Z
-> Files: 21 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T20:11:54.624Z
+> Files: 23 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.dockerignore` — Python (~134 tok)
+- `CLAUDE.md` — OpenWolf (~4440 tok)
 - `Dockerfile` — Docker container definition (~144 tok)
 
 ## .claude/
@@ -245,6 +246,10 @@
 ## F:/MasarX_A/
 
 - `Dockerfile` — Docker container definition (~140 tok)
+
+## F:/MasarX_A/docs/documentation/
+
+- `AGENT_RAG_INTEGRATION_STRATEGY.md` — Connexio Full-Stack Integration: Master Blueprint (~10610 tok)
 
 ## F:/MasarX_A/src/
 

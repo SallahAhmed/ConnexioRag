@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 43528,
-    "total_reads": 233,
-    "total_writes": 90,
-    "total_sessions": 5,
+    "total_tokens_estimated": 55038,
+    "total_reads": 238,
+    "total_writes": 129,
+    "total_sessions": 6,
     "anatomy_hits": 19,
-    "anatomy_misses": 191,
-    "repeated_reads_blocked": 27,
-    "estimated_savings_vs_bare_cli": 12012
+    "anatomy_misses": 196,
+    "repeated_reads_blocked": 31,
+    "estimated_savings_vs_bare_cli": 29768
   },
   "sessions": [
     {
@@ -2089,6 +2089,265 @@
         "writes_count": 17,
         "repeated_reads_blocked": 6,
         "anatomy_lookups": 6
+      }
+    },
+    {
+      "id": "session-2026-05-12-2303",
+      "started": "2026-05-12T20:03:23.968Z",
+      "ended": "2026-05-12T20:05:44.894Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 4439,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 152,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 137,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 80,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 169,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 313,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 68,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 4439,
+        "output_tokens_estimated": 919,
+        "reads_count": 2,
+        "writes_count": 6,
+        "repeated_reads_blocked": 2,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2303",
+      "started": "2026-05-12T20:03:23.968Z",
+      "ended": "2026-05-12T20:12:52.927Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 4439,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 152,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 137,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 80,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 169,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 313,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 68,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 69,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 37,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 66,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 15,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 19,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 16,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 51,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 10,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 12,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 24,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 51,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 12,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 12,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 58,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 16,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 13,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 89,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 29,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 26,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 35,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 22,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 24,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 4439,
+        "output_tokens_estimated": 1713,
+        "reads_count": 3,
+        "writes_count": 33,
+        "repeated_reads_blocked": 2,
+        "anatomy_lookups": 0
       }
     }
   ],
