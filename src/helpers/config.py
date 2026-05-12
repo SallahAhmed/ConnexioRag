@@ -3,12 +3,12 @@ from typing import List
 
 class Settings(BaseSettings):
     
-    APP_NAME: str
-    APP_VERSION: str
+    APP_NAME: str = "Connexio"
+    APP_VERSION: str = "0.1"
 
-    FILE_ALLOWED_TYPES: list
-    FILE_MAX_SIZE: int
-    FILE_DEFAULT_CHUNK_SIZE: int
+    FILE_ALLOWED_TYPES: list = ["application/pdf", "text/plain"]
+    FILE_MAX_SIZE: int = 10
+    FILE_DEFAULT_CHUNK_SIZE: int = 1024
 
     # MONGODB_URL: str
     # MONGODB_DATABASE: str
@@ -23,8 +23,8 @@ class Settings(BaseSettings):
     REDIS_PORT: int = 6379
     REDIS_DB: int = 0
 
-    GENERATION_BACKEND: str
-    EMBEDDING_BACKEND: str
+    GENERATION_BACKEND: str = "GROQ"
+    EMBEDDING_BACKEND: str = "COHERE"
 
     OPENAI_API_KEY: str | None = None
     OPENAI_API_URL: str | None = None
@@ -48,22 +48,22 @@ class Settings(BaseSettings):
     TOTAL_CONTEXT_CHAR_BUDGET: int = 12000
 
     VECTOR_DB_BACKEND_LITERAL: List[str] | None = None
-    VECTOR_DB_BACKEND : str
-    VECTOR_DB_PATH : str
-    VECTOR_DB_DISTANCE_METHOD: str = None
+    VECTOR_DB_BACKEND : str = "PGVECTOR"
+    VECTOR_DB_PATH : str = "qdrant_db"
+    VECTOR_DB_DISTANCE_METHOD: str = "cosine"
     VECTOR_DB_PGVEC_INDEX_THRESHOLD: int = 100
 
-    DEFAULT_LANG: str = None
-    PRIMARY_LANG: str = None
+    DEFAULT_LANG: str = "en"
+    PRIMARY_LANG: str = "en"
 
-    CELERY_BROKER_URL: str = None
-    CELERY_RESULT_BACKEND: str = None
+    CELERY_BROKER_URL: str | None = None
+    CELERY_RESULT_BACKEND: str | None = None
     CELERY_TASK_SERIALIZER: str = "json"
     CELERY_TASK_TIME_LIMIT: int = 600
     CELERY_TASK_ACKS_LATE: bool = False
     CELERY_WORKER_CONCURRENCY: int = 2
-    CELERY_FLOWER_PASSWORD: str = None
-    CELERY_FLOWER_BROKER_API: str = None
+    CELERY_FLOWER_PASSWORD: str | None = None
+    CELERY_FLOWER_BROKER_API: str | None = None
 
     CONNEXIO_INTERNAL_API_KEY: str | None = None
     MAIN_BACKEND_URL: str = "http://localhost:3000"
