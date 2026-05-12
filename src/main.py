@@ -6,6 +6,7 @@ import asyncio
 
 # --- Application Routes ---
 from Routes import base, data, nlp, agent
+from Routes.projects import projects_router
 
 # --- Configuration & Factories ---
 from helpers.config import get_settings
@@ -137,3 +138,4 @@ app.include_router(base.base_router)
 app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
 app.include_router(agent.agent_router)
+app.include_router(projects_router)

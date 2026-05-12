@@ -187,7 +187,7 @@ class BackendApiClient:
         points, start_date, end_date, completed_at. Returns None on failure.
         """
         return await self._get(
-            f"/api/tasks?project_id={project_id}",
+            f"/api/tasks/project/{project_id}",
             cache_key=None,  # volatile — never cache
             cache_ttl=_CACHE_TTL_VOLATILE,
         )

@@ -1,4 +1,53 @@
 {
   "version": 1,
-  "bugs": []
+  "bugs": [
+    {
+      "id": "bug-001",
+      "timestamp": "2026-05-12T18:23:15.955Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/main.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→6 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-12T18:23:15.955Z"
+    },
+    {
+      "id": "bug-002",
+      "timestamp": "2026-05-12T18:25:55.789Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/celery_app.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 15→18 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-12T18:25:55.789Z"
+    },
+    {
+      "id": "bug-003",
+      "timestamp": "2026-05-12T18:52:16.829Z",
+      "error_message": "Missing await",
+      "file": "src/Routes/data.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: @data_router.post(\"/upload-and-process/{project_id}\", status; async def upload_and_process(",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-12T18:52:34.639Z"
+    }
+  ]
 }

@@ -2,16 +2,1556 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 0,
-    "total_reads": 0,
-    "total_writes": 0,
-    "total_sessions": 0,
-    "anatomy_hits": 0,
-    "anatomy_misses": 0,
-    "repeated_reads_blocked": 0,
-    "estimated_savings_vs_bare_cli": 0
+    "total_tokens_estimated": 22674,
+    "total_reads": 177,
+    "total_writes": 56,
+    "total_sessions": 5,
+    "anatomy_hits": 7,
+    "anatomy_misses": 149,
+    "repeated_reads_blocked": 15,
+    "estimated_savings_vs_bare_cli": 5924
   },
-  "sessions": [],
+  "sessions": [
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:12:42.454Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:21:16.393Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:22:30.725Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:25:03.068Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:29:35.261Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:46:27.050Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2002",
+      "started": "2026-05-12T17:02:25.068Z",
+      "ended": "2026-05-12T17:47:58.256Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/README.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/start.sh",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 14,
+        "writes_count": 0,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2120",
+      "started": "2026-05-12T18:20:14.519Z",
+      "ended": "2026-05-12T18:27:12.614Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 1412,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/env.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/2c957a9b6777_initial_commit.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/tasks/file_processing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 170,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 135,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py",
+          "tokens_estimated": 170,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 81,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/f1a2b3c4d5e6_add_project_id_map_table.py",
+          "tokens_estimated": 328,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 42,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 54,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 60,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 155,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 579,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1412,
+        "output_tokens_estimated": 1795,
+        "reads_count": 12,
+        "writes_count": 11,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2120",
+      "started": "2026-05-12T18:20:14.519Z",
+      "ended": "2026-05-12T18:30:08.566Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 1412,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/env.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/2c957a9b6777_initial_commit.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/tasks/file_processing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/requirements.txt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 170,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 135,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py",
+          "tokens_estimated": 170,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 81,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/f1a2b3c4d5e6_add_project_id_map_table.py",
+          "tokens_estimated": 328,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 42,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 54,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 60,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 155,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 579,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 35,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 337,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 165,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/requirements.txt",
+          "tokens_estimated": 29,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1412,
+        "output_tokens_estimated": 2361,
+        "reads_count": 14,
+        "writes_count": 15,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2120",
+      "started": "2026-05-12T18:20:14.519Z",
+      "ended": "2026-05-12T18:36:50.305Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 1412,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/env.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/2c957a9b6777_initial_commit.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/tasks/file_processing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/requirements.txt",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/live_models.py",
+          "tokens_estimated": 170,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 135,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py",
+          "tokens_estimated": 170,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 81,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic/versions/f1a2b3c4d5e6_add_project_id_map_table.py",
+          "tokens_estimated": 328,
+          "action": "create"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/db_schemas/connexio/alembic.ini",
+          "tokens_estimated": 42,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 54,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 60,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 155,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/celery_app.py",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 579,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/helpers/config.py",
+          "tokens_estimated": 35,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 337,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 165,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/requirements.txt",
+          "tokens_estimated": 29,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1412,
+        "output_tokens_estimated": 2361,
+        "reads_count": 14,
+        "writes_count": 15,
+        "repeated_reads_blocked": 1,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-12-2148",
+      "started": "2026-05-12T18:48:06.709Z",
+      "ended": "2026-05-12T18:54:57.249Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1535,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/file_processing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/ChunkModel.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/process_workflow.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/data_indexing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/ProjectModel.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/schemas/data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 83,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py",
+          "tokens_estimated": 170,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 240,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1001,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1051,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/projects.py",
+          "tokens_estimated": 784,
+          "action": "create"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 25,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 53,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 1788,
+        "output_tokens_estimated": 3154,
+        "reads_count": 16,
+        "writes_count": 6,
+        "repeated_reads_blocked": 2,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-12-2148",
+      "started": "2026-05-12T18:48:06.709Z",
+      "ended": "2026-05-12T19:05:06.012Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1535,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/file_processing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/ChunkModel.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/process_workflow.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/tasks/data_indexing.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/ProjectModel.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/schemas/data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py",
+          "tokens_estimated": 83,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/__init__.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py",
+          "tokens_estimated": 170,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/.env",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 144,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/Dockerfile",
+          "tokens_estimated": 144,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/BaseController.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/src/main.py",
+          "tokens_estimated": 1556,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/src/controllers/BaseController.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/.dockerignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 240,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1001,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+          "tokens_estimated": 1051,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/projects.py",
+          "tokens_estimated": 784,
+          "action": "create"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 25,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 53,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/.dockerignore",
+          "tokens_estimated": 143,
+          "action": "create"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/Dockerfile",
+          "tokens_estimated": 25,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/Dockerfile",
+          "tokens_estimated": 25,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 3632,
+        "output_tokens_estimated": 3347,
+        "reads_count": 23,
+        "writes_count": 9,
+        "repeated_reads_blocked": 4,
+        "anatomy_lookups": 4
+      }
+    }
+  ],
   "daemon_usage": [],
   "waste_flags": [],
   "optimization_report": {

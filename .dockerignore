@@ -1,0 +1,50 @@
+# Python
+.venv
+__pycache__
+*.py[cod]
+*.pyo
+*.egg-info
+dist
+build
+.eggs
+
+# Secrets — never bake into image; inject via HF Space secrets
+.env
+.env.*
+!.env.example
+
+# Version control
+.git
+.github
+
+# Dev tooling
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Databases and local data
+*.db
+*.sqlite3
+
+# Logs
+*.log
+
+# Docker
+Dockerfile
+.dockerignore
+docker-compose*.yml
+docker/
+
+# Test artifacts
+.pytest_cache
+.coverage
+htmlcov
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Wolf (internal session notes — not needed in container)
+.wolf/

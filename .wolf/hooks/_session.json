@@ -1,0 +1,190 @@
+{
+  "session_id": "session-2026-05-12-2148",
+  "started": "2026-05-12T18:48:06.709Z",
+  "files_read": {
+    "C:/Users/salla/Connexios/src/Routes/data.py": {
+      "count": 1,
+      "tokens": 1535,
+      "first_read": "2026-05-12T18:48:11.523Z"
+    },
+    "C:/Users/salla/Connexios/src/controllers/NLPController.py": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:12.161Z"
+    },
+    "C:/Users/salla/Connexios/src/tasks/file_processing.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:16.015Z"
+    },
+    "C:/Users/salla/Connexios/src/main.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:16.214Z"
+    },
+    "C:/Users/salla/Connexios/src/models/ChunkModel.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:47.738Z"
+    },
+    "C:/Users/salla/Connexios/src/tasks/process_workflow.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:47.744Z"
+    },
+    "C:/Users/salla/Connexios/src/tasks/data_indexing.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:48:50.640Z"
+    },
+    "C:/Users/salla/Connexios/src/models/ProjectModel.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:49:31.754Z"
+    },
+    "C:/Users/salla/Connexios/src/Routes/schemas/data.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:49:37.429Z"
+    },
+    "C:/Users/salla/Connexios/src/Routes/__init__.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:49:37.574Z"
+    },
+    "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/__init__.py": {
+      "count": 1,
+      "tokens": 83,
+      "first_read": "2026-05-12T18:49:41.382Z"
+    },
+    "C:/Users/salla/Connexios/src/models/__init__.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:49:44.254Z"
+    },
+    "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project_id_map.py": {
+      "count": 1,
+      "tokens": 170,
+      "first_read": "2026-05-12T18:49:47.676Z"
+    },
+    "C:/Users/salla/Connexios/src/controllers/WorkflowController.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:50:20.390Z"
+    },
+    "C:/Users/salla/Connexios/src/models/db_schemas/connexio/schemas/project.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:50:48.541Z"
+    },
+    "C:/Users/salla/Connexios/src/.env": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:53:04.335Z"
+    },
+    "C:/Users/salla/Connexios/Dockerfile": {
+      "count": 2,
+      "tokens": 144,
+      "first_read": "2026-05-12T18:57:16.460Z"
+    },
+    "F:/MasarX_A/Dockerfile": {
+      "count": 2,
+      "tokens": 144,
+      "first_read": "2026-05-12T18:57:17.070Z"
+    },
+    "C:/Users/salla/Connexios/src/helpers/config.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:57:47.623Z"
+    },
+    "C:/Users/salla/Connexios/src/controllers/BaseController.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:57:50.921Z"
+    },
+    "F:/MasarX_A/src/main.py": {
+      "count": 1,
+      "tokens": 1556,
+      "first_read": "2026-05-12T18:58:23.433Z"
+    },
+    "F:/MasarX_A/src/controllers/BaseController.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:58:58.911Z"
+    },
+    "F:/MasarX_A/.dockerignore": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T18:59:31.245Z"
+    }
+  },
+  "files_written": [
+    {
+      "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+      "action": "edit",
+      "tokens": 240,
+      "at": "2026-05-12T18:51:58.986Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+      "action": "edit",
+      "tokens": 1001,
+      "at": "2026-05-12T18:52:16.827Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/Routes/data.py",
+      "action": "edit",
+      "tokens": 1051,
+      "at": "2026-05-12T18:52:34.637Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/Routes/projects.py",
+      "action": "create",
+      "tokens": 784,
+      "at": "2026-05-12T18:52:47.380Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/main.py",
+      "action": "edit",
+      "tokens": 25,
+      "at": "2026-05-12T18:52:52.483Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/main.py",
+      "action": "edit",
+      "tokens": 53,
+      "at": "2026-05-12T18:52:59.054Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/.dockerignore",
+      "action": "create",
+      "tokens": 143,
+      "at": "2026-05-12T19:03:04.157Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/Dockerfile",
+      "action": "edit",
+      "tokens": 25,
+      "at": "2026-05-12T19:03:10.722Z"
+    },
+    {
+      "file": "F:/MasarX_A/Dockerfile",
+      "action": "edit",
+      "tokens": 25,
+      "at": "2026-05-12T19:03:16.866Z"
+    }
+  ],
+  "edit_counts": {
+    "src/Routes/data.py": 3,
+    "src/Routes/projects.py": 1,
+    "src/main.py": 2,
+    ".dockerignore": 1,
+    "Dockerfile": 1,
+    "F:/MasarX_A/Dockerfile": 1
+  },
+  "anatomy_hits": 4,
+  "anatomy_misses": 19,
+  "repeated_reads_warned": 4,
+  "cerebrum_warnings": 0,
+  "stop_count": 2
+}

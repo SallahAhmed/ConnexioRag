@@ -18,7 +18,7 @@ COPY . .
 
 RUN chmod +x start.sh
 
-RUN useradd -m -u 1000 user
+RUN useradd -m -u 1000 user && chown -R user:user /app
 USER user
 ENV HOME=/home/user \
     PATH=/home/user/.local/bin:$PATH

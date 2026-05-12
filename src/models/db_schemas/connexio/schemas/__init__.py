@@ -4,3 +4,4 @@ from .data_chunk import DataChunk, RetrievedDocument
 from .chat_session import ChatSession
 from .connexio_base import SQLAlchemyBase
 from .celery_task_execution import CeleryTaskExecution
+from .project_id_map import ProjectIDMap

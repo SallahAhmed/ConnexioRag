@@ -1,4 +1,11 @@
-from celery import Celery
+import logging as _logging
+_celery_logger = _logging.getLogger("uvicorn.error")
+
+try:
+    from celery import Celery
+except ImportError:
+    Celery = None  # type: ignore
+
 from helpers.config import get_settings
 
 from stores.llm.LLMProviderFactory import LLMProviderFactory
@@ -58,21 +65,24 @@ async def get_setup_utils():
     return (db_engine, db_client, llm_provider_factory, vectordb_provider_factory,
             generation_client, utility_client, embedding_client, vectordb_client, template_parser)
 
-# Create Celery application instance
-celery_app = Celery(
-    "connexio",
-    broker=settings.CELERY_BROKER_URL,
-    backend=settings.CELERY_RESULT_BACKEND,
-    include=[
-        "tasks.file_processing",
-        "tasks.data_indexing",
-        "tasks.process_workflow",
-        "tasks.maintenance"
-    ]
-)
+try:
+    celery_app = Celery(
+        "connexio",
+        broker=settings.CELERY_BROKER_URL,
+        backend=settings.CELERY_RESULT_BACKEND,
+        include=[
+            "tasks.file_processing",
+            "tasks.data_indexing",
+            "tasks.process_workflow",
+            "tasks.maintenance"
+        ]
+    )
+except Exception as _e:
+    _celery_logger.warning(f"[Celery] Failed to initialize Celery app: {_e}. Background tasks disabled.")
+    celery_app = None  # type: ignore
 
-# Configure Celery with essential settings
-celery_app.conf.update(
+if celery_app is not None:
+    celery_app.conf.update(
     task_serializer=settings.CELERY_TASK_SERIALIZER,
     result_serializer=settings.CELERY_TASK_SERIALIZER,
     accept_content=[
@@ -121,7 +131,6 @@ celery_app.conf.update(
     },
 
     timezone='UTC',
-
 )
 
-celery_app.conf.task_default_queue = "default"
+    celery_app.conf.task_default_queue = "default"
