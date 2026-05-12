@@ -37,7 +37,7 @@ async def startup_span():
 
     # --- Database Initialization (Postgres) ---
     postgres_conn = f"postgresql+asyncpg://{settings.POSTGRES_USERNAME}:{settings.POSTGRES_PASSWORD}@{settings.POSTGRES_HOST}:{settings.POSTGRES_PORT}/{settings.POSTGRES_MAIN_DATABASE}"
-    app.db_engine = create_async_engine(postgres_conn)
+    app.db_engine = create_async_engine(postgres_conn, connect_args={"ssl": True})
     
     # Ensure tables are created (with a safety timeout to prevent hanging the whole server)
     try:
