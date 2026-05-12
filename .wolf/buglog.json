@@ -48,6 +48,38 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-05-12T18:52:34.639Z"
+    },
+    {
+      "id": "bug-004",
+      "timestamp": "2026-05-12T19:36:10.539Z",
+      "error_message": "Missing import: , , , ",
+      "file": "F:/MasarX_A/src/main.py",
+      "root_cause": "Module(s) not imported: , , , ",
+      "fix": "Added import(s) for , , , ",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-12T19:36:10.539Z"
+    },
+    {
+      "id": "bug-005",
+      "timestamp": "2026-05-12T19:36:22.966Z",
+      "error_message": "Missing import: , , , ",
+      "file": "F:/MasarX_A/src/stores/vectordb/rag_tool.py",
+      "root_cause": "Module(s) not imported: , , , ",
+      "fix": "Added import(s) for , , , ",
+      "tags": [
+        "auto-detected",
+        "missing-import",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-12T19:36:22.966Z"
     }
   ]
 }

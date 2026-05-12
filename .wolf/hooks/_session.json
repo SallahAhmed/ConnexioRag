@@ -103,7 +103,7 @@
       "first_read": "2026-05-12T18:57:50.921Z"
     },
     "F:/MasarX_A/src/main.py": {
-      "count": 1,
+      "count": 2,
       "tokens": 1556,
       "first_read": "2026-05-12T18:58:23.433Z"
     },
@@ -116,6 +116,31 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-05-12T18:59:31.245Z"
+    },
+    "C:/Users/salla/Connexios/src/celery_app.py": {
+      "count": 1,
+      "tokens": 1413,
+      "first_read": "2026-05-12T19:33:36.931Z"
+    },
+    "F:/MasarX_A/src/celery_app.py": {
+      "count": 1,
+      "tokens": 1413,
+      "first_read": "2026-05-12T19:34:04.905Z"
+    },
+    "C:/Users/salla/Connexios/src/stores/vectordb/providers/PGVectorProvider.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T19:34:05.051Z"
+    },
+    "F:/MasarX_A/src/stores/memory/checkpointer.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-12T19:34:56.199Z"
+    },
+    "F:/MasarX_A/src/stores/vectordb/rag_tool.py": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-05-12T19:35:07.971Z"
     }
   },
   "files_written": [
@@ -172,19 +197,71 @@
       "action": "edit",
       "tokens": 25,
       "at": "2026-05-12T19:03:16.866Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/main.py",
+      "action": "edit",
+      "tokens": 77,
+      "at": "2026-05-12T19:35:42.310Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/celery_app.py",
+      "action": "edit",
+      "tokens": 76,
+      "at": "2026-05-12T19:35:48.313Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/celery_app.py",
+      "action": "edit",
+      "tokens": 28,
+      "at": "2026-05-12T19:35:53.594Z"
+    },
+    {
+      "file": "C:/Users/salla/Connexios/src/celery_app.py",
+      "action": "edit",
+      "tokens": 64,
+      "at": "2026-05-12T19:36:00.799Z"
+    },
+    {
+      "file": "F:/MasarX_A/src/main.py",
+      "action": "edit",
+      "tokens": 54,
+      "at": "2026-05-12T19:36:10.536Z"
+    },
+    {
+      "file": "F:/MasarX_A/src/stores/vectordb/rag_tool.py",
+      "action": "edit",
+      "tokens": 57,
+      "at": "2026-05-12T19:36:22.963Z"
+    },
+    {
+      "file": "F:/MasarX_A/src/celery_app.py",
+      "action": "edit",
+      "tokens": 35,
+      "at": "2026-05-12T19:36:29.587Z"
+    },
+    {
+      "file": "F:/MasarX_A/src/celery_app.py",
+      "action": "edit",
+      "tokens": 231,
+      "at": "2026-05-12T19:36:39.353Z"
     }
   ],
   "edit_counts": {
     "src/Routes/data.py": 3,
     "src/Routes/projects.py": 1,
-    "src/main.py": 2,
+    "src/main.py": 3,
     ".dockerignore": 1,
     "Dockerfile": 1,
-    "F:/MasarX_A/Dockerfile": 1
+    "F:/MasarX_A/Dockerfile": 1,
+    "src/celery_app.py": 3,
+    "F:/MasarX_A/src/main.py": 1,
+    "F:/MasarX_A/src/stores/vectordb/rag_tool.py": 1,
+    "F:/MasarX_A/src/celery_app.py": 2
   },
-  "anatomy_hits": 4,
-  "anatomy_misses": 19,
-  "repeated_reads_warned": 4,
+  "anatomy_hits": 6,
+  "anatomy_misses": 21,
+  "repeated_reads_warned": 6,
   "cerebrum_warnings": 0,
-  "stop_count": 2
+  "stop_count": 4
 }
