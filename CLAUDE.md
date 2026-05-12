@@ -18,8 +18,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 | Component | Path | Status | Role |
 |---|---|---|---|
 | **Node.js Backend** | `github.com/Hassan19Z/Connexio-backend` | Deployed (Hostinger) | Core API: auth, users, projects, tasks, chat, file upload |
-| **Connexios RAG** | `C:\Users\salla\Connexios` | Local only | Knowledge engine: document indexing, hybrid search, intent-aware chat |
-| **MasarX Agent** | `F:\MasarX_A` | Local only | Autonomous PM: task creation, team matching, audit, HITL workflows |
+| **Connexios RAG** | `C:\Users\salla\Connexios` | Deployed (HF Spaces: ConnexioRag) | Knowledge engine: document indexing, hybrid search, intent-aware chat |
+| **MasarX Agent** | `F:\MasarX_A` | Deployed (HF Spaces: ConnexioAgent) | Autonomous PM: task creation, team matching, audit, HITL workflows |
 | **Frontend** | TBD | Not started | UI — will be the last integration layer |
 
 **Goal:** Make all three backend services production-ready and fully integrated so only the frontend remains to connect.
@@ -35,12 +35,13 @@ Browser / Frontend
 Node.js Backend (connexio.icu — Hostinger)
 Express + MySQL + JWT Auth
        │
-       ├── X-API-Key ──────────────────► Connexios RAG (Render)
-       │   POST /api/v1/data/upload-and-process/{pid}    (file indexing)
+       ├── X-API-Key ──────────────────► Connexios RAG (HF Spaces: ConnexioRag)
+       │   POST /api/v1/data/upload-and-process/{pid}    (file indexing — 202 fire-and-forget)
+       │   POST /api/v1/projects/sync                    (project ID sync)
        │   POST /api/v1/nlp/agent/chat/{pid}             (chat)
        │   GET  /api/v1/nlp/agent/chat/stream/{pid}      (streaming chat)
        │
-       └── Service JWT ─────────────────► MasarX Agent (Render)
+       └── Service JWT ─────────────────► MasarX Agent (HF Spaces: ConnexioAgent)
            POST /api/v1/masarx/webhook/event/{type}/{pid}  (events, fire-and-forget)
            POST /api/v1/masarx/agent/{intent}/{pid}        (manual triggers)
            POST /api/v1/masarx/approval/{token}            (HITL decisions)
@@ -114,6 +115,8 @@ Key variables:
 
 Docker env files live in `docker/env/` per service.
 
+**HF Spaces deployment:** Port 7860, UID 1000 user. All secrets set as HF Space environment variables (never committed). `POSTGRES_PORT` must be **5432** for Neon.tech pooler (not 5433 which is only for local Docker pgvector).
+
 ### Request Flow
 
 ```
@@ -162,7 +165,8 @@ src/
 ├── celery_app.py            # Celery config, 4 queues, beat schedule
 ├── Routes/
 │   ├── base.py              # /health, version
-│   ├── data.py              # /upload, /process, /process-and-push  [X-API-Key]
+│   ├── data.py              # /upload, /process, /process-and-push, /upload-and-process  [X-API-Key]
+│   ├── projects.py          # /sync — project ID sync from Node.js MySQL PID  [X-API-Key]
 │   ├── nlp.py               # embed/search endpoints                [X-API-Key]
 │   └── agent.py             # /chat/{pid}, /chat/stream/{pid}       [X-API-Key]
 ├── controllers/
@@ -349,11 +353,18 @@ src/
 | **1** | Shared PostgreSQL (Neon.tech), schema alignment, env updates | Pending |
 | **2** | JWT bridge — Node.js → MasarX service token auth | Pending |
 | **3** | Backend → MasarX: `aiService.js` + event wiring | Pending |
-| **4** | Backend → RAG: sync upload-and-process endpoint + project sync | Pending |
-| **5** | Deploy both Python services to Render.com | Pending |
+| **4** | Backend → RAG: `upload-and-process` endpoint + `projects/sync` | ✅ Done |
+| **5** | Deploy both Python services to HF Spaces | ✅ Done (MasarX ✅, RAG DB fix pending) |
 | **6** | End-to-end testing | Pending |
 
-**Target hosting:** Node.js stays on Hostinger. Both Python services → Render.com free tier. PostgreSQL → Neon.tech free tier. Add keepalive cron pings to prevent Render sleep (cron-job.org, free).
+**Phase 5 notes:**
+
+- MasarX Agent (ConnexioAgent): ✅ Fully operational — PostgreSQL ✅, LLM ✅, Celery ✅
+- Connexios RAG (ConnexioRag): Celery ✅, LLM ✅ — DB still timing out. Fix: set `POSTGRES_PORT=5432` in HF Space secrets (was 5433).
+
+**Target hosting:** Node.js stays on Hostinger. Both Python services → Hugging Face Spaces (Docker SDK). PostgreSQL → Neon.tech free tier. Add keepalive cron pings (cron-job.org, free) to prevent HF Spaces sleep.
+
+**Do not make Node.js backend changes (Phases 3–4.3/4.4) until Connexios RAG DB connection is confirmed working.**
 
 ---
 
