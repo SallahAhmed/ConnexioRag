@@ -144,3 +144,11 @@ app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
 app.include_router(agent.agent_router)
 app.include_router(projects_router)
+
+@app.get("/")
+async def root():
+    return {
+        "status": "Connexios RAG is running",
+        "health": "healthy",
+        "documentation": "/docs"
+    }
