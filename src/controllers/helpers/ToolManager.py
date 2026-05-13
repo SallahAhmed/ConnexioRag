@@ -34,16 +34,16 @@ from langchain_community.utilities import (
 # doesn't emit SAWarning when reflecting the database schema.
 try:
     from sqlalchemy.dialects.postgresql import dialect as pg_dialect
+    from sqlalchemy.types import UserDefinedType
 
-    class _VectorStub:
+    class VECTOR(UserDefinedType):
         def __init__(self, *args, **kwargs):
             pass
-
         def get_col_spec(self, **kw):
             return "vector"
 
     pg_dialect.ischema_names = getattr(pg_dialect, "ischema_names", {})
-    pg_dialect.ischema_names["vector"] = _VectorStub
+    pg_dialect.ischema_names["vector"] = VECTOR
 except Exception:
     pass
 

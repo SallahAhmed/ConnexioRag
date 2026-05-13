@@ -67,14 +67,6 @@ async def get_setup_utils():
             generation_client, utility_client, embedding_client, vectordb_client, template_parser)
 
 try:
-    class _VectorStub:
-        def __init__(self, *args, **kwargs):
-            # Accept dimensions/arguments passed by SQLAlchemy during reflection
-            pass
-
-        def get_col_spec(self, **kw):
-            return "vector"
-
     celery_app = Celery(
         "connexio",
         broker=settings.CELERY_BROKER_URL,
