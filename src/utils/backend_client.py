@@ -4,9 +4,9 @@ HTTP client for calling the main Connexio backend REST API.
 The RAG never touches the main backend's database directly.
 All live project/user/task data is fetched through these REST calls.
 
-Authentication: the RAG authenticates to the main backend using
-the same shared `X-API-Key` header that the main backend uses to
-call the RAG (same secret, bidirectional).
+Authentication: the RAG authenticates to the main backend using a
+short-lived service JWT signed with the shared JWT_SECRET. This is
+the same pattern MasarX uses for backend→agent communication.
 
 Caching: user profiles and project details are cached in-memory for
 5 minutes per instance to avoid hammering the main backend on every
@@ -15,6 +15,7 @@ tool invocation. Tasks are NOT cached because they change frequently.
 import asyncio
 import logging
 import time
+import jwt
 from typing import Any, Optional
 
 import httpx
@@ -22,9 +23,9 @@ import httpx
 logger = logging.getLogger(__name__)
 
 # Seconds before a cached entry is considered stale
-_CACHE_TTL_STABLE = 300   # 5 min  — user profiles, project details, members
-_CACHE_TTL_VOLATILE = 0   # no cache — tasks (status changes constantly)
-_REQUEST_TIMEOUT = 10.0   # seconds
+_CACHE_TTL_STABLE = 300   # 5 min
+_CACHE_TTL_VOLATILE = 0   # no cache — tasks
+_REQUEST_TIMEOUT = 10.0
 _MAX_RETRIES = 2
 
 
@@ -32,35 +33,56 @@ class BackendApiClient:
     """
     Async HTTP client for the main Connexio backend.
 
-    Instantiate once at application startup and reuse across requests
-    so the in-memory cache is shared and effective.
-
     Example (in main.py startup):
         app.backend_client = BackendApiClient(
             base_url=settings.MAIN_BACKEND_URL,
             api_key=settings.CONNEXIO_INTERNAL_API_KEY,
+            jwt_secret=settings.JWT_SECRET,
         )
     """
 
-    def __init__(self, base_url: str, api_key: str, timeout: float = _REQUEST_TIMEOUT):
+    def __init__(
+        self,
+        base_url: str,
+        api_key: str,
+        jwt_secret: Optional[str] = None,
+        service_user_id: int = 1,
+        timeout: float = _REQUEST_TIMEOUT,
+    ):
         self.base_url = base_url.rstrip("/")
         self._api_key = api_key
+        self._jwt_secret = jwt_secret
+        self._service_user_id = service_user_id
         self._timeout = timeout
-        # Simple dict cache: key → (value, expiry_timestamp)
         self._cache: dict[str, tuple[Any, float]] = {}
 
     # ------------------------------------------------------------------
     # Internal helpers
     # ------------------------------------------------------------------
 
+    def _make_service_token(self) -> Optional[str]:
+        """Generate a short-lived service JWT for outbound backend calls."""
+        if not self._jwt_secret:
+            return None
+        try:
+            return jwt.encode(
+                {"uid": self._service_user_id, "iat": int(time.time())},
+                self._jwt_secret,
+                algorithm="HS256",
+            )
+        except Exception as e:
+            logger.error("Failed to generate service JWT: %s", e)
+            return None
+
     def _headers(self) -> dict[str, str]:
-        # The main backend's read endpoints (users, projects, members, tasks)
-        # are PUBLIC — no authentication header is required or expected.
-        # X-API-Key is ONLY used on inbound requests TO the RAG, never outbound.
-        return {
+        headers = {
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+        token = self._make_service_token()
+        if token:
+            headers["Authorization"] = f"Bearer {token}"
+        return headers
 
     def _get_cached(self, key: str) -> Optional[Any]:
         entry = self._cache.get(key)

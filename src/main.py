@@ -117,6 +117,7 @@ async def startup_span():
     app.backend_client = BackendApiClient(
         base_url=settings.MAIN_BACKEND_URL,
         api_key=settings.CONNEXIO_INTERNAL_API_KEY or "",
+        jwt_secret=settings.JWT_SECRET,
     )
  
     if settings.CONNEXIO_INTERNAL_API_KEY:

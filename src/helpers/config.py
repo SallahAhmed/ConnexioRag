@@ -66,7 +66,8 @@ class Settings(BaseSettings):
     CELERY_FLOWER_BROKER_API: str | None = None
 
     CONNEXIO_INTERNAL_API_KEY: str | None = None
-    MAIN_BACKEND_URL: str = "http://localhost:3000"
+    JWT_SECRET: str | None = None
+    MAIN_BACKEND_URL: str = "https://connexio.icu"
 
     class Config:
         env_file= ".env"
