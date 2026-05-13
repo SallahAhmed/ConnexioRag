@@ -122,7 +122,12 @@ if celery_app is not None:
     broker_transport_options={
         'visibility_timeout': 3600,
         'polling_interval': 20.0, # Check for tasks every 20 seconds (Sweet spot for free tier)
+        'sepel_socket_timeout': 30,
+        'sepel_socket_connect_timeout': 30,
     },
+    redis_socket_timeout=30,
+    redis_socket_connect_timeout=30,
+    redis_retry_on_timeout=True,
 
     task_routes={
         "tasks.file_processing.process_project_files": {"queue": "file_processing"},
