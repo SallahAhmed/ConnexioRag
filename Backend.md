@@ -3,8 +3,8 @@ File 1: Connexio-backend/.env — add these 4 variables
 AI_AGENT_URL=https://salla-masarx-agent.hf.space
 RAG_SERVICE_URL=https://salla-connexios-rag.hf.space
 CONNEXIO_RAG_API_KEY=90abeeeaa98cec6d68c47bebf65400ba3eb4cdb89ca87d0958d9c3b25533b091
-BACKEND_JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
-Replace the HF Space URLs with your actual Space URLs. CONNEXIO_RAG_API_KEY is the same as CONNEXIO_INTERNAL_API_KEY in Connexios .env. BACKEND_JWT_SECRET must be identical to the existing JWT_SECRET.
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production-2024
+Replace the HF Space URLs with your actual Space URLs. CONNEXIO_RAG_API_KEY is the same as CONNEXIO_INTERNAL_API_KEY in Connexios .env. JWT_SECRET must be identical to the existing JWT_SECRET.
 
 File 2: Create Connexio-backend/services/aiService.js (new file)
 
@@ -13,11 +13,11 @@ import jwt from "jsonwebtoken";
 
 const AI_AGENT_URL = process.env.AI_AGENT_URL;
 const RAG_SERVICE_URL = process.env.RAG_SERVICE_URL;
-const BACKEND_JWT_SECRET = process.env.BACKEND_JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET;
 const CONNEXIO_RAG_API_KEY = process.env.CONNEXIO_RAG_API_KEY;
 
 function makeServiceToken(uid, projectId, intent) {
-return jwt.sign({ uid, project_id: projectId, intent }, BACKEND_JWT_SECRET, {
+return jwt.sign({ uid, project_id: projectId, intent }, JWT_SECRET, {
 expiresIn: "5m",
 });
 }

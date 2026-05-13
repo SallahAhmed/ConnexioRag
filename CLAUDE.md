@@ -4,7 +4,6 @@
 
 This project uses OpenWolf for context management. Read and follow .wolf/OPENWOLF.md every session. Check .wolf/cerebrum.md before generating code. Check .wolf/anatomy.md before reading files.
 
-
 # CLAUDE.md
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
@@ -15,12 +14,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Connexio** is a collaborative platform that connects learners and builders to create real software projects in intelligent teams. It spans four components that must work together as one production system:
 
-| Component | Path | Status | Role |
-|---|---|---|---|
-| **Node.js Backend** | `github.com/Hassan19Z/Connexio-backend` | Deployed (Hostinger) | Core API: auth, users, projects, tasks, chat, file upload |
-| **Connexios RAG** | `C:\Users\salla\Connexios` | Deployed (HF Spaces: ConnexioRag) | Knowledge engine: document indexing, hybrid search, intent-aware chat |
-| **MasarX Agent** | `F:\MasarX_A` | Deployed (HF Spaces: ConnexioAgent) | Autonomous PM: task creation, team matching, audit, HITL workflows |
-| **Frontend** | TBD | Not started | UI — will be the last integration layer |
+| Component           | Path                                    | Status                              | Role                                                                  |
+| ------------------- | --------------------------------------- | ----------------------------------- | --------------------------------------------------------------------- |
+| **Node.js Backend** | `github.com/Hassan19Z/Connexio-backend` | Deployed (Hostinger)                | Core API: auth, users, projects, tasks, chat, file upload             |
+| **Connexios RAG**   | `C:\Users\salla\Connexios`              | Deployed (HF Spaces: ConnexioRag)   | Knowledge engine: document indexing, hybrid search, intent-aware chat |
+| **MasarX Agent**    | `F:\MasarX_A`                           | Deployed (HF Spaces: ConnexioAgent) | Autonomous PM: task creation, team matching, audit, HITL workflows    |
+| **Frontend**        | TBD                                     | Not started                         | UI — will be the last integration layer                               |
 
 **Goal:** Make all three backend services production-ready and fully integrated so only the frontend remains to connect.
 
@@ -55,7 +54,7 @@ Both Python services share one PostgreSQL (Neon.tech):
 ### Auth Model
 
 - **Backend → Connexios RAG:** `X-API-Key` header matching `CONNEXIO_INTERNAL_API_KEY`. Already implemented. Dev bypass if key is unset.
-- **Backend → MasarX:** Short-lived service token (JWT, signed with `BACKEND_JWT_SECRET`, exp: 5 min, payload: `{uid, project_id, intent}`). To be implemented in Phase 2.
+- **Backend → MasarX:** Short-lived service token (JWT, signed with `JWT_SECRET`, exp: 5 min, payload: `{uid, project_id, intent}`). To be implemented in Phase 2.
 - **MasarX internal/Celery Beat calls:** Service-level actor `uid=0, actor="system"` — no JWT, same DB session.
 
 ### Project ID Strategy
@@ -69,6 +68,7 @@ Upload is fire-and-forget: backend calls `POST /api/v1/data/upload-and-process/{
 ### Database Schema Ownership Rules
 
 Connexios runs Alembic migrations and owns the `chunks` table schema. MasarX must NOT run `create_all` for `chunks` or `projects` — only for `masarx_*`, `user`, `task`. MasarX's `DataChunk` model must exactly mirror Connexios's columns:
+
 - Required additions to MasarX's `live_models.py`: `chunk_asset_id` (Integer, nullable), `updated_at` (DateTime, onupdate)
 
 ---
@@ -104,14 +104,14 @@ No automated test suite exists yet.
 
 Key variables:
 
-| Variable | Purpose |
-|---|---|
-| `GENERATION_BACKEND` / `EMBEDDING_BACKEND` | Provider: `GROQ`, `OPENAI`, `COHERE` |
-| `VECTOR_DB_BACKEND` | `QDRANT` or `PGVECTOR` |
-| `POSTGRES_*` | Host, port, credentials, database |
-| `GROQ_API_KEY` / `OPENAI_API_KEY` | LLM credentials |
-| `CONNEXIO_INTERNAL_API_KEY` | Shared secret for X-API-Key auth (unset = dev bypass) |
-| `MAIN_BACKEND_URL` | URL of Node.js backend (default: `http://localhost:3000`) |
+| Variable                                   | Purpose                                                   |
+| ------------------------------------------ | --------------------------------------------------------- |
+| `GENERATION_BACKEND` / `EMBEDDING_BACKEND` | Provider: `GROQ`, `OPENAI`, `COHERE`                      |
+| `VECTOR_DB_BACKEND`                        | `QDRANT` or `PGVECTOR`                                    |
+| `POSTGRES_*`                               | Host, port, credentials, database                         |
+| `GROQ_API_KEY` / `OPENAI_API_KEY`          | LLM credentials                                           |
+| `CONNEXIO_INTERNAL_API_KEY`                | Shared secret for X-API-Key auth (unset = dev bypass)     |
+| `MAIN_BACKEND_URL`                         | URL of Node.js backend (default: `http://localhost:3000`) |
 
 Docker env files live in `docker/env/` per service.
 
@@ -145,6 +145,7 @@ traces/trace_{uuid}.json               # written to disk per request
 **Provider Factory Pattern** — `LLMProviderFactory` and `VectorDBProviderFactory` swap implementations via `.env` without touching business logic.
 
 **Three LLM clients:**
+
 - `generation_client` — large model for final answers (`GENERATION_MODEL_ID`)
 - `utility_client` — small/fast for classification, grading, tool selection (`UTILITY_MODEL_ID`, default: `llama-3.1-8b-instant`)
 - `embedding_client` — embedding model (`EMBEDDING_MODEL_ID`)
@@ -223,26 +224,27 @@ alembic upgrade head
 
 Key variables:
 
-| Variable | Purpose |
-|---|---|
-| `POSTGRES_URL` | Async PG URL (`postgresql+asyncpg://...`) for main DB |
-| `PGVECTOR_URL` | Async PG URL for vector search (same DB, Connexios tables) |
-| `GROQ_API_KEY` | Primary LLM |
-| `GENERATION_MODEL_ID` / `UTILITY_MODEL_ID` | Model IDs |
-| `EMBEDDING_BACKEND` / `EMBEDDING_MODEL_ID` / `EMBEDDING_MODEL_SIZE` | For RAGTool |
-| `HITL_SECRET_KEY` | Signs HITL approval tokens |
-| `HITL_TOKEN_TTL_MINUTES` | Approval token lifetime |
-| `GITHUB_TOKEN` | For GitHub tool |
-| `TAVILY_API_KEY` | Web search tool |
-| `LANGSMITH_API_KEY` | Optional tracing |
-| `DB_FAIL_FAST` | If true, exit on DB init failure |
-| `BACKEND_JWT_SECRET` | **To add (Phase 2):** shared secret for service token verification |
+| Variable                                                            | Purpose                                                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| `POSTGRES_URL`                                                      | Async PG URL (`postgresql+asyncpg://...`) for main DB              |
+| `PGVECTOR_URL`                                                      | Async PG URL for vector search (same DB, Connexios tables)         |
+| `GROQ_API_KEY`                                                      | Primary LLM                                                        |
+| `GENERATION_MODEL_ID` / `UTILITY_MODEL_ID`                          | Model IDs                                                          |
+| `EMBEDDING_BACKEND` / `EMBEDDING_MODEL_ID` / `EMBEDDING_MODEL_SIZE` | For RAGTool                                                        |
+| `HITL_SECRET_KEY`                                                   | Signs HITL approval tokens                                         |
+| `HITL_TOKEN_TTL_MINUTES`                                            | Approval token lifetime                                            |
+| `GITHUB_TOKEN`                                                      | For GitHub tool                                                    |
+| `TAVILY_API_KEY`                                                    | Web search tool                                                    |
+| `LANGSMITH_API_KEY`                                                 | Optional tracing                                                   |
+| `DB_FAIL_FAST`                                                      | If true, exit on DB init failure                                   |
+| `JWT_SECRET`                                                        | **To add (Phase 2):** shared secret for service token verification |
 
 ### Architecture — LangGraph Supervisor
 
 MasarX uses a supervisor + subgraph multi-graph pattern. The `WorkflowController` compiles and routes state to one of 7 specialized subgraphs.
 
 **`MasarXState` TypedDict (21 fields):**
+
 - Routing: `intent`, `subgraph_target`
 - Context: `project_id`, `sprint_id`, `user_id`, `member_ids`
 - Invocation: `invocation_id`, `triggered_by`, `actor`, `thread_id`
@@ -254,15 +256,15 @@ MasarX uses a supervisor + subgraph multi-graph pattern. The `WorkflowController
 
 **7 Subgraphs:**
 
-| Subgraph | File | Intents |
-|---|---|---|
-| Task | `task_subgraph.py` | `create_tasks` (HITL-gated) |
-| Team | `team_subgraph.py` | `match_team`, `onboard_member`, `refine_recommender` |
-| Doc | `doc_subgraph.py` | `generate_readme`, `generate_milestone_doc`, `generate_retro` |
-| Monitor | `monitor_subgraph.py` | `detect_risks`, `monitor_workload` |
-| PR Translator | `pr_translator_subgraph.py` | `translate_pr` |
-| Skill Endorsement | `skill_endorsement_subgraph.py` | `endorse_skills` |
-| Audit | `audit_subgraph.py` | `comprehensive_audit` (runs readme + risks + team in parallel) |
+| Subgraph          | File                            | Intents                                                        |
+| ----------------- | ------------------------------- | -------------------------------------------------------------- |
+| Task              | `task_subgraph.py`              | `create_tasks` (HITL-gated)                                    |
+| Team              | `team_subgraph.py`              | `match_team`, `onboard_member`, `refine_recommender`           |
+| Doc               | `doc_subgraph.py`               | `generate_readme`, `generate_milestone_doc`, `generate_retro`  |
+| Monitor           | `monitor_subgraph.py`           | `detect_risks`, `monitor_workload`                             |
+| PR Translator     | `pr_translator_subgraph.py`     | `translate_pr`                                                 |
+| Skill Endorsement | `skill_endorsement_subgraph.py` | `endorse_skills`                                               |
+| Audit             | `audit_subgraph.py`             | `comprehensive_audit` (runs readme + risks + team in parallel) |
 
 ### API Surface (`src/Routes/webhook_routes.py`)
 
@@ -279,16 +281,16 @@ POST /approval/{approval_token}                 Submit HITL decision (approve/re
 
 **Event → Intent mapping:**
 
-| Event | Intent |
-|---|---|
-| `user.joined_platform` | `match_team` |
-| `user.joined_project` | `onboard_member` |
-| `project.sprint_started` | `create_tasks` |
-| `task.completed` | `endorse_skills` |
-| `sprint.closed` | `generate_retro` |
-| `milestone.completed` | `generate_milestone_doc` |
-| `pullrequest.merged` | `translate_pr` |
-| `project.closed` | `generate_readme` |
+| Event                    | Intent                   |
+| ------------------------ | ------------------------ |
+| `user.joined_platform`   | `match_team`             |
+| `user.joined_project`    | `onboard_member`         |
+| `project.sprint_started` | `create_tasks`           |
+| `task.completed`         | `endorse_skills`         |
+| `sprint.closed`          | `generate_retro`         |
+| `milestone.completed`    | `generate_milestone_doc` |
+| `pullrequest.merged`     | `translate_pr`           |
+| `project.closed`         | `generate_readme`        |
 
 ### HITL Flow
 
@@ -348,14 +350,14 @@ src/
 
 ## Integration Phases — Status Tracker
 
-| Phase | Description | Status |
-|---|---|---|
-| **1** | Shared PostgreSQL (Neon.tech), schema alignment, env updates | Pending |
-| **2** | JWT bridge — Node.js → MasarX service token auth | Pending |
-| **3** | Backend → MasarX: `aiService.js` + event wiring | Pending |
-| **4** | Backend → RAG: `upload-and-process` endpoint + `projects/sync` | ✅ Done |
-| **5** | Deploy both Python services to HF Spaces | ✅ Done (MasarX ✅, RAG DB fix pending) |
-| **6** | End-to-end testing | Pending |
+| Phase | Description                                                    | Status                                  |
+| ----- | -------------------------------------------------------------- | --------------------------------------- |
+| **1** | Shared PostgreSQL (Neon.tech), schema alignment, env updates   | Pending                                 |
+| **2** | JWT bridge — Node.js → MasarX service token auth               | Pending                                 |
+| **3** | Backend → MasarX: `aiService.js` + event wiring                | Pending                                 |
+| **4** | Backend → RAG: `upload-and-process` endpoint + `projects/sync` | ✅ Done                                 |
+| **5** | Deploy both Python services to HF Spaces                       | ✅ Done (MasarX ✅, RAG DB fix pending) |
+| **6** | End-to-end testing                                             | Pending                                 |
 
 **Phase 5 notes:**
 
@@ -372,16 +374,17 @@ src/
 
 Key files for integration work:
 
-| File | Relevance |
-|---|---|
-| `bootstrap.js` | All routes: `/api/auth`, `/api/users`, `/api/tasks`, `/api/projects`, `/api/posts`, `/api/friends` |
-| `database/dbconnection.js` | Full MySQL schema — canonical source of user/project/task structure |
-| `middleware/authMiddleware.js` | JWT decode: `{ UID, email, user_type }` from `JWT_SECRET` |
-| `modules/fileUpload/fileUpload.controller.js` | Project file upload — will call RAG after saving |
-| `services/aiService.js` | **To create (Phase 3):** calls MasarX + RAG |
-| `modules/ai/ai.routes.js` | **To create (Phase 3):** proxy routes for chat + agent triggers |
+| File                                          | Relevance                                                                                          |
+| --------------------------------------------- | -------------------------------------------------------------------------------------------------- |
+| `bootstrap.js`                                | All routes: `/api/auth`, `/api/users`, `/api/tasks`, `/api/projects`, `/api/posts`, `/api/friends` |
+| `database/dbconnection.js`                    | Full MySQL schema — canonical source of user/project/task structure                                |
+| `middleware/authMiddleware.js`                | JWT decode: `{ UID, email, user_type }` from `JWT_SECRET`                                          |
+| `modules/fileUpload/fileUpload.controller.js` | Project file upload — will call RAG after saving                                                   |
+| `services/aiService.js`                       | **To create (Phase 3):** calls MasarX + RAG                                                        |
+| `modules/ai/ai.routes.js`                     | **To create (Phase 3):** proxy routes for chat + agent triggers                                    |
 
 `BackendApiClient` in Connexios calls these backend paths (must verify exact routes match):
+
 - `GET /api/users/{user_id}`
 - `GET /api/projects/{project_id}`
 - `GET /api/projects/{project_id}/members`
