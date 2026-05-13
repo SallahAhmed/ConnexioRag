@@ -33,6 +33,9 @@ class BackendApiClient:
     """
     Async HTTP client for the main Connexio backend.
 
+    Instantiate once at application startup and reuse across requests
+    so the in-memory cache is shared and effective.
+
     Example (in main.py startup):
         app.backend_client = BackendApiClient(
             base_url=settings.MAIN_BACKEND_URL,
@@ -133,10 +136,10 @@ class BackendApiClient:
                     logger.warning("Main backend 404 for %s", url)
                     return None
 
-logger.warning(
-                     "Main backend returned %s for %s — body: %s (attempt %d/%d)",
-                     resp.status_code, url, resp.text[:300], attempt + 1, _MAX_RETRIES + 1,
-                 )
+                logger.warning(
+                    "Main backend returned %s for %s — body: %s (attempt %d/%d)",
+                    resp.status_code, url, resp.text[:300], attempt + 1, _MAX_RETRIES + 1,
+                )
                 return None  # Non-retriable HTTP error
 
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
@@ -162,11 +165,6 @@ logger.warning(
     async def get_user(self, user_id: int) -> Optional[dict]:
         """
         Fetch a user's full profile from the main backend.
-
-        Returns dict with keys: UID, FullName, email, technologies (comma-sep str),
-        skills (list), user_type, experience_level, years_of_experience,
-        rate, total_points, tasks_completed, team_rating_avg, etc.
-        Returns None if the user does not exist or on network failure.
         """
         return await self._get(
             f"/api/users/{user_id}",
@@ -177,10 +175,6 @@ logger.warning(
     async def get_project(self, project_id: int) -> Optional[dict]:
         """
         Fetch project details from the main backend.
-
-        Returns dict with keys: PID, PName, Description, technologyUsed (list),
-        usersNumber, startDate, endDate, created_by, github_repo_url, etc.
-        Returns None if the project does not exist or on network failure.
         """
         return await self._get(
             f"/api/projects/{project_id}",
@@ -191,9 +185,6 @@ logger.warning(
     async def get_project_members(self, project_id: int) -> Optional[list]:
         """
         Fetch all members of a project with their skills.
-
-        Returns list of dicts: UID, FullName, email, technologies (comma-sep str),
-        role, user_type. Returns None on failure.
         """
         return await self._get(
             f"/api/projects/{project_id}/members",
@@ -204,13 +195,10 @@ logger.warning(
     async def get_project_tasks(self, project_id: int) -> Optional[list]:
         """
         Fetch all tasks for a project. NOT cached (task status changes frequently).
-
-        Returns list of dicts: taskID, TaskDesc, assigned_to, status, priority,
-        points, start_date, end_date, completed_at. Returns None on failure.
         """
         return await self._get(
             f"/api/tasks/project/{project_id}",
-            cache_key=None,  # volatile — never cache
+            cache_key=None,
             cache_ttl=_CACHE_TTL_VOLATILE,
         )
 
@@ -219,11 +207,6 @@ logger.warning(
     ) -> dict[str, Any]:
         """
         Fetch user profile, project details, members, and tasks in parallel.
-        Returns a dict with keys: user, project, members, tasks.
-        Any failed fetch will have None for that key — callers must handle.
-
-        This is the primary method used by ToolManager to build grounded
-        context for matching rationale and team gap analysis.
         """
         user, project, members, tasks = await asyncio.gather(
             self.get_user(user_id),
@@ -240,10 +223,7 @@ logger.warning(
         }
 
     def invalidate_project_cache(self, project_id: int) -> None:
-        """
-        Manually evict all cached entries for a given project.
-        Call this if you know the project data has just changed.
-        """
+        """Manually evict all cached entries for a given project."""
         for key in [f"project:{project_id}", f"members:{project_id}"]:
             self._cache.pop(key, None)
 
