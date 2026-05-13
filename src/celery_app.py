@@ -67,6 +67,14 @@ async def get_setup_utils():
             generation_client, utility_client, embedding_client, vectordb_client, template_parser)
 
 try:
+    class _VectorStub:
+        def __init__(self, *args, **kwargs):
+            # Accept dimensions/arguments passed by SQLAlchemy during reflection
+            pass
+
+        def get_col_spec(self, **kw):
+            return "vector"
+
     celery_app = Celery(
         "connexio",
         broker=settings.CELERY_BROKER_URL,
@@ -114,10 +122,15 @@ if celery_app is not None:
     broker_heartbeat=None, # Disable heartbeats to prevent timeouts during long blocking tasks
     worker_cancel_long_running_tasks_on_connection_loss=True,
 
-    # Enable remote control and events for monitoring (e.g. Flower)
-    # Ensure RabbitMQ allows transient non-exclusive queues if using version 3.13+
+    # Enable remote control but disable events to save Redis commands (not needed without Flower)
     worker_enable_remote_control=True,
-    worker_send_task_events=True,
+    worker_send_task_events=False,
+
+    # Upstash/Redis optimization: increase polling interval to reduce 'GET' commands
+    broker_transport_options={
+        'visibility_timeout': 3600,
+        'polling_interval': 20.0, # Check for tasks every 20 seconds (Sweet spot for free tier)
+    },
 
     task_routes={
         "tasks.file_processing.process_project_files": {"queue": "file_processing"},

@@ -36,7 +36,10 @@ try:
     from sqlalchemy.dialects.postgresql import dialect as pg_dialect
 
     class _VectorStub:
-        def get_col_spec(self):
+        def __init__(self, *args, **kwargs):
+            pass
+
+        def get_col_spec(self, **kw):
             return "vector"
 
     pg_dialect.ischema_names = getattr(pg_dialect, "ischema_names", {})
