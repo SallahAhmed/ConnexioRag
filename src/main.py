@@ -118,6 +118,7 @@ async def startup_span():
         base_url=settings.MAIN_BACKEND_URL,
         api_key=settings.CONNEXIO_INTERNAL_API_KEY or "",
         jwt_secret=settings.JWT_SECRET,
+        service_user_id=settings.SERVICE_USER_ID,
     )
  
     if settings.CONNEXIO_INTERNAL_API_KEY:
