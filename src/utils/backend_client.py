@@ -66,7 +66,7 @@ class BackendApiClient:
             return None
         try:
             return jwt.encode(
-                {"uid": self._service_user_id, "iat": int(time.time())},
+                {"UID": self._service_user_id, "iat": int(time.time())},
                 self._jwt_secret,
                 algorithm="HS256",
             )
