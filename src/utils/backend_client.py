@@ -133,10 +133,10 @@ class BackendApiClient:
                     logger.warning("Main backend 404 for %s", url)
                     return None
 
-                logger.warning(
-                    "Main backend returned %s for %s (attempt %d/%d)",
-                    resp.status_code, url, attempt + 1, _MAX_RETRIES + 1,
-                )
+logger.warning(
+                     "Main backend returned %s for %s — body: %s (attempt %d/%d)",
+                     resp.status_code, url, resp.text[:300], attempt + 1, _MAX_RETRIES + 1,
+                 )
                 return None  # Non-retriable HTTP error
 
             except (httpx.TimeoutException, httpx.ConnectError) as exc:
