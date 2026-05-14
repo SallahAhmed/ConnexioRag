@@ -1,13 +1,14 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T20:54:18.674Z
-> Files: 36 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T21:04:25.502Z
+> Files: 38 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
 - `.dockerignore` — Python (~134 tok)
-- `CLAUDE.md` — OpenWolf (~4440 tok)
+- `CLAUDE.md` — OpenWolf (~5715 tok)
 - `Dockerfile` — Docker container definition (~144 tok)
+- `README.md` — Project documentation (~5901 tok)
 
 ## .claude/
 
@@ -268,6 +269,10 @@
 
 - `chatAIHelpers.js` — API routes: POST (1 endpoints) (~1655 tok)
 - `chats.controller.js` — modules/chats/chats.controller.js (~7815 tok)
+
+## f:/MasarX_A/
+
+- `README.md` — Project documentation (~4173 tok)
 
 ## f:/MasarX_A/scratch/
 

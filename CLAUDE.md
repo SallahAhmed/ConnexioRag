@@ -117,6 +117,18 @@ Docker env files live in `docker/env/` per service.
 
 **HF Spaces deployment:** Port 7860, UID 1000 user. All secrets set as HF Space environment variables (never committed). `POSTGRES_PORT` must be **5432** for Neon.tech pooler (not 5433 which is only for local Docker pgvector).
 
+### Tiered Response Strategy
+
+Response cost is gated by context value. No project context = no RAG value = no generation model.
+
+| Tier | Condition | Model | History | Cost |
+|------|-----------|-------|---------|------|
+| 0 | `OUT_OF_SCOPE` | None — canned string | — | 0 tokens |
+| 1 | `project_id is None` (any node) | `utility_client` (8B) + 12-tok system prompt | Last 4 msgs (2 turns) | ~80–150 tokens |
+| 2 | `project_id` set | `generation_client` (70B) + full RAG prompt | Token-budget window | ~300–800 tokens |
+
+`OUT_OF_SCOPE` covers: geography, politics, cooking, weather, celebrity, historical figures (`"who is X"` bypasses the 50-char fast-path via `_SKIP_FAST_PATH`), jailbreak attempts (`"your system prompt"`, `"ignore your instructions"`, `"bypass your rules"`, etc.) and Arabic equivalents.
+
 ### Request Flow
 
 ```
@@ -125,15 +137,18 @@ POST /api/v1/nlp/agent/chat/{project_id}   [X-API-Key required]
     ▼
 NLPController._prepare_chat_context()
   1. WorkflowController.detect_language()     # Arabic: Unicode range ؀-ۿ
-  2. WorkflowController.detect_node()         # keyword → 50-char fast-path → utility LLM
+  2. WorkflowController.detect_node()         # keyword → _SKIP_FAST_PATH check → 50-char fast-path → utility LLM
   3. SessionModel.get_or_create_session()     # PostgreSQL chat history
-  4. ToolManager.search_knowledge_base()      # vector search on indexed docs
+     └── project_id is None: cap history at last 4 messages (2 turns)
+  4. ToolManager.search_knowledge_base()      # vector search — SKIPPED if no project_id
   5. WorkflowController.grade_relevance()     # utility LLM: YES/NO
-  6. [CRAG] utility LLM picks: WIKIPEDIA / GOOGLE / GITHUB / PYTHON / NONE
-  7. BackendApiClient.get_rich_context()      # live user/project/tasks from Node.js backend REST
+  6. [CRAG] ONLY fires when project_id is set: WIKIPEDIA / GOOGLE / GITHUB / PYTHON / NONE
+  7. BackendApiClient.get_rich_context()      # live user/project/tasks — SKIPPED if no project_id
     │
     ▼
-generation_client.generate_text() / generate_text_stream()
+  Tier 0: OUT_OF_SCOPE → canned refusal returned immediately (0 LLM calls)
+  Tier 1: project_id is None → utility_client.generate_text() (8B, minimal prompt)
+  Tier 2: project_id set    → generation_client.generate_text() (70B, full RAG prompt)
     │
     ▼
 SessionModel.append_message()          # persist history
@@ -146,15 +161,15 @@ traces/trace_{uuid}.json               # written to disk per request
 
 **Three LLM clients:**
 
-- `generation_client` — large model for final answers (`GENERATION_MODEL_ID`)
-- `utility_client` — small/fast for classification, grading, tool selection (`UTILITY_MODEL_ID`, default: `llama-3.1-8b-instant`)
+- `generation_client` — large model for final answers (`GENERATION_MODEL_ID`) — used only when `project_id` is set
+- `utility_client` — small/fast for classification, grading, tool selection, and projectless sessions (`UTILITY_MODEL_ID`, default: `llama-3.1-8b-instant`)
 - `embedding_client` — embedding model (`EMBEDDING_MODEL_ID`)
 
 **Workflow nodes** (`WorkflowNodeEnum`): `ONBOARDING`, `TEAM_FORMATION`, `PHASE_TRANSITION`, `BLOCKER`, `MILESTONE_WARNING`, `GENERAL`, `OUT_OF_SCOPE`.
 
 **Vector collection naming:** `collection_{embedding_size}_{project_id}` — single source of truth in `NLPController.create_collection_name()`. MasarX's `RAGTool` uses the same convention.
 
-**CRAG:** If vector search is irrelevant or empty, the agent falls back to external tools. `BackendApiClient` fetches live user/project/member/task data via REST (5-min cache for stable data, no cache for tasks).
+**CRAG:** Only activates when `project_id` is set. If vector search is irrelevant or empty, the agent falls back to external tools (Wikipedia, Google, GitHub, Python). `BackendApiClient` fetches live user/project/member/task data via REST (5-min cache for stable data, no cache for tasks).
 
 **No direct DB to Node.js backend** — all live data flows through `BackendApiClient` REST calls only.
 

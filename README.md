@@ -209,6 +209,11 @@ CELERY_RESULT_BACKEND="redis://:pass@host:6379/0"
 
 Connexio implements advanced intelligent capabilities beyond basic RAG:
 
+- **Tiered Response Strategy**: Response cost is gated by context value — no project context means no RAG value, so no expensive model is used:
+  - **Tier 0 (0 tokens)** — `OUT_OF_SCOPE`: instant canned refusal, zero LLM calls
+  - **Tier 1 (~100 tokens)** — Projectless sessions (`project_id = 0`): utility 8B model, history capped at last 2 turns
+  - **Tier 2 (full pipeline)** — Project sessions: generation 70B model, full RAG context, live backend data
+
 - **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
   - ONBOARDING: Guidance for new users
   - TEAM_FORMATION: Intelligent teammate matching logic
@@ -216,9 +221,9 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
   - BLOCKER: Troubleshooting and technical problem resolution
   - MILESTONE_WARNING: Proactive reporting on deadlines and late tasks
   - GENERAL: Conversational AI grounded in project context
-  - OUT_OF_SCOPE: Guardrail that rejects off-topic queries (trivia, history, etc.)
+  - OUT_OF_SCOPE: Guardrail that rejects off-topic queries. Catches trivia, history (`"who is X"` bypasses the short-query fast-path), jailbreak attempts (`"your system prompt"`, `"ignore your instructions"`), cooking, weather, sports, and Arabic equivalents. Returns a canned response with zero LLM cost.
 
-- **Corrective RAG (CRAG)**: When internal knowledge is insufficient, the system dynamically extracts context and triggers external tools:
+- **Corrective RAG (CRAG)**: Only activates when a project context exists (`project_id` is set). When internal knowledge is insufficient, the system dynamically triggers external tools:
   - Wikipedia & Google (SerpApi) for live web search and general definitions
   - GitHub API for extracting repository issues, commits, and summaries
   - Python Interpreter for executing logic, math, and data processing
@@ -226,11 +231,11 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
 - **Multi-Source Intelligence**: Combines information from:
   - SQL Database: Real-time project metrics, user skills, and task history
   - Vector Knowledge Base: Semantic search through project documentation
-  - External APIs: Wikipedia, Google, GitHub for additional context
+  - External APIs: Wikipedia, Google, GitHub for additional context (project sessions only)
 
 - **Language Support**: Automatic detection and switching between English and Arabic prompts
 - **Persona Mapping**: Adjusts tone and depth based on user role (student, educator, company representative, early-career professional)
-- **Deep Conversational Memory**: Retains conversation history (configurable, currently 12,000 characters) for context continuity
+- **Adaptive Conversational Memory**: Full token-budget window for project sessions; capped at 2 turns for projectless sessions to prevent accumulation across unrelated queries
 - **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization
 
 ---
@@ -354,6 +359,11 @@ Connexio uses **Reciprocal Rank Fusion (RRF)** to combine results from multiple 
 
 The `NLPController` manages the conversation flow through a sophisticated agentic loop:
 
+- **Tiered Response Strategy**: Cost scales with context value. The pipeline selects model and history window based on the query's context tier:
+  - **Tier 0** — `OUT_OF_SCOPE`: canned refusal returned immediately, 0 LLM calls
+  - **Tier 1** — No project context (`project_id = 0`): utility 8B model, 12-token system prompt, last 2 turns of history only
+  - **Tier 2** — Project context: generation 70B model, full RAG prompt, full token-budget history
+
 - **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
   - **ONBOARDING**: Guidance for new users getting started with the project
   - **TEAM_FORMATION**: Intelligent teammate matching logic based on skills and availability
@@ -361,12 +371,12 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
   - **BLOCKER**: Troubleshooting and technical problem resolution
   - **MILESTONE_WARNING**: Proactive reporting on deadlines and late tasks
   - **GENERAL**: Conversational AI grounded in project context
-  - **OUT_OF_SCOPE**: Guardrail that automatically rejects off-topic queries (trivia, history, etc.) to maintain focus on professional/project topics
+  - **OUT_OF_SCOPE**: Guardrail that rejects off-topic queries. Short queries containing `"who is"`, `"who was"` bypass the 50-character fast-path and go to the LLM classifier. Jailbreak attempts (`"your system prompt"`, `"ignore your instructions"`, `"bypass your rules"`) are caught by keyword matching before the LLM is ever called.
 
 - **Language Detection**: Automatically switches between English and Arabic prompts based on user input.
-- **Deep Conversational Memory**: Retains conversation history (currently limited to 12,000 characters) for context continuity, enabling deep, continuous, multi-turn technical discussions.
+- **Adaptive Conversational Memory**: Full token-budget window for project sessions. Projectless sessions cap history at the last 2 turns (4 messages) to prevent token accumulation across unrelated queries.
 - **Persona Mapping**: Adjusts the tone, depth, and terminology of the answer based on the user's role (student, educator, company representative, or early-career professional).
-- **Corrective RAG (CRAG)**: When the internal knowledge base is insufficient or irrelevant, the system dynamically extracts context and triggers external tools:
+- **Corrective RAG (CRAG)**: Only activates when `project_id` is set. When the internal knowledge base is insufficient or irrelevant, the system triggers external tools:
   - **Wikipedia & Google (SerpApi)** for live web search, general definitions, and current information
   - **GitHub API** for extracting repository issues, commits, and code summaries
   - **Python Interpreter** for executing logic, mathematical calculations, and data processing tasks

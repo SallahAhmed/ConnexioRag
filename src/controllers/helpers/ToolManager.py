@@ -375,24 +375,26 @@ class ToolManager:
 
             lines = []
 
-            if project_data:
+            if isinstance(project_data, dict):
                 lines.append(f"Project: {project_data.get('PName', 'N/A')}")
                 lines.append(f"Description: {project_data.get('Description', 'N/A')}")
                 techs = project_data.get("technologyUsed") or []
+                if isinstance(techs, str):
+                    techs = [t.strip() for t in techs.split(",") if t.strip()]
                 lines.append(f"Technology stack: {', '.join(techs) if techs else 'N/A'}")
                 lines.append(f"Timeline: {project_data.get('startDate', '?')} → {project_data.get('endDate', '?')}")
 
-            if members:
+            if isinstance(members, list) and members:
                 lines.append(f"Team size: {len(members)} member(s)")
-                member_names = [m.get("FullName", "?") for m in members[:5]]
+                member_names = [m.get("FullName", "?") for m in members[:5] if isinstance(m, dict)]
                 lines.append(f"Members: {', '.join(member_names)}")
 
-            if tasks:
+            if isinstance(tasks, list) and tasks:
                 total = len(tasks)
-                done = sum(1 for t in tasks if t.get("status") in ("completed", "done"))
+                done = sum(1 for t in tasks if isinstance(t, dict) and t.get("status") in ("completed", "done"))
                 overdue = sum(
                     1 for t in tasks
-                    if t.get("status") not in ("completed", "done")
+                    if isinstance(t, dict) and t.get("status") not in ("completed", "done")
                     and t.get("end_date")
                 )
                 lines.append(f"Tasks: {total} total, {done} completed, {overdue} potentially overdue")

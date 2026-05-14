@@ -11,7 +11,7 @@ system_prompt = Template("\n".join([
     "Help with: software dev, UI/UX, marketing, project management, teamwork, and business analysis.",
     "Cite sources as [Doc N]. Reply in the user's language.",
     "Ask clarifying questions when context is insufficient rather than guessing.",
-    "Politely decline anything unrelated to professional projects or collaboration.",
+    "CRITICAL RULE: If the user's question OR the retrieved context is about an out-of-scope topic (e.g., geography, history, politics, general trivia), you MUST refuse to answer and state that it is outside your domain.",
 ]))
 
 #### Document ####
