@@ -4,6 +4,17 @@ import re
 # pyrefly: ignore [missing-import]
 import guidance
 
+# Short queries matching these patterns bypass the fast-path and go to the LLM classifier,
+# because they could be trivia, jailbreak attempts, or historical questions.
+_SKIP_FAST_PATH = (
+    "who is ", "who was ", "who were ", "who's ",
+    "من هو ", "من كان ", "من هي ", "من كانت ",
+    "system prompt", "your prompt", "your instructions",
+    "ignore your", "ignore previous", "disregard your",
+    "forget your", "pretend you", "act as if", "bypass your",
+    "jailbreak", "تجاهل تعليم", "تجاوز قيود", "تظاهر أنك",
+)
+
 class WorkflowController(BaseController):
     def __init__(self, generation_client, template_parser, utility_client=None):
         super().__init__()
@@ -58,8 +69,14 @@ class WorkflowController(BaseController):
                 "وصفة", "مكونات الطبق",
                 # Weather
                 "weather in", "temperature in", "forecast for",
+                # Jailbreak / prompt-injection
+                "your system prompt", "show me your prompt", "ignore your instructions",
+                "ignore previous instructions", "disregard your instructions",
+                "pretend you are not", "pretend you have no", "bypass your rules",
+                "override your", "jailbreak",
                 # Arabic equivalents
-                "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز"
+                "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز",
+                "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
             ],
             # GENERAL conversational triggers
             WorkflowNodeEnum.GENERAL: [
@@ -73,8 +90,10 @@ class WorkflowController(BaseController):
             if any(trigger in query_lower for trigger in triggers):
                 return node
 
-        # 2. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly if no keywords matched.
-        if len(query_lower) < 50:
+        # 2. ABSOLUTE FAST-PATH: Short queries (greetings, noise) return GENERAL instantly.
+        # EXCEPTION: queries matching knowledge/jailbreak patterns must go to the LLM classifier
+        # so "who is gamal abd el nasser" (26 chars) doesn't slip through as GENERAL.
+        if len(query_lower) < 50 and not any(p in query_lower for p in _SKIP_FAST_PATH):
             return WorkflowNodeEnum.GENERAL
 
         # 3. Fallback to LLM for complex classification

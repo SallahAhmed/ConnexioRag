@@ -282,7 +282,25 @@ class NLPController(BaseController):
             WorkflowNodeEnum.PHASE_TRANSITION,
         }
 
-        if not is_kb_relevant and node != WorkflowNodeEnum.OUT_OF_SCOPE:
+        if node == WorkflowNodeEnum.OUT_OF_SCOPE:
+            tracer.end_trace(trace_id, step_id, "Skipped (Out of Scope)")
+
+        elif is_kb_relevant:
+            retrieved_context.append(kb_results)
+            if kb_results.strip():
+                sources.append("Documentation")
+            tracer.end_trace(
+                trace_id, step_id, f"Total Length: {len(kb_results)}", usage=kb_usage
+            )
+
+        elif project_id is None:
+            # No project context — skip external tools entirely to avoid Wikipedia/Google
+            # answering general-knowledge trivia. Let the generation model handle the
+            # query using the system prompt guardrails alone.
+            tracer.end_trace(trace_id, step_id, "No project context, skipping external tools")
+
+        else:
+            # KB was irrelevant/empty and we have a project context → CRAG fallback
             tracer.end_trace(
                 trace_id, step_id, "Irrelevant/Empty (Fallback Triggered)", usage=kb_usage
             )
@@ -392,16 +410,6 @@ class NLPController(BaseController):
                         "\n[Global Knowledge]: No relevant information found in project domain."
                     )
 
-        elif node != WorkflowNodeEnum.OUT_OF_SCOPE:
-            retrieved_context.append(kb_results)
-            if kb_results.strip():
-                sources.append("Documentation")
-            tracer.end_trace(
-                trace_id, step_id, f"Total Length: {len(kb_results)}", usage=kb_usage
-            )
-        else:
-            tracer.end_trace(trace_id, step_id, "Skipped (Out of Scope)")
-
         # --- Live backend context injection (project summary from main backend) ---
         if project_id and self.backend_client and node not in (WorkflowNodeEnum.OUT_OF_SCOPE,):
             try:
@@ -487,6 +495,26 @@ class NLPController(BaseController):
             )
         )
 
+        # Short-circuit: out-of-scope queries never reach the generation LLM.
+        if node == WorkflowNodeEnum.OUT_OF_SCOPE:
+            answer = (
+                "أنا متخصص في التعاون في المشاريع والمهارات المهنية. "
+                "هل يمكنني مساعدتك في شيء متعلق بمشروعك؟"
+                if language == "ar"
+                else "I specialize in project collaboration and professional skills. "
+                     "Can I help you with something related to your project?"
+            )
+            if self.db_client:
+                await self.session_model.append_message(session_id, "user", query, node.value)
+                await self.session_model.append_message(session_id, "assistant", answer, node.value)
+            return {
+                "answer": answer,
+                "node": node.value,
+                "language": language,
+                "sources": [],
+                "session_id": session_id,
+            }
+
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": False})
         answer = await self.generation_client.generate_text(
             prompt=footer_prompt, chat_history=chat_history
@@ -566,6 +594,24 @@ class NLPController(BaseController):
                 user_id, project_id, query, persona, session_id, limit
             )
         )
+
+        # Short-circuit: out-of-scope queries never reach the generation LLM.
+        if node == WorkflowNodeEnum.OUT_OF_SCOPE:
+            answer = (
+                "أنا متخصص في التعاون في المشاريع والمهارات المهنية. "
+                "هل يمكنني مساعدتك في شيء متعلق بمشروعك؟"
+                if language == "ar"
+                else "I specialize in project collaboration and professional skills. "
+                     "Can I help you with something related to your project?"
+            )
+            if self.db_client:
+                await self.session_model.append_message(session_id, "user", query, node.value)
+                await self.session_model.append_message(session_id, "assistant", answer, node.value)
+            import json as _json
+            yield f"data: {_json.dumps({'node': node.value, 'language': language, 'sources': [], 'session_id': session_id, 'event': 'meta'})}\n\n"
+            yield f"data: {_json.dumps({'text': answer})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
 
         metadata_sent = False
         full_answer = ""

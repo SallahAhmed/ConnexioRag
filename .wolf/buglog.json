@@ -144,6 +144,38 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-14T16:19:24.169Z"
+    },
+    {
+      "id": "bug-010",
+      "timestamp": "2026-05-14T20:31:01.839Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/controllers/WorkflowController.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 78→97 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-14T20:31:01.839Z"
+    },
+    {
+      "id": "bug-011",
+      "timestamp": "2026-05-14T20:32:46.538Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/stores/llm/templates/locales/en/rag.py",
+      "root_cause": "18 lines replaced/restructured",
+      "fix": "Rewrote 25→9 lines (18 removed) | Also: \"أنت مستشار ذكاء اصطناعي خبير لمنصة Connexio — منص; \"تساعد Connexio الطلاب والمصممين والمسوقين والمطور",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-14T20:33:09.007Z"
     }
   ]
 }

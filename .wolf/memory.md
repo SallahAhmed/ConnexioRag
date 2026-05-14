@@ -147,3 +147,20 @@
 | 19:19 | Edited F:/connexio_back2/modules/chats/chats.controller.js | expanded (+6 lines) | ~223 |
 | 19:20 | Session end: @connexio feature — 4 bug fixes across 4 files | agent.py, chatAIHelpers.js, socket.js, chats.controller.js | RAG+backend wired for team mention + individual chatbot | ~8000 tok |
 | 19:20 | Session end: 6 writes across 4 files (agent.py, chatAIHelpers.js, socket.js, chats.controller.js) | 10 reads | ~1209 tok |
+| 23:26 | Session end: 6 writes across 4 files (agent.py, chatAIHelpers.js, socket.js, chats.controller.js) | 21 reads | ~1209 tok |
+| 23:31 | Edited src/controllers/WorkflowController.py | modified __init__() | ~1409 |
+| 23:31 | Edited src/controllers/NLPController.py | modified strip() | ~2064 |
+| 23:32 | Edited src/controllers/NLPController.py | expanded (+20 lines) | ~396 |
+| 23:32 | Edited src/controllers/NLPController.py | expanded (+18 lines) | ~398 |
+| 23:32 | Edited src/stores/llm/templates/locales/en/rag.py | reduced (-16 lines) | ~158 |
+| 23:33 | Edited src/stores/llm/templates/locales/ar/rag.py | reduced (-16 lines) | ~135 |
+
+## Session: 2026-05-14 (scope + token fixes)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| session | Fixed OUT_OF_SCOPE detection: added jailbreak keywords + _SKIP_FAST_PATH to stop "who is X" fast-pathing to GENERAL | WorkflowController.py | trivia/historical queries now go to LLM classifier | ~200 |
+| session | Fixed CRAG: disabled external-tool fallback when project_id is None; refactored if/elif/else into clear 4-branch structure | NLPController.py | Wikipedia/Google no longer called for projectless sessions | ~150 |
+| session | Added OUT_OF_SCOPE short-circuit in both answer_agent_chat and answer_agent_chat_stream — returns canned refusal, 0 LLM tokens | NLPController.py | out-of-scope queries: ~1300 tok → ~0 tok | ~200 |
+| session | Compressed EN + AR system prompts from ~250 tok to ~55 tok each | en/rag.py, ar/rag.py | ~170 tok saved per request | ~100 |
+| 23:33 | Session end: 12 writes across 7 files (agent.py, chatAIHelpers.js, socket.js, chats.controller.js, WorkflowController.py) | 22 reads | ~5769 tok |

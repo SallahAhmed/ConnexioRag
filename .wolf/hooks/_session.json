@@ -51,6 +51,66 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-05-14T16:15:27.840Z"
+    },
+    "c:/Users/salla/Connexios/.wolf/anatomy.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:24:33.559Z"
+    },
+    "c:/Users/salla/Connexios/src/controllers/WorkflowController.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:24:37.227Z"
+    },
+    "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:24:40.978Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:24:48.920Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/workflow.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:24:51.999Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:12.699Z"
+    },
+    "c:/Users/salla/Connexios/src/models/enums/WorkflowNodeEnum.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:15.879Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:19.033Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/workflow.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:22.290Z"
+    },
+    "c:/Users/salla/Connexios/.wolf/cerebrum.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:30.909Z"
+    },
+    "c:/Users/salla/Connexios/.wolf/buglog.json": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:25:33.715Z"
+    },
+    "c:/Users/salla/Connexios/.wolf/memory.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-14T20:33:26.524Z"
     }
   },
   "files_written": [
@@ -89,6 +149,42 @@
       "action": "edit",
       "tokens": 223,
       "at": "2026-05-14T16:19:24.164Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+      "action": "edit",
+      "tokens": 1409,
+      "at": "2026-05-14T20:31:01.835Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 2064,
+      "at": "2026-05-14T20:31:56.263Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 396,
+      "at": "2026-05-14T20:32:09.644Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 398,
+      "at": "2026-05-14T20:32:20.172Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py",
+      "action": "edit",
+      "tokens": 158,
+      "at": "2026-05-14T20:32:46.536Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py",
+      "action": "edit",
+      "tokens": 135,
+      "at": "2026-05-14T20:33:09.004Z"
     }
   ],
   "edit_counts": {
@@ -96,11 +192,15 @@
     "src/Routes/agent.py": 2,
     "F:/connexio_back2/modules/chats/chatAIHelpers.js": 1,
     "F:/connexio_back2/socket.js": 1,
-    "F:/connexio_back2/modules/chats/chats.controller.js": 1
+    "F:/connexio_back2/modules/chats/chats.controller.js": 1,
+    "src/controllers/WorkflowController.py": 1,
+    "src/controllers/NLPController.py": 3,
+    "src/stores/llm/templates/locales/en/rag.py": 1,
+    "src/stores/llm/templates/locales/ar/rag.py": 1
   },
   "anatomy_hits": 0,
-  "anatomy_misses": 10,
+  "anatomy_misses": 22,
   "repeated_reads_warned": 0,
   "cerebrum_warnings": 0,
-  "stop_count": 5
+  "stop_count": 7
 }

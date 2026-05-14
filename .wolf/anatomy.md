@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T16:19:24.142Z
-> Files: 32 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T20:33:08.988Z
+> Files: 36 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -311,6 +311,11 @@
 
 - `agent.py` — Pydantic: AgentChatRequest (~174 tok)
 
+## src/controllers/
+
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~8384 tok)
+- `WorkflowController.py` — pyrefly: ignore [missing-import] (~2573 tok)
+
 ## src/helpers/
 
 - `config.py` — Settings: get_settings (~716 tok)
@@ -327,6 +332,14 @@
 
 - `__init__.py` (~83 tok)
 - `project_id_map.py` — Declares ProjectIDMap (~170 tok)
+
+## src/stores/llm/templates/locales/ar/
+
+- `rag.py` — ### RAG PROMPTS #### (~278 tok)
+
+## src/stores/llm/templates/locales/en/
+
+- `rag.py` — ### RAG PROMPTS #### (~301 tok)
 
 ## src/utils/
 
