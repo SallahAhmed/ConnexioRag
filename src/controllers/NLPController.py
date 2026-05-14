@@ -213,6 +213,12 @@ class NLPController(BaseController):
                 history = await self.session_model.get_recent_history(session_id)
         else:
             history = []
+
+        # Without project context there is nothing to RAG about — cap history
+        # at 2 turns (4 messages) to prevent accumulation across unrelated queries.
+        if not project_id:
+            history = history[-4:] if len(history) > 4 else history
+
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
         # --- Token budgeting ---
@@ -424,9 +430,22 @@ class NLPController(BaseController):
 
         # --- Step 4: Final Prompt Construction ---
         self.template_parser.set_language(language)
-        system_prompt = self.template_parser.get(
-            "rag", "system_prompt", {"persona": persona, "node": node.value}
-        )
+
+        # Projectless sessions use the utility model — no RAG value without a project.
+        # Use an ultra-short system prompt to further cut token cost.
+        is_projectless = not project_id
+        if is_projectless:
+            system_prompt = (
+                "أنت Connexio AI، مساعد تعاون في المشاريع. كن موجزاً ومفيداً."
+                if language == "ar"
+                else "You are Connexio AI, a project collaboration assistant. Be concise and helpful."
+            )
+            prompt_client = self.utility_client
+        else:
+            system_prompt = self.template_parser.get(
+                "rag", "system_prompt", {"persona": persona, "node": node.value}
+            )
+            prompt_client = self.generation_client
 
         context_string = "\n\n".join(retrieved_context)
 
@@ -439,16 +458,16 @@ class NLPController(BaseController):
         )
 
         chat_history = [
-            self.generation_client.construct_prompt(prompt=system_prompt, role="system")
+            prompt_client.construct_prompt(prompt=system_prompt, role="system")
         ]
         for msg in final_history:
             chat_history.append(
-                self.generation_client.construct_prompt(
+                prompt_client.construct_prompt(
                     prompt=msg["content"], role=msg["role"]
                 )
             )
 
-        return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id
+        return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id, prompt_client
 
     # ------------------------------------------------------------------
     # Public chat methods
@@ -489,7 +508,7 @@ class NLPController(BaseController):
                 "language": lang, "sources": [], "session_id": sid,
             }
 
-        chat_history, footer_prompt, session_id, node, language, sources, trace_id = (
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
             await self._prepare_chat_context(
                 user_id, project_id, query, persona, session_id, limit
             )
@@ -516,11 +535,11 @@ class NLPController(BaseController):
             }
 
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": False})
-        answer = await self.generation_client.generate_text(
+        answer = await prompt_client.generate_text(
             prompt=footer_prompt, chat_history=chat_history
         )
 
-        usage = self.generation_client.last_usage or {}
+        usage = prompt_client.last_usage or {}
         self.logger.info(
             f"[TOKEN USAGE] Node: {node.value} | "
             f"In: {usage.get('prompt_tokens', 0)} | "
@@ -589,7 +608,7 @@ class NLPController(BaseController):
             yield "data: [DONE]\n\n"
             return
 
-        chat_history, footer_prompt, session_id, node, language, sources, trace_id = (
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
             await self._prepare_chat_context(
                 user_id, project_id, query, persona, session_id, limit
             )
@@ -618,7 +637,7 @@ class NLPController(BaseController):
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": True})
 
         import json as _json
-        async for chunk in self.generation_client.generate_text_stream(
+        async for chunk in prompt_client.generate_text_stream(
             prompt=footer_prompt, chat_history=chat_history
         ):
             if not metadata_sent:

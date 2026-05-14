@@ -164,3 +164,11 @@
 | session | Added OUT_OF_SCOPE short-circuit in both answer_agent_chat and answer_agent_chat_stream — returns canned refusal, 0 LLM tokens | NLPController.py | out-of-scope queries: ~1300 tok → ~0 tok | ~200 |
 | session | Compressed EN + AR system prompts from ~250 tok to ~55 tok each | en/rag.py, ar/rag.py | ~170 tok saved per request | ~100 |
 | 23:33 | Session end: 12 writes across 7 files (agent.py, chatAIHelpers.js, socket.js, chats.controller.js, WorkflowController.py) | 22 reads | ~5769 tok |
+| 23:53 | Edited src/controllers/NLPController.py | expanded (+6 lines) | ~319 |
+| 23:53 | Edited src/controllers/NLPController.py | expanded (+13 lines) | ~459 |
+| 23:53 | Edited src/controllers/NLPController.py | inline fix | ~33 |
+| 23:53 | Edited src/controllers/NLPController.py | 30→30 lines | ~398 |
+| 23:53 | Edited src/controllers/NLPController.py | 8→8 lines | ~108 |
+| 23:54 | Edited src/controllers/NLPController.py | 27→27 lines | ~402 |
+| 23:54 | Edited src/controllers/NLPController.py | modified generate_text_stream() | ~47 |
+| 23:54 | Session end: 19 writes across 7 files (agent.py, chatAIHelpers.js, socket.js, chats.controller.js, WorkflowController.py) | 22 reads | ~16173 tok |

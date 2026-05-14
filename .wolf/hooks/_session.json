@@ -63,8 +63,8 @@
       "first_read": "2026-05-14T20:24:37.227Z"
     },
     "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
-      "count": 1,
-      "tokens": 0,
+      "count": 4,
+      "tokens": 8638,
       "first_read": "2026-05-14T20:24:40.978Z"
     },
     "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py": {
@@ -185,6 +185,48 @@
       "action": "edit",
       "tokens": 135,
       "at": "2026-05-14T20:33:09.004Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 319,
+      "at": "2026-05-14T20:53:02.203Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 459,
+      "at": "2026-05-14T20:53:19.339Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 33,
+      "at": "2026-05-14T20:53:26.402Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 398,
+      "at": "2026-05-14T20:53:44.018Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 108,
+      "at": "2026-05-14T20:53:59.285Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 402,
+      "at": "2026-05-14T20:54:11.229Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 47,
+      "at": "2026-05-14T20:54:18.687Z"
     }
   ],
   "edit_counts": {
@@ -194,13 +236,13 @@
     "F:/connexio_back2/socket.js": 1,
     "F:/connexio_back2/modules/chats/chats.controller.js": 1,
     "src/controllers/WorkflowController.py": 1,
-    "src/controllers/NLPController.py": 3,
+    "src/controllers/NLPController.py": 10,
     "src/stores/llm/templates/locales/en/rag.py": 1,
     "src/stores/llm/templates/locales/ar/rag.py": 1
   },
   "anatomy_hits": 0,
   "anatomy_misses": 22,
-  "repeated_reads_warned": 0,
+  "repeated_reads_warned": 3,
   "cerebrum_warnings": 0,
-  "stop_count": 7
+  "stop_count": 8
 }

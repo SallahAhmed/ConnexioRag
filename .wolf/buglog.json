@@ -176,6 +176,38 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-05-14T20:33:09.007Z"
+    },
+    {
+      "id": "bug-012",
+      "timestamp": "2026-05-14T20:53:19.343Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 25→38 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-14T20:53:19.343Z"
+    },
+    {
+      "id": "bug-013",
+      "timestamp": "2026-05-14T20:53:26.408Z",
+      "error_message": "Wrong return value",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Was returning: chat_history, footer_prompt, session_id, node, lan",
+      "fix": "Now returns: chat_history, footer_prompt, session_id, node, lan",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-14T20:53:26.408Z"
     }
   ]
 }

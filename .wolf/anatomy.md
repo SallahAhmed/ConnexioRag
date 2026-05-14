@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T20:33:08.988Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T20:54:18.674Z
 > Files: 36 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
@@ -313,7 +313,7 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~8384 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~8638 tok)
 - `WorkflowController.py` — pyrefly: ignore [missing-import] (~2573 tok)
 
 ## src/helpers/
