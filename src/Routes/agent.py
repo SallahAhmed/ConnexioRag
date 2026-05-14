@@ -38,9 +38,11 @@ def get_nlp_controller(request: Request) -> NLPController:
 async def agent_chat(request: Request, project_id: int, chat_request: AgentChatRequest):
     try:
         nlp_controller = get_nlp_controller(request)
+        # project_id=0 is the convention for individual (no-project) chatbot rooms
+        effective_project_id = None if project_id == 0 else project_id
         result = await nlp_controller.answer_agent_chat(
             user_id=chat_request.user_id,
-            project_id=project_id,
+            project_id=effective_project_id,
             query=chat_request.query,
             persona=chat_request.persona,
             session_id=chat_request.session_id,
@@ -60,17 +62,18 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
         )
 
 @agent_router.get("/chat/stream/{project_id}")
-async def agent_chat_stream(request: Request, project_id: int, 
-                            query: str, user_id: int, 
-                            persona: Optional[str] = "student", 
-                            session_id: Optional[int] = None, 
+async def agent_chat_stream(request: Request, project_id: int,
+                            query: str, user_id: int,
+                            persona: Optional[str] = "student",
+                            session_id: Optional[int] = None,
                             limit: Optional[int] = 5):
     try:
         nlp_controller = get_nlp_controller(request)
+        effective_project_id = None if project_id == 0 else project_id
         return StreamingResponse(
             nlp_controller.answer_agent_chat_stream(
                 user_id=user_id,
-                project_id=project_id,
+                project_id=effective_project_id,
                 query=query,
                 persona=persona,
                 session_id=session_id,

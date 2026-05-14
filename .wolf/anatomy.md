@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T15:27:32.765Z
-> Files: 27 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T16:19:24.142Z
+> Files: 32 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -260,6 +260,15 @@
 
 - `rag_tool.py` — RAGTool: hybrid_search (~1148 tok)
 
+## F:/connexio_back2/
+
+- `socket.js` — Exports initializeSocket (~4790 tok)
+
+## F:/connexio_back2/modules/chats/
+
+- `chatAIHelpers.js` — API routes: POST (1 endpoints) (~1655 tok)
+- `chats.controller.js` — modules/chats/chats.controller.js (~7815 tok)
+
 ## f:/MasarX_A/scratch/
 
 - `e2e_test_runner.py` — section_1_health, section_2_project_sync, section_3_file_upload, section_4_vector_search (~6048 tok)
@@ -293,9 +302,14 @@
 
 ## src/Routes/
 
+- `agent.py` — get_nlp_controller, agent_chat, agent_chat_stream (~1054 tok)
 - `base.py` — welcome, health_check (~214 tok)
 - `data.py` — Upload_data, process_endpoint, process_and_push_endpoint, upload_and_process (~3346 tok)
 - `projects.py` — ProjectSyncRequest: sync_project (~784 tok)
+
+## src/Routes/schemas/
+
+- `agent.py` — Pydantic: AgentChatRequest (~174 tok)
 
 ## src/helpers/
 
