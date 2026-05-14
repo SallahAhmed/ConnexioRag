@@ -24,7 +24,7 @@ class ChatSession(SQLAlchemyBase):
     project_id = Column(Integer, nullable=True)
 
     # Adaptive tracking fields
-    persona = Column(String(50), nullable=False, default="student")
+    persona = Column(Text, nullable=False, default="student")
     language = Column(String(10), nullable=False, default="en")
     last_workflow_node = Column(String(50), nullable=True, default="general")
     current_phase = Column(String(100), nullable=True)

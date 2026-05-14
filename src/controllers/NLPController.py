@@ -247,6 +247,9 @@ class NLPController(BaseController):
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
             print(f"[AGENT] [{now()}] Query is OUT OF SCOPE. Skipping retrieval.")
             results = [[]]
+        elif not project_id:
+            print(f"[AGENT] [{now()}] No project context. Skipping KB retrieval.")
+            results = [[]]
         else:
             search_tasks = [
                 self.tool_manager.search_knowledge_base(
