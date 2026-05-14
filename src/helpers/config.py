@@ -67,7 +67,7 @@ class Settings(BaseSettings):
 
     CONNEXIO_INTERNAL_API_KEY: str | None = None
     JWT_SECRET: str | None = None
-    SERVICE_USER_ID: int = 3
+    SERVICE_USER_ID: int | None = None
     MAIN_BACKEND_URL: str = "https://connexio.icu"
 
     class Config:

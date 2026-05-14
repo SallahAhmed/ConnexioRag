@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 55038,
-    "total_reads": 238,
-    "total_writes": 129,
-    "total_sessions": 6,
-    "anatomy_hits": 19,
-    "anatomy_misses": 196,
+    "total_tokens_estimated": 124156,
+    "total_reads": 277,
+    "total_writes": 155,
+    "total_sessions": 8,
+    "anatomy_hits": 34,
+    "anatomy_misses": 220,
     "repeated_reads_blocked": 31,
-    "estimated_savings_vs_bare_cli": 29768
+    "estimated_savings_vs_bare_cli": 32768
   },
   "sessions": [
     {
@@ -2348,6 +2348,421 @@
         "writes_count": 33,
         "repeated_reads_blocked": 2,
         "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-14-1755",
+      "started": "2026-05-14T14:55:29.850Z",
+      "ended": "2026-05-14T15:10:02.877Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/walkthrough3.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/improvement_suggestions.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 6955,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 1052,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/agent.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 337,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 1564,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 2495,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 217,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 30,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 50,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 62,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 192,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 5802,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12403,
+        "output_tokens_estimated": 6353,
+        "reads_count": 13,
+        "writes_count": 6,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 5
+      }
+    },
+    {
+      "id": "session-2026-05-14-1755",
+      "started": "2026-05-14T14:55:29.850Z",
+      "ended": "2026-05-14T15:17:32.117Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/walkthrough3.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/improvement_suggestions.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 6955,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 1052,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/agent.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 337,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 1564,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 2495,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 217,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 30,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 50,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 62,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 192,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 5802,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 5716,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 85,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 244,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 380,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12403,
+        "output_tokens_estimated": 12778,
+        "reads_count": 13,
+        "writes_count": 10,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 5
+      }
+    },
+    {
+      "id": "session-2026-05-14-1755",
+      "started": "2026-05-14T14:55:29.850Z",
+      "ended": "2026-05-14T15:20:41.500Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/walkthrough3.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/important note/improvement_suggestions.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 6955,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 1052,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/agent.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 337,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 1564,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/base.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 2495,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.gitignore",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 217,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/Routes/base.py",
+          "tokens_estimated": 30,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/helpers/config.py",
+          "tokens_estimated": 50,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 62,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/utils/backend_client.py",
+          "tokens_estimated": 192,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/phase6_e2e_postman_collection.json",
+          "tokens_estimated": 5802,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 5716,
+          "action": "create"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 85,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 244,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/scratch/e2e_test_runner.py",
+          "tokens_estimated": 380,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12403,
+        "output_tokens_estimated": 12778,
+        "reads_count": 13,
+        "writes_count": 10,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 5
       }
     }
   ],

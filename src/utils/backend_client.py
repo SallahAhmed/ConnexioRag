@@ -49,7 +49,7 @@ class BackendApiClient:
         base_url: str,
         api_key: str,
         jwt_secret: Optional[str] = None,
-        service_user_id: int = 1,
+        service_user_id: Optional[int] = None,
         timeout: float = _REQUEST_TIMEOUT,
     ):
         self.base_url = base_url.rstrip("/")
@@ -72,6 +72,9 @@ class BackendApiClient:
     def _make_service_token(self) -> Optional[str]:
         """Generate a short-lived service JWT for outbound backend calls."""
         if not self._jwt_secret:
+            return None
+        if self._service_user_id is None:
+            logger.warning("SERVICE_USER_ID is not configured — skipping service JWT generation")
             return None
         try:
             return jwt.encode(

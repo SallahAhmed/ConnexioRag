@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-12T20:11:54.624Z
-> Files: 23 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T15:27:32.765Z
+> Files: 27 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -260,6 +260,11 @@
 
 - `rag_tool.py` — RAGTool: hybrid_search (~1148 tok)
 
+## f:/MasarX_A/scratch/
+
+- `e2e_test_runner.py` — section_1_health, section_2_project_sync, section_3_file_upload, section_4_vector_search (~6048 tok)
+- `phase6_e2e_postman_collection.json` — base64urlEncode: signJWT, signJWT, signJWT (~5802 tok)
+
 ## f:/MasarX_A/src/
 
 - `main.py` — API: 1 endpoints (~1052 tok)
@@ -288,8 +293,13 @@
 
 ## src/Routes/
 
+- `base.py` — welcome, health_check (~214 tok)
 - `data.py` — Upload_data, process_endpoint, process_and_push_endpoint, upload_and_process (~3346 tok)
 - `projects.py` — ProjectSyncRequest: sync_project (~784 tok)
+
+## src/helpers/
+
+- `config.py` — Settings: get_settings (~716 tok)
 
 ## src/models/db_schemas/connexio/
 
@@ -306,4 +316,4 @@
 
 ## src/utils/
 
-- `backend_client.py` — BackendApiClient: get_user, get_project, get_project_members, get_project_tasks + 3 more (~2495 tok)
+- `backend_client.py` — BackendApiClient: close, get_user, get_project, get_project_members + 4 more (~2362 tok)

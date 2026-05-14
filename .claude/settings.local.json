@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Users/salla/Connexios/.venv/Scripts/pip list *)",
+      "Bash(C:/Users/salla/Connexios/.venv/Scripts/pip install *)",
+      "PowerShell(& \"C:\\\\Users\\\\salla\\\\Connexios\\\\.venv\\\\Scripts\\\\pip.exe\" install PyJWT 2>&1)",
+      "PowerShell(& \"C:\\\\Users\\\\salla\\\\Connexios\\\\.venv\\\\Scripts\\\\pip.exe\" show PyJWT 2>&1)"
+    ]
+  }
+}
