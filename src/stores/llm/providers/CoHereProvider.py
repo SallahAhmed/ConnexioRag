@@ -94,6 +94,31 @@ class CoHereProvider(LLMInterface):
         
         return [ f for f in response.embeddings.float ]
     
+    async def generate_text_stream(self, prompt: str, chat_history: list = [],
+                                     max_output_tokens: int = None,
+                                     temperature: float = None):
+        if not self.client:
+            self.logger.error("CoHere client was not set")
+            return
+        if not self.generation_model_id:
+            self.logger.error("Generation model for CoHere was not set")
+            return
+
+        max_output_tokens = max_output_tokens or self.default_generation_max_output_tokens
+        temperature = temperature or self.default_generation_temperature
+
+        stream = await self.client.chat_stream(
+            model=self.generation_model_id,
+            chat_history=chat_history,
+            message=self.process_text(prompt),
+            temperature=temperature,
+            max_tokens=max_output_tokens,
+        )
+
+        async for event in stream:
+            if event.event_type == "text-generation":
+                yield event.text
+
     def construct_prompt(self, prompt: str, role: str):
         return {
             "role": role,

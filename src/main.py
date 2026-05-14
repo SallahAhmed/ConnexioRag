@@ -133,8 +133,11 @@ async def startup_span():
         )
 
 async def shutdown_span():
+    if hasattr(app, 'backend_client') and app.backend_client:
+        await app.backend_client.close()
     await app.db_engine.dispose()
-    await app.vectordb_client.disconnect()
+    if hasattr(app, 'vectordb_client') and app.vectordb_client:
+        await app.vectordb_client.disconnect()
 
 # --- Register Lifecycle Events ---
 app.on_event("startup")(startup_span)
