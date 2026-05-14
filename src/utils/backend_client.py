@@ -58,6 +58,12 @@ class BackendApiClient:
         self._service_user_id = service_user_id
         self._timeout = timeout
         self._cache: dict[str, tuple[Any, float]] = {}
+        # Persistent client — reuse connections across requests
+        self._client = httpx.AsyncClient(timeout=self._timeout)
+
+    async def close(self) -> None:
+        """Gracefully close the underlying HTTP client. Call during app shutdown."""
+        await self._client.aclose()
 
     # ------------------------------------------------------------------
     # Internal helpers
@@ -123,8 +129,7 @@ class BackendApiClient:
 
         for attempt in range(_MAX_RETRIES + 1):
             try:
-                async with httpx.AsyncClient(timeout=self._timeout) as client:
-                    resp = await client.get(url, headers=self._headers())
+                resp = await self._client.get(url, headers=self._headers())
 
                 if resp.status_code == 200:
                     data = resp.json()
