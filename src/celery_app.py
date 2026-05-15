@@ -31,18 +31,10 @@ async def get_setup_utils():
     vectordb_provider_factory = VectorDBProviderFactory(config=settings, db_client=db_client)
 
     # generation client
-    generation_client = llm_provider_factory.create(
-        provider=settings.GENERATION_BACKEND,
-        api_url=settings.OPENAI_GENERATION_API_URL
-    )
-    generation_client.set_generation_model(model_id = settings.GENERATION_MODEL_ID)
+    generation_client = llm_provider_factory.create_generation_client()
 
     # utility client
-    utility_client = llm_provider_factory.create(
-        provider=settings.GENERATION_BACKEND,
-        api_url=settings.OPENAI_GENERATION_API_URL
-    )
-    utility_client.set_generation_model(model_id=settings.UTILITY_MODEL_ID)
+    utility_client = llm_provider_factory.create_utility_client()
 
     # embedding client
     embedding_client = llm_provider_factory.create(

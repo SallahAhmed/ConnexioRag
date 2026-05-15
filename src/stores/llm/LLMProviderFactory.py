@@ -33,3 +33,19 @@ class LLMProviderFactory:
             )
 
         return None
+
+    def create_generation_client(self):
+        backend = self.config.GENERATION_BACKEND
+        api_url = self.config.GROQ_API_URL if backend == LLMEnums.GROQ.value else self.config.OPENAI_GENERATION_API_URL
+        client = self.create(backend, api_url)
+        if client:
+            client.set_generation_model(model_id=self.config.GENERATION_MODEL_ID)
+        return client
+
+    def create_utility_client(self):
+        backend = self.config.UTILITY_BACKEND or self.config.GENERATION_BACKEND
+        api_url = self.config.GROQ_API_URL if backend == LLMEnums.GROQ.value else self.config.OPENAI_GENERATION_API_URL
+        client = self.create(backend, api_url)
+        if client:
+            client.set_generation_model(model_id=self.config.UTILITY_MODEL_ID)
+        return client

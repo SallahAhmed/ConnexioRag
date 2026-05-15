@@ -67,20 +67,9 @@ async def startup_span():
     llm_provider_factory = LLMProviderFactory(settings)
     vectordb_provider_factory = VectorDBProviderFactory(config=settings, db_client=app.db_client)
 
-    # --- Generation Client Setup ---
-    gen_url = settings.GROQ_API_URL if settings.GENERATION_BACKEND == "GROQ" else settings.OPENAI_GENERATION_API_URL
-    app.generation_client = llm_provider_factory.create(
-        provider=settings.GENERATION_BACKEND,
-        api_url=gen_url
-    )
-    app.generation_client.set_generation_model(model_id=settings.GENERATION_MODEL_ID)
-
-    # --- Utility Client Setup (Fast model for agentic tasks) ---
-    app.utility_client = llm_provider_factory.create(
-        provider=settings.GENERATION_BACKEND,
-        api_url=gen_url
-    )
-    app.utility_client.set_generation_model(model_id=settings.UTILITY_MODEL_ID)
+    # --- Generation & Utility Clients Setup ---
+    app.generation_client = llm_provider_factory.create_generation_client()
+    app.utility_client = llm_provider_factory.create_utility_client()
 
     # --- Embedding Client Setup ---
     app.embedding_client = llm_provider_factory.create(

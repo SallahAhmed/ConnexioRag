@@ -24,6 +24,7 @@ class Settings(BaseSettings):
     REDIS_DB: int = 0
 
     GENERATION_BACKEND: str = "GROQ"
+    UTILITY_BACKEND: str = "GROQ"
     EMBEDDING_BACKEND: str = "COHERE"
 
     OPENAI_API_KEY: str | None = None
