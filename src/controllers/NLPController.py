@@ -467,23 +467,14 @@ class NLPController(BaseController):
                 "company": "Focus on ROI, strategy, efficiency, and business outcomes.",
             }
             guide = persona_guide.get(persona.lower(), persona_guide["student"])
-            domain_rule = (
-                "إذا كان السؤال عن الطعام، الطقس، السياسة، الرياضة، المشاهير، "
-                "الجغرافيا، التاريخ، أو معلومات عامة غير متعلقة بالمشاريع، "
-                "فارفض الإجابة بلطف واذكر أنك متخصص في التعاون في المشاريع فقط."
-                if language == "ar"
-                else "If the question is about food, weather, politics, sports, celebrities, "
-                     "geography, history, general trivia, or subjective opinions ('best', "
-                     "'most brilliant', 'top') — politely refuse and state you only "
-                     "help with project collaboration topics."
-            )
             system_prompt = (
                 f"أنت Connexio AI، مساعد تعاون في المشاريع. الشخصية: {persona}. "
-                f"{guide} {domain_rule} كن موجزاً ومفيداً. لا تستخدم رؤوس markdown."
+                f"{guide} كن موجزاً ومفيداً. استخدم المعرفة المتاحة للإجابة. لا تستخدم رؤوس markdown."
                 if language == "ar"
                 else f"You are Connexio AI, a project collaboration assistant. "
-                     f"Persona: {persona}. {guide} {domain_rule} "
-                     f"Be concise and helpful. Do not use markdown headers."
+                     f"Persona: {persona}. {guide} "
+                     f"Use the provided knowledge to answer. Be concise and helpful. "
+                     f"Do not use markdown headers."
             )
             prompt_client = self.utility_client
 

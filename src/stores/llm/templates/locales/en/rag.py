@@ -42,8 +42,9 @@ footer_prompt = Template("\n".join([
     "Retrieved Context:",
     "$context",
     "",
-    "User Question: $query",
+    "Answer the following question using the context above. Do not repeat the question. Reply in the same language as the user:",
     "",
-    "IMPORTANT: Reply in the EXACT language of the user's question above. No markdown headers. Answer naturally:",
-    ""
+    "$query",
+    "",
+    "Answer:"
 ]))
