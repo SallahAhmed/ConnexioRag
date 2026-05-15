@@ -435,10 +435,20 @@ class NLPController(BaseController):
         # Use an ultra-short system prompt to further cut token cost.
         is_projectless = not project_id
         if is_projectless:
+            persona_guide = {
+                "student": "Teach concepts simply with examples. Encourage exploration.",
+                "early_career": "Give practical career advice and real-world tradeoffs.",
+                "educator": "Use structured explanations with pedagogical depth.",
+                "company": "Focus on ROI, strategy, efficiency, and business outcomes.",
+            }
+            guide = persona_guide.get(persona.lower(), persona_guide["student"])
             system_prompt = (
-                "أنت Connexio AI، مساعد تعاون في المشاريع. كن موجزاً ومفيداً."
+                f"أنت Connexio AI، مساعد تعاون في المشاريع. الشخصية: {persona}. "
+                f"{guide} كن موجزاً ومفيداً. لا تستخدم رؤوس markdown."
                 if language == "ar"
-                else "You are Connexio AI, a project collaboration assistant. Be concise and helpful."
+                else f"You are Connexio AI, a project collaboration assistant. "
+                     f"Persona: {persona}. {guide} "
+                     f"Be concise and helpful. Do not use markdown headers."
             )
             prompt_client = self.utility_client
         else:

@@ -54,26 +54,33 @@ class WorkflowController(BaseController):
             ],
             WorkflowNodeEnum.ONBOARDING: [
                 "where do i start", "new here", "how it works", "how do i start",
-                "getting started", "first time", "بداية", "كيف أبدأ", "جديد هنا"
+                "how does this", "how does the", "how does your", "how does it",
+                "getting started", "first time", "start here", "guide me",
+                "بداية", "كيف أبدأ", "جديد هنا", "كيف تعمل"
             ],
             WorkflowNodeEnum.OUT_OF_SCOPE: [
                 # Geography / Politics
                 "capital of", "who is the president", "who is the current",
                 "who won the election", "population of", "located in",
+                "mayor of", "prime minister", "king of",
                 # Entertainment / Trivia
                 "tell me a joke", "who won the game", "who won the match",
-                "celebrity", "actor", "movie plot",
-                # Food / Cooking — explicitly blocked
-                "recipe for", "how do i cook", "how to bake", "ingredients for",
-                "how to make a cake", "how to make a pizza", "كيف أطبخ",
-                "وصفة", "مكونات الطبق",
+                "celebrity", "actor", "movie plot", "movie about",
+                "singer", "album", "song by",
+                # Food / Cooking — explicitly blocked (broader patterns)
+                "recipe for", "recipe ", "how do i cook", "how to bake",
+                "how to make ", "ingredients for", "cook ", "bake ",
+                "how to cook", "how to prepare", "how to fry", "how to boil",
+                "كيف أطبخ", "وصفة", "مكونات الطبق", "طريقة عمل", "طريقة تحضير",
                 # Weather
-                "weather in", "temperature in", "forecast for",
+                "weather in", "temperature in", "forecast for", "weather forecast",
+                # History & dates (general trivia)
+                "what happened on", "born on", "died in", "year ",
                 # Jailbreak / prompt-injection
                 "your system prompt", "show me your prompt", "ignore your instructions",
                 "ignore previous instructions", "disregard your instructions",
                 "pretend you are not", "pretend you have no", "bypass your rules",
-                "override your", "jailbreak",
+                "override your", "jailbreak", "developer mode", "dan mode",
                 # Arabic equivalents
                 "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز",
                 "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
@@ -163,25 +170,10 @@ class WorkflowController(BaseController):
             )
         ]
 
-        # Use Guidance for 100% reliable enum selection
-        # We use a simple select block to force the model to pick YES or NO
         try:
-            # We assume the utility_client is OpenAI-compatible (like Groq/Ollama)
-            # and can be used with Guidance's OpenAI model wrapper if configured,
-            # but for portability with the existing custom clients, we'll use 
-            # a robust prompt strategy that Guidance can manage.
-            
-            # Note: In a production environment with direct API access, 
-            # you'd use guidance.models.OpenAI(...) here.
-            
-            prompt = f"""Task: Grade document relevance.
-Query: {query}
-Document: {context[:2000]}
-
-Is the document relevant to the query? Answer ONLY with 'YES' or 'NO'.
-Answer:"""
-            
-            response = await self.utility_client.generate_text(prompt=prompt)
+            response = await self.utility_client.generate_text(
+                prompt=user_prompt, chat_history=chat_history
+            )
             grade = response.strip().upper()
             
             # Robust boundary check
