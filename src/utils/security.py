@@ -12,6 +12,9 @@ from fastapi import Header, HTTPException, status
 
 logger = logging.getLogger(__name__)
 
+# Cache settings to avoid reloading .env on every request
+_settings_cache = None
+
 
 async def verify_api_key(x_api_key: str = Header(None, alias="x-api-key")) -> str:
     """
@@ -28,9 +31,11 @@ async def verify_api_key(x_api_key: str = Header(None, alias="x-api-key")) -> st
     any shared or production environment.
     """
     # Import here to avoid circular dependency at module load time
-    from helpers.config import get_settings
-    settings = get_settings()
-    expected_key = settings.CONNEXIO_INTERNAL_API_KEY
+    global _settings_cache
+    if _settings_cache is None:
+        from helpers.config import get_settings
+        _settings_cache = get_settings()
+    expected_key = _settings_cache.CONNEXIO_INTERNAL_API_KEY
 
     # Dev-mode bypass: if the key is not configured, skip validation
     if not expected_key:
