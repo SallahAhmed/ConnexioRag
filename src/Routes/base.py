@@ -33,7 +33,7 @@ async def health_check(app_settings: Settings = Depends(get_settings)):
                 "model": app_settings.GENERATION_MODEL_ID
             },
             "utility": {
-                "backend": app_settings.UTILITY_BACKEND,
+                "backend": app_settings.GENERATION_BACKEND,
                 "model": app_settings.UTILITY_MODEL_ID
             },
             "embedding": {
