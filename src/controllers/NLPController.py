@@ -465,13 +465,13 @@ class NLPController(BaseController):
             guide = persona_guide.get(persona.lower(), persona_guide["student"])
             domain_rule = (
                 "إذا كان السؤال عن الطعام، الطقس، السياسة، الرياضة، المشاهير، "
-                "الجغرافيا، التاريخ، أو معلومات عامة غير متعلقة بالمشاريع، قل: "
-                "'أنا متخصص في التعاون في المشاريع. هل يمكنني مساعدتك في شيء متعلق بمشروعك؟'"
+                "الجغرافيا، التاريخ، أو معلومات عامة غير متعلقة بالمشاريع، "
+                "فارفض الإجابة بلطف واذكر أنك متخصص في التعاون في المشاريع فقط."
                 if language == "ar"
                 else "If the question is about food, weather, politics, sports, celebrities, "
                      "geography, history, general trivia, or subjective opinions ('best', "
-                     "'most brilliant', 'top') — refuse politely: "
-                     "'I specialize in project collaboration. Can I help you with your project?'"
+                     "'most brilliant', 'top') — politely refuse and state you only "
+                     "help with project collaboration topics."
             )
             system_prompt = (
                 f"أنت Connexio AI، مساعد تعاون في المشاريع. الشخصية: {persona}. "
