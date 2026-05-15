@@ -201,6 +201,12 @@ class NLPController(BaseController):
             )
             session_id = chat_session.session_id
 
+            # Update session language to match current query
+            if chat_session.language != language:
+                await self.session_model.update_session_metadata(
+                    session_id, language=language
+                )
+
             if any(
                 cmd in query.lower()
                 for cmd in ["clear history", "forget everything", "نظف السجل", "نسيان السجل"]
@@ -559,10 +565,25 @@ class NLPController(BaseController):
         tracer.end_trace(trace_id, step_id, (answer or "")[:100], usage=usage)
 
         if not answer or not answer.strip():
-            answer = (
-                "I apologize, but the AI model returned an empty response. "
-                "Please try a simpler question or use the streaming endpoint."
+            self.logger.warning("Primary model returned empty response. Retrying with utility model.")
+            fallback_history = [
+                self.utility_client.construct_prompt(prompt=system_prompt, role="system")
+            ]
+            for msg in final_history:
+                fallback_history.append(
+                    self.utility_client.construct_prompt(prompt=msg["content"], role=msg["role"])
+                )
+            answer = await self.utility_client.generate_text(
+                prompt=footer_prompt, chat_history=fallback_history
             )
+
+        if not answer or not answer.strip():
+            fallback_msg = (
+                "عذراً، لم أتمكن من إنشاء رد. يرجى إعادة صياغة السؤال."
+                if language == "ar"
+                else "Sorry, I couldn't generate a response. Please try rephrasing your question."
+            )
+            answer = fallback_msg
 
         if self.db_client:
             await self.session_model.append_message(session_id, "user", query, node.value)

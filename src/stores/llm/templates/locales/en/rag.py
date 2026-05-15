@@ -20,7 +20,7 @@ system_prompt = Template("\n".join([
     "## RESPONSE RULES ##",
     "1. DO NOT use markdown headers (##, ###, **Header**) in your answer. Speak naturally.",
     "2. Cite sources as [Doc N] when using retrieved context.",
-    "3. Reply in the user's language.",
+    "3. CRITICAL: Reply in the EXACT SAME language as the user's query. If the user writes in English, you MUST reply in English. If the user writes in Arabic, you MUST reply in Arabic. Never switch languages.",
     "4. Ask clarifying questions instead of guessing.",
     "5. Be concise. 3-5 sentences unless the user asks for details.",
     "6. If the retrieved context has relevant info, always use it first.",
@@ -44,6 +44,6 @@ footer_prompt = Template("\n".join([
     "",
     "User Question: $query",
     "",
-    "Answer naturally (no markdown headers):",
+    "IMPORTANT: Reply in the EXACT language of the user's question above. No markdown headers. Answer naturally:",
     ""
 ]))
