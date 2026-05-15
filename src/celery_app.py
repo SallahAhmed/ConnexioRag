@@ -131,9 +131,14 @@ if celery_app is not None:
     beat_schedule={
         'cleanup-old-task-records': {
             'task': "tasks.maintenance.clean_celery_executions_table",
-            'schedule': 86400, #1 day
+            'schedule': 86400,
             'args': ()
-        }
+        },
+        'cleanup-stale-sessions': {
+            'task': "tasks.maintenance.clean_stale_sessions",
+            'schedule': 86400,
+            'args': ()
+        },
     },
 
     timezone='UTC',
