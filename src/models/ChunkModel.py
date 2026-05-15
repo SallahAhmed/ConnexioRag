@@ -55,8 +55,8 @@ class ChunkModel(BaseDataModel):
             records = result.scalars().all()
         return records
 
-    # Keep old name as a deprecated alias so nothing breaks before all callers are updated
-    async def get_poject_chunks(self, project_id: int, page_no: int=1, page_size: int=50):
+    # Keep old name as a deprecated alias
+    async def get_project_chunks_old(self, project_id: int, page_no: int=1, page_size: int=50):
         return await self.get_project_chunks(project_id=project_id, page_no=page_no, page_size=page_size)
     
     async def get_total_chunks_count(self, project_id: int):

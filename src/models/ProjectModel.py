@@ -22,7 +22,7 @@ class ProjectModel(BaseDataModel):
         
         return project
 
-    async def get_project_or_create_one(self, project_id: str):
+    async def get_project_or_create_one(self, project_id: int):
 
         async with self.db_client() as session:
             async with session.begin():

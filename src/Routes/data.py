@@ -115,7 +115,7 @@ data_router = APIRouter(
 )
 
 @data_router.post("/upload/{project_id}")
-async def Upload_data(request: Request, project_id : int, file: UploadFile,
+async def upload_data(request: Request, project_id : int, file: UploadFile,
                       app_settings: Settings = Depends(get_settings)):
 
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)

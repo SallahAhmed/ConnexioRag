@@ -496,7 +496,7 @@ class NLPController(BaseController):
                 )
             )
 
-        return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id, prompt_client
+        return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id, prompt_client, final_history
 
     # ------------------------------------------------------------------
     # Public chat methods
@@ -539,7 +539,7 @@ class NLPController(BaseController):
                 "language": lang, "sources": [], "session_id": sid,
             }
 
-        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
                 user_id, project_id, query, persona, session_id, limit, model_tier
             )
@@ -655,7 +655,7 @@ class NLPController(BaseController):
             yield "data: [DONE]\n\n"
             return
 
-        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
+        chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
                 user_id, project_id, query, persona, session_id, limit, model_tier
             )
