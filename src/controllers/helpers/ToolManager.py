@@ -196,7 +196,8 @@ class ToolManager:
             return None
 
     async def search_knowledge_base(self, project_id, query: str, limit: int = 5):
-        """Hybrid search over project KB + global KB, merged via RRF."""
+        """Hybrid search over project KB + global KB, merged via RRF.
+        If project_id=0, searches only the global KB to avoid double-searching the same collection."""
         try:
             vectors = await self.embedding_client.embed_text(text=query, document_type="query")
             if not vectors or len(vectors) == 0:
