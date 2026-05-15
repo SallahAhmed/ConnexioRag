@@ -136,7 +136,9 @@ class ToolManager:
     async def search_wiki(self, query: str, lang: str = "en") -> str:
         try:
             self.wiki_tool.api_wrapper.lang = lang
-            res = await asyncio.to_thread(self.wiki_tool.run, query)
+            res = await asyncio.wait_for(
+                asyncio.to_thread(self.wiki_tool.run, query), timeout=5.0
+            )
 
             if (not res or "No relevant information" in res or "Page not found" in res) and lang != "en":
                 self.logger.info(f"Wiki search failed for {lang}, retrying in English...")
@@ -156,7 +158,9 @@ class ToolManager:
         if not self.serp_tool:
             return "Google Search is not configured (Missing SERPAPI_API_KEY)."
         try:
-            res = await asyncio.to_thread(self.serp_tool.run, query)
+            res = await asyncio.wait_for(
+                asyncio.to_thread(self.serp_tool.run, query), timeout=5.0
+            )
             if len(res) > 2000:
                 res = res[:2000] + "\n[...google truncated...]"
             return res
@@ -420,7 +424,7 @@ class ToolManager:
         base_url = f"https://api.github.com/repos/{repo_name}"
 
         try:
-            async with httpx.AsyncClient(follow_redirects=True) as client:
+            async with httpx.AsyncClient(follow_redirects=True, timeout=5.0) as client:
                 if mode == "commits":
                     resp = await client.get(f"{base_url}/commits?per_page=5", headers=headers)
                     resp.raise_for_status()
