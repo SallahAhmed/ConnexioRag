@@ -2,6 +2,7 @@ from .BaseDataModel import BaseDataModel
 from .db_schemas import DataChunk
 from sqlalchemy.future import select
 from sqlalchemy import func, delete
+from typing import Optional
 
 class ChunkModel(BaseDataModel):
 
@@ -40,14 +41,14 @@ class ChunkModel(BaseDataModel):
             await session.commit()
         return len(chunks)
 
-    async def delete_chunks_by_project_id(self, project_id: ObjectId):
+    async def delete_chunks_by_project_id(self, project_id: int):
         async with self.db_client() as session:
             stmt = delete(DataChunk).where(DataChunk.chunk_project_id == project_id)
             result = await session.execute(stmt)
             await session.commit()
         return result.rowcount
     
-    async def get_project_chunks(self, project_id: ObjectId, page_no: int=1, page_size: int=50):
+    async def get_project_chunks(self, project_id: int, page_no: int=1, page_size: int=50):
         async with self.db_client() as session:
             stmt = select(DataChunk).where(DataChunk.chunk_project_id == project_id).offset((page_no - 1) * page_size).limit(page_size)
             result = await session.execute(stmt)
@@ -55,10 +56,10 @@ class ChunkModel(BaseDataModel):
         return records
 
     # Keep old name as a deprecated alias so nothing breaks before all callers are updated
-    async def get_poject_chunks(self, project_id: ObjectId, page_no: int=1, page_size: int=50):
+    async def get_poject_chunks(self, project_id: int, page_no: int=1, page_size: int=50):
         return await self.get_project_chunks(project_id=project_id, page_no=page_no, page_size=page_size)
     
-    async def get_total_chunks_count(self, project_id: ObjectId):
+    async def get_total_chunks_count(self, project_id: int):
         total_count = 0
         async with self.db_client() as session:
             count_sql = select(func.count(DataChunk.chunk_id)).where(DataChunk.chunk_project_id == project_id)
