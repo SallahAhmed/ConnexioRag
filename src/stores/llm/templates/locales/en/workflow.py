@@ -10,7 +10,7 @@ CATEGORIES:
 - PHASE_TRANSITION: Moving to the next phase of their project (e.g., "we finished the MVP").
 - BLOCKER: Technical issue, bug, stuck on a task in their project.
 - MILESTONE_WARNING: User reports THEIR OWN project is behind schedule. Must be first-person ("my project", "we are behind").
-- GENERAL: Professional/technical questions (methodologies, coding, design, marketing, management). If unsure, default here.
+- GENERAL: Professional/technical questions (methodologies, coding, design, marketing, management, career advice, interview prep, resume tips, professional development, learning recommendations). If unsure, default here.
 - OUT_OF_SCOPE: Food, cooking, weather, politics, sports, celebrities, geography, history dates ("what year did X happen"), general trivia, general knowledge questions ("who is X", "what is the capital of Y"). Anything completely unrelated to professional work.
 
 CRITICAL RULES:
