@@ -261,7 +261,7 @@ class NLPController(BaseController):
             print(f"[AGENT] [{now()}] Query is OUT OF SCOPE. Skipping retrieval.")
             results = [[]]
         elif not project_id:
-            print(f"[AGENT] [{now()}] No project context. Searching global KB.")
+            print(f"[AGENT] [{now()}] Searching global KB.")
             search_tasks = [
                 self.tool_manager.search_knowledge_base(
                     project_id=0, query=q, limit=limit
