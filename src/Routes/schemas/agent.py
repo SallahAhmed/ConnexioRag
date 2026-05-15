@@ -4,7 +4,7 @@ from typing import Optional, List
 
 class AgentChatRequest(BaseModel):
     """Main agent conversation request."""
-    query: str = Field(..., min_length=1, description="The user's message")
+    query: str = Field(..., min_length=1, max_length=5000, description="The user's message")
     user_id: int = Field(..., description="Backend user ID")
     persona: Optional[str] = Field("student", description="student | early_career | educator | company")
     session_id: Optional[int] = Field(None, description="Existing session ID to continue conversation")
