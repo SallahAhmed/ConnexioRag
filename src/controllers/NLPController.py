@@ -286,8 +286,12 @@ class NLPController(BaseController):
                 kb_results += f"\n[Results for: {q}]\n{res}\n"
                 has_kb_content = True
 
+        # Bypass relevance grader for projectless mode — global KB is curated content
         if not has_kb_content:
             is_kb_relevant = False
+            kb_usage = {}
+        elif not project_id:
+            is_kb_relevant = True
             kb_usage = {}
         else:
             is_kb_relevant = await self.workflow_controller.grade_relevance(
