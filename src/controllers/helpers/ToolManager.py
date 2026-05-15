@@ -168,7 +168,8 @@ class ToolManager:
             self.logger.error(f"Google Search Tool Error: {str(e)}")
             return "Unable to perform Google Search at this time."
 
-    GLOBAL_KB_COLLECTION = "connexio_global_kb"
+    def get_global_collection_name(self):
+        return self._get_collection_name(0)
 
     # ------------------------------------------------------------------
     # Vector Knowledge Base Tool
@@ -229,11 +230,11 @@ class ToolManager:
             # Search global KB
             try:
                 global_results = await self.vectordb_client.hybrid_search(
-                    collection_name=self.GLOBAL_KB_COLLECTION, query=query, vector=query_vector, limit=limit * 2,
+                    collection_name=self.get_global_collection_name(), query=query, vector=query_vector, limit=limit * 2,
                 )
             except Exception:
                 global_results = await self.vectordb_client.search_by_vector(
-                    collection_name=self.GLOBAL_KB_COLLECTION, vector=query_vector, limit=limit * 2,
+                    collection_name=self.get_global_collection_name(), vector=query_vector, limit=limit * 2,
                 )
             add_results(global_results, "global_")
 
