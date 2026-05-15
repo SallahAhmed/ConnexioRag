@@ -160,6 +160,7 @@ class NLPController(BaseController):
         persona: str = "student",
         session_id: Optional[int] = None,
         limit: int = 5,
+        model_tier: str = "auto",
     ):
         """
         Prepares chat history, retrieves context from all sources, and
@@ -437,10 +438,18 @@ class NLPController(BaseController):
         # --- Step 4: Final Prompt Construction ---
         self.template_parser.set_language(language)
 
-        # Projectless sessions use the utility model — no RAG value without a project.
-        # Use an ultra-short system prompt to further cut token cost.
-        is_projectless = not project_id
-        if is_projectless:
+        # Decide which model to use based on model_tier and project context
+        use_generation = (
+            model_tier == "generation"
+            or (model_tier == "auto" and project_id is not None)
+        )
+
+        if use_generation:
+            system_prompt = self.template_parser.get(
+                "rag", "system_prompt", {"persona": persona, "node": node.value}
+            )
+            prompt_client = self.generation_client
+        else:
             persona_guide = {
                 "student": "Teach concepts simply with examples. Encourage exploration.",
                 "early_career": "Give practical career advice and real-world tradeoffs.",
@@ -467,11 +476,6 @@ class NLPController(BaseController):
                      f"Be concise and helpful. Do not use markdown headers."
             )
             prompt_client = self.utility_client
-        else:
-            system_prompt = self.template_parser.get(
-                "rag", "system_prompt", {"persona": persona, "node": node.value}
-            )
-            prompt_client = self.generation_client
 
         context_string = "\n\n".join(retrieved_context)
 
@@ -507,7 +511,9 @@ class NLPController(BaseController):
         persona: str = "student",
         session_id: Optional[int] = None,
         limit: int = 5,
+        model_tier: str = "auto",
     ):
+        self.logger.info(f"answer_agent_chat called with model_tier={model_tier}")
         # Fast path — history clear
         clear_commands = [
             "clear history", "forget everything", "new topic",
@@ -536,7 +542,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit
+                user_id, project_id, query, persona, session_id, limit, model_tier
             )
         )
 
@@ -622,6 +628,7 @@ class NLPController(BaseController):
         persona: str = "student",
         session_id: Optional[int] = None,
         limit: int = 5,
+        model_tier: str = "auto",
     ):
         # Fast path — history clear
         clear_commands = [
@@ -651,7 +658,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit
+                user_id, project_id, query, persona, session_id, limit, model_tier
             )
         )
 

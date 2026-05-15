@@ -46,7 +46,8 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
             query=chat_request.query,
             persona=chat_request.persona,
             session_id=chat_request.session_id,
-            limit=chat_request.limit
+            limit=chat_request.limit,
+            model_tier=chat_request.model_tier or "auto",
         )
         return JSONResponse(
             content={
