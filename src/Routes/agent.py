@@ -20,19 +20,23 @@ agent_router = APIRouter(
 )
 
 def get_nlp_controller(request: Request) -> NLPController:
-    return NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_client=request.app.generation_client,
-        utility_client=request.app.utility_client,
-        embedding_client=request.app.embedding_client,
-        template_parser=request.app.template_parser,
-        settings=getattr(request.app, 'settings', None),
-        db_client=getattr(request.app, 'db_client', None),
-        reranker=getattr(request.app, 'reranker', None),
-        # Single BackendApiClient instance created at startup — shared across
-        # requests so its in-memory cache is effective.
-        backend_client=getattr(request.app, 'backend_client', None),
-    )
+    # Created once at app startup and reused across requests.
+    # Avoids recreating ToolManager (with expensive SQLDatabase init) per request.
+    controller = getattr(request.app, '_nlp_controller', None)
+    if controller is None:
+        controller = NLPController(
+            vectordb_client=request.app.vectordb_client,
+            generation_client=request.app.generation_client,
+            utility_client=request.app.utility_client,
+            embedding_client=request.app.embedding_client,
+            template_parser=request.app.template_parser,
+            settings=getattr(request.app, 'settings', None),
+            db_client=getattr(request.app, 'db_client', None),
+            reranker=getattr(request.app, 'reranker', None),
+            backend_client=getattr(request.app, 'backend_client', None),
+        )
+        request.app._nlp_controller = controller
+    return controller
 
 @agent_router.post("/chat/{project_id}")
 async def agent_chat(request: Request, project_id: int, chat_request: AgentChatRequest):
@@ -67,7 +71,8 @@ async def agent_chat_stream(request: Request, project_id: int,
                             query: str, user_id: int,
                             persona: Optional[str] = "student",
                             session_id: Optional[int] = None,
-                            limit: Optional[int] = 5):
+                            limit: Optional[int] = 5,
+                            model_tier: Optional[str] = "auto"):
     try:
         nlp_controller = get_nlp_controller(request)
         effective_project_id = None if project_id == 0 else project_id
@@ -78,7 +83,8 @@ async def agent_chat_stream(request: Request, project_id: int,
                 query=query,
                 persona=persona,
                 session_id=session_id,
-                limit=limit
+                limit=limit,
+                model_tier=model_tier,
             ),
             media_type="text/event-stream"
         )
@@ -90,5 +96,33 @@ async def agent_chat_stream(request: Request, project_id: int,
         )
 
 
+@agent_router.post("/cache/invalidate/{project_id}")
+async def invalidate_cache(request: Request, project_id: int):
+    """Invalidate the in-memory cache for a project's data on the main backend.
+    Call this after updating project details, members, or tasks on the backend.
+    """
+    backend = getattr(request.app, 'backend_client', None)
+    if backend:
+        backend.invalidate_project_cache(project_id)
+        return JSONResponse(
+            content={"signal": "CACHE_INVALIDATED", "project_id": project_id}
+        )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"signal": "BACKEND_CLIENT_UNAVAILABLE"}
+    )
 
 
+@agent_router.post("/cache/invalidate/user/{user_id}")
+async def invalidate_user_cache(request: Request, user_id: int):
+    """Invalidate the in-memory cache for a user's profile."""
+    backend = getattr(request.app, 'backend_client', None)
+    if backend:
+        backend.invalidate_user_cache(user_id)
+        return JSONResponse(
+            content={"signal": "CACHE_INVALIDATED", "user_id": user_id}
+        )
+    return JSONResponse(
+        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+        content={"signal": "BACKEND_CLIENT_UNAVAILABLE"}
+    )

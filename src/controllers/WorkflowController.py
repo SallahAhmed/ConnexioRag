@@ -1,8 +1,6 @@
 from .BaseController import BaseController
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 import re
-# pyrefly: ignore [missing-import]
-import guidance
 
 # Short queries matching these patterns bypass the fast-path and go to the LLM classifier,
 # because they could be trivia, jailbreak attempts, or historical questions.

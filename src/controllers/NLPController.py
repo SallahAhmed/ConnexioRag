@@ -77,7 +77,7 @@ class NLPController(BaseController):
     # Collection helpers
     # ------------------------------------------------------------------
 
-    def create_collection_name(self, project_id: str):
+    def create_collection_name(self, project_id: int):
         """Single source of truth for vector collection naming. Keep in sync with ToolManager."""
         return f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
 
@@ -235,8 +235,6 @@ class NLPController(BaseController):
             encoding = None
 
         total_token_budget = getattr(self.settings, "TOTAL_CONTEXT_TOKEN_BUDGET", 4000)
-        if len(query) < 200:
-            total_token_budget = min(total_token_budget, 2500)
 
         def count_tokens(text):
             return len(encoding.encode(text)) if encoding else len(text) // 4
