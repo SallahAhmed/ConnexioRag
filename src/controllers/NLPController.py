@@ -446,10 +446,15 @@ class NLPController(BaseController):
         # --- Step 4: Final Prompt Construction ---
         self.template_parser.set_language(language)
 
-        # Decide which model to use based on model_tier and project context
+        # Decide which model to use based on intent + model_tier
+        PROJECT_NODES = {
+            WorkflowNodeEnum.ONBOARDING, WorkflowNodeEnum.TEAM_FORMATION,
+            WorkflowNodeEnum.PHASE_TRANSITION, WorkflowNodeEnum.BLOCKER,
+            WorkflowNodeEnum.MILESTONE_WARNING,
+        }
         use_generation = (
             model_tier == "generation"
-            or (model_tier == "auto" and project_id is not None)
+            or (model_tier == "auto" and node in PROJECT_NODES)
         )
 
         if use_generation:
@@ -579,19 +584,36 @@ class NLPController(BaseController):
         )
         tracer.end_trace(trace_id, step_id, (answer or "")[:100], usage=usage)
 
-        if not answer or not answer.strip():
-            self.logger.warning("Primary model returned empty response. Retrying with utility model.")
-            fallback_history = [
-                self.utility_client.construct_prompt(prompt=system_prompt, role="system")
-            ]
-            for msg in final_history:
-                fallback_history.append(
-                    self.utility_client.construct_prompt(prompt=msg["content"], role=msg["role"])
-                )
-            answer = await self.utility_client.generate_text(
-                prompt=footer_prompt, chat_history=fallback_history
+        # Auto-escalate: if utility model gave a bad answer, retry with generation
+        if prompt_client == self.utility_client and not use_generation:
+            is_bad = (
+                not answer or not answer.strip()
+                or len(answer.strip()) < 20
+                or query.lower().strip().startswith(answer.lower().strip()[:15])
+                or "only help" in answer.lower()
+                or "can't help" in answer.lower()
+                or "specialize in" in answer.lower()
             )
+            if is_bad:
+                self.logger.info(f"Utility answer subpar. Escalating to generation model.")
+                gen_system = self.template_parser.get(
+                    "rag", "system_prompt", {"persona": persona, "node": node.value}
+                )
+                gen_chat = [self.generation_client.construct_prompt(prompt=gen_system, role="system")]
+                for msg in final_history:
+                    gen_chat.append(
+                        self.generation_client.construct_prompt(prompt=msg["content"], role=msg["role"])
+                    )
+                gen_answer = await self.generation_client.generate_text(
+                    prompt=footer_prompt, chat_history=gen_chat
+                )
+                if gen_answer and gen_answer.strip():
+                    answer = gen_answer
+                    self.logger.info("Escalation succeeded — using generation answer.")
+                else:
+                    self.logger.warning("Escalation failed — keeping utility answer.")
 
+        # Fallback if still empty after primary + potential escalation
         if not answer or not answer.strip():
             fallback_msg = (
                 "عذراً، لم أتمكن من إنشاء رد. يرجى إعادة صياغة السؤال."
