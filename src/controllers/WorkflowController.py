@@ -70,7 +70,7 @@ class WorkflowController(BaseController):
                 # Food / Cooking — explicitly blocked (broader patterns)
                 "recipe for", "recipe ", "how do i cook", "how to bake",
                 "how to make ", "ingredients for", "cook ", "bake ",
-                "how to cook", "how to prepare", "how to fry", "how to boil",
+                "how to cook", "how to fry", "how to boil",
                 "كيف أطبخ", "وصفة", "مكونات الطبق", "طريقة عمل", "طريقة تحضير",
                 # Weather
                 "weather in", "temperature in", "forecast for", "weather forecast",
