@@ -441,17 +441,21 @@ class ToolManager:
             return ""
 
         try:
-            project_data, members, tasks = await asyncio.gather(
+            project_raw, members_raw, tasks_raw = await asyncio.gather(
                 self.backend_client.get_project(project_id),
                 self.backend_client.get_project_members(project_id),
                 self.backend_client.get_project_tasks(project_id),
             )
 
+            project_data = project_raw.get("data") if isinstance(project_raw, dict) and "data" in project_raw else project_raw
+            members = members_raw.get("data") if isinstance(members_raw, dict) and "data" in members_raw else members_raw
+            tasks = tasks_raw.get("data") if isinstance(tasks_raw, dict) and "data" in tasks_raw else tasks_raw
+
             lines = []
 
             if isinstance(project_data, dict):
-                lines.append(f"Project: {project_data.get('PName', 'N/A')}")
-                lines.append(f"Description: {project_data.get('Description', 'N/A')}")
+                lines.append(f"Project: {project_data.get('PName', project_data.get('name', 'N/A'))}")
+                lines.append(f"Description: {project_data.get('Description', project_data.get('description', 'N/A'))}")
                 techs = project_data.get("technologyUsed") or []
                 if isinstance(techs, str):
                     techs = [t.strip() for t in techs.split(",") if t.strip()]

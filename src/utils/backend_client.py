@@ -91,6 +91,8 @@ class BackendApiClient:
             "Content-Type": "application/json",
             "Accept": "application/json",
         }
+        if self._api_key:
+            headers["X-API-Key"] = self._api_key
         token = self._make_service_token()
         if token:
             headers["Authorization"] = f"Bearer {token}"

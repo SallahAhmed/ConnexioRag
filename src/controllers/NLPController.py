@@ -450,7 +450,6 @@ class NLPController(BaseController):
                 )
                 if live_summary:
                     retrieved_context.append(f"\n[Live Project Data]:\n{live_summary}")
-                    sources.append("Live Backend Data")
             except Exception as e:
                 self.logger.warning(f"Could not fetch live project context: {e}")
 
