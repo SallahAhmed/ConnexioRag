@@ -238,3 +238,21 @@
 | 13:00 | Edited src/stores/llm/templates/locales/en/rag.py | 3→3 lines | ~43 |
 | 13:00 | Edited src/stores/llm/templates/locales/ar/rag.py | "الشخصية: $persona | السيا" → "الجمهور المستهدف: متعلم م" | ~18 |
 | 13:00 | Session end: 27 writes across 14 files (NLPController.py, Message.js, aiService.js, ai.routes.js, chatAIHelpers.js) | 21 reads | ~16751 tok |
+
+## Session: 2026-05-16 (project_id resolve + auth + chunking fixes)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 14:49 | Investigated project_id=0 in RAG streaming URL — found hardcoded 0 in socket.js | socket.js | root cause identified | ~200 |
+| 14:49 | Added resolveProjectId(chatRoom, userId) helper with metadata check + DB fallback in socket.js | socket.js | replaces hardcoded 0 | ~300 |
+| 14:49 | Updated createAIChatbot to accept projectId in body, store in room metadata | chats.controller.js | project context stored on room | ~150 |
+| 14:50 | Updated ConnexioAI.jsx: read projectId from URL params, auto-create session on navigation | ConnexioAI.jsx | frontend passes project context | ~250 |
+| 14:50 | Added AI Assistant button in ProjectDetail.jsx overview tab | ProjectDetail.jsx | navigates to /ai-chat?projectId=X | ~100 |
+| 14:51 | Removed sources.append("Live Backend Data") from NLPController | NLPController.py | source tag no longer shown to user | ~50 |
+| 14:51 | Fixed get_project_context_summary to unwrap data field from backend API responses | ToolManager.py | N/A project/description fixed | ~200 |
+| 14:51 | Added X-API-Key to outbound headers in BackendApiClient._headers() | backend_client.py | RAG can auth to backend | ~50 |
+| 14:51 | Added X-API-Key bypass to protect middleware | authMiddleware.js | internal services skip JWT | ~100 |
+| 14:51 | Increased limit: 5 → 20 in socket.js RAG params | socket.js | more chunks retrieved per query | ~30 |
+| 14:54 | Uploaded test document to project 27 (chunk_size=500, do_reset=1) | — | 3 chunks indexed | ~50 |
+| 14:55 | Verified via UI — project context flows, answers use doc content | — | core fix working | ~100 |
+| 15:00 | Session end: project_id resolve + auth fixes + chunking — full stack end to end tested | 7 files | Ready for production | ~1800 |
