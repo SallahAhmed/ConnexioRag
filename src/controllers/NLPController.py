@@ -307,8 +307,6 @@ class NLPController(BaseController):
 
         elif is_kb_relevant:
             retrieved_context.append(kb_results)
-            if kb_results.strip():
-                sources.append("Documentation")
             tracer.end_trace(
                 trace_id, step_id, f"Total Length: {len(kb_results)}", usage=kb_usage
             )
