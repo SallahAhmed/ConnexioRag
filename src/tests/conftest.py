@@ -6,6 +6,19 @@ from unittest.mock import AsyncMock, MagicMock, patch
 
 
 # ──────────────────────────────────────────────
+# Global mock: prevent CI/test from reading .env
+# ──────────────────────────────────────────────
+@pytest.fixture(autouse=True)
+def mock_settings_all(mock_settings):
+    """Patch get_settings in ALL modules that import it.
+    Runs before every test to prevent .env loading failures.
+    """
+    with patch("controllers.BaseController.get_settings", return_value=mock_settings), \
+         patch("models.BaseDataModel.get_settings", return_value=mock_settings):
+        yield
+
+
+# ──────────────────────────────────────────────
 # Mock Data
 # ──────────────────────────────────────────────
 
@@ -224,13 +237,43 @@ def mock_retrieved_documents():
 def mock_utility_client():
     """Mock utility LLM client (8B model)."""
     client = AsyncMock()
-    client.generate_text = AsyncMock(return_value="GENERAL")
+    async def _generate_text(prompt, chat_history=None, **kwargs):
+        p = prompt.lower()
+        # Classification: return OOS for jailbreak or out-of-scope prompts
+        if "classify" in p or "only one word" in p or "only the single" in p:
+            if any(w in p for w in ["jailbreak", "bypass", "system prompt",
+                                    "arche", "نظام برومبت", "نظام البرومبت",
+                                    "override your", "out of scope"]):
+                return "OUT_OF_SCOPE"
+            # Detect Arabic in the query portion → assume OOS (conservative)
+            if any('\u0600' <= c <= '\u06FF' for c in p if 'classify' in p):
+                return "OUT_OF_SCOPE"
+            # "who is/was X" → historical figure → OOS
+            if any(phrase in p for phrase in ["who is ", "who was ", "who's ",
+                                               "what is ", "what was "]):
+                return "OUT_OF_SCOPE"
+            if any(w in p for w in ["weather", "pizza", "president", "capital",
+                                    "joke", "cook", "recipe", "population",
+                                    "عاصمة", "الطقس", "رئيس", "نكتة", "فاز",
+                                    "طبخ", "اكل", "حب", "مشاعر", "فلسفة",
+                                    "شخصية", "مشهور", "ممثل", "مطرب", "مسلسل", "أغاني"]):
+                return "OUT_OF_SCOPE"
+            return "GENERAL"
+        # Relevance grader: return RELEVANT for most cases
+        if "relevance" in p or "grade" in p or "document" in p:
+            return "RELEVANT"
+        # Default for text generation
+        return "This is a mock response from the utility client."
+    client.generate_text = _generate_text
     client.last_usage = {"prompt_tokens": 50, "completion_tokens": 10, "total_tokens": 60}
     client.construct_prompt = MagicMock(side_effect=lambda prompt, role: {"role": role, "content": prompt})
     client.enums = MagicMock()
-    client.enums.SYSTEM = "system"
-    client.enums.USER = "user"
-    client.enums.ASSISTANT = "assistant"
+    client.enums.SYSTEM = MagicMock()
+    client.enums.SYSTEM.value = "system"
+    client.enums.USER = MagicMock()
+    client.enums.USER.value = "user"
+    client.enums.ASSISTANT = MagicMock()
+    client.enums.ASSISTANT.value = "assistant"
     return client
 
 
@@ -239,12 +282,21 @@ def mock_generation_client():
     """Mock generation LLM client (70B model)."""
     client = AsyncMock()
     client.generate_text = AsyncMock(return_value="This is a mock response from the generation model about your query.")
+    client.generate_text_stream = AsyncMock()
+    async def _stream():
+        yield "mock"
+        yield " stream"
+        yield " response"
+    client.generate_text_stream.return_value = _stream()
     client.last_usage = {"prompt_tokens": 500, "completion_tokens": 100, "total_tokens": 600}
     client.construct_prompt = MagicMock(side_effect=lambda prompt, role: {"role": role, "content": prompt})
     client.enums = MagicMock()
-    client.enums.SYSTEM = "system"
-    client.enums.USER = "user"
-    client.enums.ASSISTANT = "assistant"
+    client.enums.SYSTEM = MagicMock()
+    client.enums.SYSTEM.value = "system"
+    client.enums.USER = MagicMock()
+    client.enums.USER.value = "user"
+    client.enums.ASSISTANT = MagicMock()
+    client.enums.ASSISTANT.value = "assistant"
     return client
 
 
@@ -396,23 +448,31 @@ def nlp_controller(
 ):
     """Create NLPController with all mocked dependencies."""
     from controllers.NLPController import NLPController
-    ctrl = NLPController(
-        vectordb_client=mock_vectordb_client,
-        generation_client=mock_generation_client,
-        embedding_client=mock_embedding_client,
-        template_parser=mock_template_parser,
-        utility_client=mock_utility_client,
-        settings=mock_settings,
-        db_client=mock_db_client,
-        reranker=None,
-        backend_client=mock_backend_client,
-    )
-    # Mock session_model
-    ctrl.session_model = MagicMock()
-    ctrl.session_model.get_or_create_session = AsyncMock(return_value=MagicMock(session_id=TEST_SESSION_ID))
-    ctrl.session_model.get_recent_history = AsyncMock(return_value=[])
-    ctrl.session_model.append_message = AsyncMock(return_value=True)
-    return ctrl
+    with patch("controllers.NLPController.ToolManager") as MockTM:
+        mock_tm = MagicMock()
+        mock_tm.search_knowledge_base = AsyncMock(return_value="Mock KB content.")
+        mock_tm.get_project_context_summary = AsyncMock(return_value="Mock project summary.")
+        mock_tm.get_masarx_tasks = AsyncMock(return_value="Mock MasarX tasks.")
+        MockTM.return_value = mock_tm
+
+        ctrl = NLPController(
+            vectordb_client=mock_vectordb_client,
+            generation_client=mock_generation_client,
+            embedding_client=mock_embedding_client,
+            template_parser=mock_template_parser,
+            utility_client=mock_utility_client,
+            settings=mock_settings,
+            db_client=mock_db_client,
+            reranker=None,
+            backend_client=mock_backend_client,
+        )
+        # Mock session_model (replace real one)
+        ctrl.session_model = MagicMock()
+        ctrl.session_model.get_or_create_session = AsyncMock(return_value=MagicMock(session_id=TEST_SESSION_ID))
+        ctrl.session_model.get_recent_history = AsyncMock(return_value=[])
+        ctrl.session_model.append_message = AsyncMock(return_value=True)
+        ctrl.session_model.update_session_metadata = AsyncMock(return_value=True)
+        return ctrl
 
 
 @pytest.fixture

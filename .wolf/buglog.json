@@ -466,6 +466,42 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-16T13:00:00.000Z"
+    },
+    {
+      "id": "bug-030",
+      "timestamp": "2026-05-16T13:30:00.000Z",
+      "error_message": "Arabic OOS queries (folklore, philosophy) bypass detection — treated as GENERAL",
+      "file": "src/controllers/WorkflowController.py",
+      "root_cause": "_SKIP_FAST_PATH missing Arabic question words (\"ما هو\", \"ما هي\", \"كيف\", \"هل\"), so Arabic queries under 50 chars bypass LLM classifier. Arabic OOS keywords also missing philosophy/feelings topics.",
+      "fix": "Added Arabic question starters to _SKIP_FAST_PATH (ما هو, ما هي, ماذا, لماذا, كيف, أين, متى, هل). Added Arabic OOS keywords for love, feelings, philosophy, folk characters, food, entertainment.",
+      "tags": ["OOS", "Arabic", "fast-path", "detection"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T13:30:00.000Z"
+    },
+    {
+      "id": "bug-031",
+      "timestamp": "2026-05-16T13:30:00.000Z",
+      "error_message": "Streaming endpoint sends all tokens at once (buffered) instead of incremental SSE",
+      "file": "src/Routes/agent.py",
+      "root_cause": "StreamingResponse missing anti-buffering SSE headers. HF Spaces nginx buffers entire response before sending.",
+      "fix": "Added Cache-Control: no-cache, Pragma: no-cache, Expires: 0, Connection: keep-alive, X-Accel-Buffering: no headers to StreamingResponse in agent_chat_stream().",
+      "tags": ["streaming", "SSE", "nginx", "HF Spaces"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T13:30:00.000Z"
+    },
+    {
+      "id": "bug-032",
+      "timestamp": "2026-05-16T13:30:00.000Z",
+      "error_message": "Streaming path uses utility (8B) model for projectless GENERAL queries — poor quality, no escalation unlike non-streaming path",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Streaming answer_agent_chat_stream() had no auto-escalation logic. Non-streaming path escalates from utility to generation if answer is bad. Streaming renders tokens visibly so poor quality is more noticeable.",
+      "fix": "Added upgrade check: if prompt_client is utility and project_id is None and node is GENERAL, switch to generation_client and rebuild chat_history with generation format.",
+      "tags": ["streaming", "quality", "escalation", "utility-model"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T13:30:00.000Z"
     }
   ]
 }

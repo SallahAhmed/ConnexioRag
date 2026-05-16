@@ -46,6 +46,15 @@
 - **[2026-05-14] Do not pass a string as `project_id` to the RAG chat URL.**
   The FastAPI route `POST /api/v1/nlp/agent/chat/{project_id}` has `project_id: int` — passing `'general'` causes a 422 validation error. Use `0` for projectless sessions instead.
 
+- **[2026-05-16] Streaming SSE requires anti-buffering headers on HF Spaces.**
+  Without `Cache-Control: no-cache`, `Connection: keep-alive`, and `X-Accel-Buffering: no`, nginx buffers the entire streaming response and delivers it all at once. These headers must be passed in the `StreamingResponse(headers={...})` constructor.
+
+- **[2026-05-16] _SKIP_FAST_PATH must cover Arabic question words.**
+  The 50-char fast path in `detect_node()` bypasses LLM classification. Arabic question starters like "ما هو", "ما هي", "كيف", "هل" were missing, allowing Arabic queries about folklore, philosophy, and personal topics to bypass OOS detection. Always keep `_SKIP_FAST_PATH` in sync with common Arabic question patterns.
+
+- **[2026-05-16] Streaming path needs explicit model upgrade logic.**
+  Unlike the non-streaming path with auto-escalation (utility→generation on bad answer), the streaming path must pre-emptively upgrade to the generation model for projectless GENERAL queries. Streaming renders tokens visibly, so poor 8B answers are more noticeable.
+
 ## Decision Log
 
 - **[2026-05-14] `ai_chatbot` rooms use `project_id=0` when calling the RAG.**

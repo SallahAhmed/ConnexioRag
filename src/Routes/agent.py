@@ -87,7 +87,14 @@ async def agent_chat_stream(request: Request, project_id: int,
                 limit=limit,
                 model_tier=model_tier,
             ),
-            media_type="text/event-stream"
+            media_type="text/event-stream",
+            headers={
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+                "Pragma": "no-cache",
+                "Expires": "0",
+                "Connection": "keep-alive",
+                "X-Accel-Buffering": "no",
+            }
         )
     except Exception as e:
         logger.error(f"Agent Chat Stream Error: {str(e)}")

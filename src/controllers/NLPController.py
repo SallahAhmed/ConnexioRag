@@ -722,6 +722,22 @@ class NLPController(BaseController):
             yield "data: [DONE]\n\n"
             return
 
+        # Upgrade to generation model for streaming when there's no project context.
+        # Streaming users see every token rendered — utility model (8B) quality is too
+        # poor for general conversation. No escalation needed since we start with 70B.
+        if prompt_client == self.utility_client and project_id is None and node == WorkflowNodeEnum.GENERAL:
+            prompt_client = self.generation_client
+            gen_system = self.template_parser.get(
+                "rag", "system_prompt", {"persona": persona, "node": node.value}
+            )
+            chat_history = [
+                prompt_client.construct_prompt(prompt=gen_system, role="system")
+            ]
+            for msg in final_history:
+                chat_history.append(
+                    prompt_client.construct_prompt(prompt=msg["content"], role=msg["role"])
+                )
+
         metadata_sent = False
         full_answer = ""
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": True})

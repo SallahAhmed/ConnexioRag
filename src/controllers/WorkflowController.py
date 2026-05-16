@@ -6,7 +6,10 @@ import re
 # because they could be trivia, jailbreak attempts, or historical questions.
 _SKIP_FAST_PATH = (
     "who is ", "who was ", "who were ", "who's ",
+    "what is ", "what was ", "what are ", "what does ",
     "من هو ", "من كان ", "من هي ", "من كانت ",
+    "ما هو ", "ما هي ", "ماذا ", "لماذا ",
+    "كيف ", "أين ", "متى ", "هل ",
     "system prompt", "your prompt", "your instructions",
     "ignore your", "ignore previous", "disregard your",
     "forget your", "pretend you", "act as if", "bypass your",
@@ -30,7 +33,7 @@ class WorkflowController(BaseController):
         # 1. OOS KEYWORDS FIRST: Catch off-topic queries immediately before anything else
         OOS_KEYWORDS = [
             "capital of", "who is the president", "who is the current",
-            "who won the election", "population of", "located in",
+            "who won the election", "who won the", "population of", "located in",
             "mayor of", "prime minister", "king of",
             "tell me a joke", "who won the game", "who won the match",
             "celebrity", "actor", "movie plot", "movie about",
@@ -47,7 +50,7 @@ class WorkflowController(BaseController):
             # Personal/off-topic
             "wearing", "wear ", "clothes", "outfit", "dress", "shirt", "pants",
             "eat ", "eating", "drink", "drinking", "hungry", "thirsty",
-            "my name is", "i am ", "i'm ", "my age", "how old",
+            "my name is", "my age", "how old",
             "dream ", "dreams", "sleep", "asleep", "woke up",
             # Jailbreak
             "your system prompt", "show me your prompt", "ignore your instructions",
@@ -57,6 +60,15 @@ class WorkflowController(BaseController):
             # Arabic OOS
             "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز",
             "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
+            # Arabic philosophy / personal / feelings
+            "الحب", "حب ", "مشاعر", "عواطف", "المشاعر", "الحنان",
+            "معنى ", "الغرض من", "هدف في", "فلسفة", "فلسفي",
+            "خوف", "قلق", "اكتئاب", "حزن", "فرح", "سعادة",
+            # Arabic folk / trivia / personal
+            "شخصية ", "مشهور", "مشهورة", "ولد في", "توفي في",
+            "مطرب", "مغني", "ممثل", "مسلسل", "فيلم", "أغنية",
+            "طبخة", "طبخ", "اكل", "أكل", "شربة", "سلطة",
+            "أغاني", "أغان", "مهرجان", "مهرجانات", "كليبات", "دوري",
         ]
         if any(kw in query_lower for kw in OOS_KEYWORDS):
             return WorkflowNodeEnum.OUT_OF_SCOPE
@@ -70,7 +82,7 @@ class WorkflowController(BaseController):
                 "بداية", "كيف أبدأ", "جديد هنا", "كيف تعمل",
             ],
             WorkflowNodeEnum.TEAM_FORMATION: [
-                "find teammate", "need a dev", "looking for", "join team",
+                "find teammate", "find a ", "need a dev", "looking for", "join team",
                 "find a designer", "need someone", "recruit",
                 "ابحث عن", "أحتاج مطور", "فريق",
             ],
@@ -105,7 +117,13 @@ class WorkflowController(BaseController):
 
         # 4. FAST PATH: Short queries under 50 chars → GENERAL
         # (Unless they match SKIP_FAST_PATH patterns like "who is" or jailbreak attempts)
-        if len(query_lower) < 50 and not any(p in query_lower for p in _SKIP_FAST_PATH):
+        # Also skip for Arabic queries — short Arabic can be philosophical/folk questions
+        # without explicit question words (e.g. "مروان موسى لقى البوصلة ولا لسة").
+        if (
+            len(query_lower) < 50
+            and not any(p in query_lower for p in _SKIP_FAST_PATH)
+            and not re.search(r'[\u0600-\u06FF]', query_lower)
+        ):
             return WorkflowNodeEnum.GENERAL
 
         # 5. Fallback to LLM for complex classification
