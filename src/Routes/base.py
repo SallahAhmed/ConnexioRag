@@ -27,18 +27,4 @@ async def health_check(app_settings: Settings = Depends(get_settings)):
         "status": "healthy",
         "service": "ConnexiosRAG",
         "version": app_settings.APP_VERSION,
-        "llm_config": {
-            "generation": {
-                "backend": app_settings.GENERATION_BACKEND,
-                "model": app_settings.GENERATION_MODEL_ID
-            },
-            "utility": {
-                "backend": app_settings.GENERATION_BACKEND,
-                "model": app_settings.UTILITY_MODEL_ID
-            },
-            "embedding": {
-                "backend": app_settings.EMBEDDING_BACKEND,
-                "model": app_settings.EMBEDDING_MODEL_ID
-            }
-        }
     }

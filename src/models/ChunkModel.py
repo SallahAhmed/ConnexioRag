@@ -37,7 +37,7 @@ class ChunkModel(BaseDataModel):
             async with session.begin():
                 for i in range(0, len(chunks), batch_size):
                     batch = chunks[i:i+batch_size]
-                    session.add_all(batch)
+                    session.bulk_save_objects(batch)
             await session.commit()
         return len(chunks)
 

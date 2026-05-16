@@ -3,6 +3,7 @@ from models.db_schemas import Project, DataChunk
 from stores.llm.LLMEnums import DocumentTypeEnum
 from typing import List, Optional
 import json
+import sys
 from .WorkflowController import WorkflowController
 from .helpers.ToolManager import ToolManager
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
@@ -71,6 +72,7 @@ class NLPController(BaseController):
                 template_parser=self.template_parser,
                 serpapi_api_key=settings.SERPAPI_API_KEY,
                 github_token=settings.GITHUB_TOKEN,
+                stackoverflow_api_key=settings.STACKOVERFLOW_API_KEY,
                 reranker=self.reranker,
                 backend_client=self.backend_client,
                 masarx_client=self.masarx_client,
@@ -171,7 +173,7 @@ class NLPController(BaseController):
         """
         trace_id = str(uuid.uuid4())
         now = lambda: datetime.now().strftime("%H:%M:%S")
-        print(f"\n[AGENT] [{now()}] Query: {query[:50]}...")
+        print(f"\n[AGENT] [{now()}] Query: {query[:50]}...", file=sys.stderr)
 
         # --- Step 1: Intent & Language ---
         step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
@@ -183,7 +185,7 @@ class NLPController(BaseController):
             {"node": node.value, "language": language},
             usage=self.utility_client.last_usage,
         )
-        print(f"[AGENT] [{now()}] Node: {node}")
+        self.logger.info("Query: %s... Node: %s", query[:50], node)
 
         # --- Step 2: Session ---
         step_id = tracer.start_trace(trace_id, "Session Management")
@@ -259,10 +261,10 @@ class NLPController(BaseController):
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
-            print(f"[AGENT] [{now()}] Query is OUT OF SCOPE. Skipping retrieval.")
+            self.logger.info("Query is OUT OF SCOPE. Skipping retrieval.")
             results = [[]]
         elif not project_id:
-            print(f"[AGENT] [{now()}] Searching global KB.")
+            self.logger.info("Searching global KB.")
             search_tasks = [
                 self.tool_manager.search_knowledge_base(
                     project_id=0, query=q, limit=limit
@@ -271,7 +273,7 @@ class NLPController(BaseController):
             ]
             results = await asyncio.gather(*search_tasks)
         else:
-            print(f"[AGENT] [{now()}] Searching project KB.")
+            self.logger.info("Searching project KB.")
             try:
                 search_tasks = [
                     self.tool_manager.search_knowledge_base(
@@ -284,7 +286,7 @@ class NLPController(BaseController):
                 if not any(results):
                     raise ValueError("empty results")
             except Exception:
-                print(f"[AGENT] [{now()}] Project collection not found, falling back to global KB.")
+                self.logger.info("Project collection not found, falling back to global KB.")
                 search_tasks = [
                     self.tool_manager.search_knowledge_base(
                         project_id=0, query=q, limit=limit
@@ -338,7 +340,7 @@ class NLPController(BaseController):
             )
 
             if node in PLATFORM_NODES and not has_kb_content:
-                print(f"[AGENT] [{now()}] Platform node with empty KB. Using canned response.")
+                self.logger.info("Platform node with empty KB. Using canned response.")
                 if language == "ar":
                     retrieved_context.append(
                         "\n[Platform Guide]: لا تتوفر لديّ وثائق منصة محددة حول هذا "
@@ -358,14 +360,15 @@ class NLPController(BaseController):
                     '- "WIKIPEDIA": General knowledge, history, science, definitions.\n'
                     '- "GOOGLE": News, recent events, technical stats, product info.\n'
                     '- "GITHUB": Searching repositories, finding open-source files.\n'
-                    '- "PYTHON": Executing code snippets, math, logic, data processing.\n'
+                    '- "ARXIV": Academic papers, research, ML/AI topics, scientific studies.\n'
+                    '- "STACKOVERFLOW": Developer questions, coding errors, API usage, debugging.\n'
                     '- "NONE": Conversational or no tool needed.\n'
                     "Return ONLY one word."
                 )
                 choice = await self.utility_client.generate_text(prompt=decision_prompt)
                 choice = choice.strip().upper() if choice else "NONE"
 
-                if "GITHUB" in choice:
+                if choice == "GITHUB":
                     step_id_gh = tracer.start_trace(trace_id, "GitHub Tool Search")
                     refine = (
                         f"Extract the GitHub repo name (owner/repo) and mode "
@@ -392,19 +395,31 @@ class NLPController(BaseController):
                     sources.append("GitHub")
                     tracer.end_trace(trace_id, step_id_gh, gh_result[:50], usage=self.utility_client.last_usage)
 
-                elif "PYTHON" in choice:
-                    step_id_py = tracer.start_trace(trace_id, "Python Interpreter Execution")
-                    py_prompt = (
-                        f"Write a short Python script to solve: {query}. "
-                        "Return ONLY the code block."
+                elif choice == "ARXIV":
+                    step_id_arxiv = tracer.start_trace(trace_id, "ArXiv Research Search")
+                    refine = f"Create a concise academic search query (2-4 keywords) for: {query}. Return ONLY the query."
+                    refined = await self.utility_client.generate_text(
+                        prompt=refine, chat_history=utility_history
                     )
-                    py_code = await self.utility_client.generate_text(prompt=py_prompt)
-                    py_result = await self.tool_manager.execute_python(code=py_code)
-                    retrieved_context.append(f"\n[Python Execution Result]:\n{py_result}")
-                    sources.append("Python Interpreter")
-                    tracer.end_trace(trace_id, step_id_py, f"Length: {len(py_result)}", usage=self.utility_client.last_usage)
+                    refined = (refined or query).strip().strip('"').strip("'")
+                    arxiv_result = await self.tool_manager.search_arxiv(query=refined)
+                    retrieved_context.append(f"\n[Academic Research (ArXiv)]:\n{arxiv_result}")
+                    sources.append("ArXiv")
+                    tracer.end_trace(trace_id, step_id_arxiv, f"Length: {len(arxiv_result)}", usage=self.utility_client.last_usage)
 
-                elif "GOOGLE" in choice:
+                elif choice == "STACKOVERFLOW":
+                    step_id_so = tracer.start_trace(trace_id, "StackOverflow Developer Q&A")
+                    refine = f"Create a concise developer search query (2-5 keywords) for: {query}. Return ONLY the query."
+                    refined = await self.utility_client.generate_text(
+                        prompt=refine, chat_history=utility_history
+                    )
+                    refined = (refined or query).strip().strip('"').strip("'")
+                    so_result = await self.tool_manager.search_stackoverflow(query=refined)
+                    retrieved_context.append(f"\n[Developer Q&A (StackOverflow)]:\n{so_result}")
+                    sources.append("StackOverflow")
+                    tracer.end_trace(trace_id, step_id_so, f"Length: {len(so_result)}", usage=self.utility_client.last_usage)
+
+                elif choice == "GOOGLE":
                     step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
                     refine = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
                     refined = await self.utility_client.generate_text(
@@ -416,7 +431,7 @@ class NLPController(BaseController):
                     sources.append("Google Search")
                     tracer.end_trace(trace_id, step_id_web, f"Length: {len(web_result)}", usage=self.utility_client.last_usage)
 
-                elif "WIKIPEDIA" in choice:
+                elif choice == "WIKIPEDIA":
                     step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
                     refine = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
                     refined = await self.utility_client.generate_text(

@@ -19,17 +19,34 @@ logger = logging.getLogger(__name__)
 
 @celery_app.task(
                  bind=True, name="tasks.file_processing.process_project_files",
-                 autoretry_for=(Exception,),
+                 autoretry_for=(ConnectionError, TimeoutError),
                  retry_kwargs={'max_retries': 3, 'countdown': 60}
                 )
-def process_project_files(self, project_id: int, 
+def process_project_files(self, project_id: int,
                           file_id: int, chunk_size: int,
                           overlap_size: int, do_reset: int):
 
-    return asyncio.run(
-        _process_project_files(self, project_id, file_id, chunk_size,
-                               overlap_size, do_reset)
-    )
+    try:
+        loop = asyncio.get_event_loop()
+        if loop.is_running():
+            import concurrent.futures
+            with concurrent.futures.ThreadPoolExecutor() as pool:
+                future = pool.submit(
+                    asyncio.run,
+                    _process_project_files(self, project_id, file_id, chunk_size,
+                                           overlap_size, do_reset)
+                )
+                return future.result()
+        else:
+            return loop.run_until_complete(
+                _process_project_files(self, project_id, file_id, chunk_size,
+                                       overlap_size, do_reset)
+            )
+    except RuntimeError:
+        return asyncio.run(
+            _process_project_files(self, project_id, file_id, chunk_size,
+                                   overlap_size, do_reset)
+        )
 
 
 async def _process_project_files(task_instance, project_id: int, 
@@ -71,7 +88,7 @@ async def _process_project_files(task_instance, project_id: int,
         )
 
         if not should_execute:
-            logger.warning(f"Can not handle th task | status: {existing_task.status}")
+            logger.warning(f"Can not handle this task | status: {existing_task.status}")
             return existing_task.result
 
         task_record = None

@@ -37,13 +37,22 @@ async def verify_api_key(x_api_key: str = Header(None, alias="x-api-key")) -> st
         _settings_cache = get_settings()
     expected_key = _settings_cache.CONNEXIO_INTERNAL_API_KEY
 
-    # Dev-mode bypass: if the key is not configured, skip validation
+    # Allow unauthenticated access for local dev if key is missing
     if not expected_key:
         logger.warning(
-            "CONNEXIO_INTERNAL_API_KEY is not set — API key validation is DISABLED. "
-            "Set this variable before deploying to any shared environment."
+            "CONNEXIO_INTERNAL_API_KEY not set — allowing unauthenticated requests "
+            "for local development only."
         )
-        return x_api_key or ""
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail={
+                "signal": "MISCONFIGURED",
+                "error": (
+                    "CONNEXIO_INTERNAL_API_KEY is not configured. "
+                    "This service cannot start without it."
+                ),
+            },
+        )
 
     if not x_api_key or x_api_key != expected_key:
         logger.warning(

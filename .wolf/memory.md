@@ -256,3 +256,8 @@
 | 14:54 | Uploaded test document to project 27 (chunk_size=500, do_reset=1) | — | 3 chunks indexed | ~50 |
 | 14:55 | Verified via UI — project context flows, answers use doc content | — | core fix working | ~100 |
 | 15:00 | Session end: project_id resolve + auth fixes + chunking — full stack end to end tested | 7 files | Ready for production | ~1800 |
+
+## Session: 2026-05-16 22:51
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

@@ -11,11 +11,8 @@ INTEGRATION NOTE:
   REST-based equivalents using the main backend's public API.
 """
 import asyncio
-import io
 import json
 import logging
-import sys
-import traceback
 import warnings
 from typing import Optional
 
@@ -58,6 +55,7 @@ class ToolManager:
         template_parser,
         serpapi_api_key: str = None,
         github_token: str = None,
+        stackoverflow_api_key: str = None,
         reranker=None,
         backend_client=None,   # BackendApiClient — REST calls to Node.js backend
         masarx_client=None,    # MasarxApiClient — direct reads from shared PostgreSQL
@@ -68,8 +66,9 @@ class ToolManager:
         self.embedding_client = embedding_client
         self.template_parser = template_parser
         self.reranker = reranker
-        self.backend_client = backend_client  # May be None in Celery workers
-        self.masarx_client = masarx_client    # May be None in Celery workers
+        self.backend_client = backend_client
+        self.masarx_client = masarx_client
+        self.stackoverflow_api_key = stackoverflow_api_key
         self.logger = logging.getLogger(__name__)
 
         # SQL tool (RAG's OWN PostgreSQL only — for Text-to-SQL on RAG tables)
@@ -105,7 +104,17 @@ class ToolManager:
         Translate natural language to SQL and execute against the RAG's own
         PostgreSQL database. This accesses only RAG-internal tables
         (projects, chunks, assets) — NOT the main backend's database.
+
+        Safety: generated SQL is validated to ensure it is a SELECT-only query.
+        Any DDL/DML keywords (INSERT, UPDATE, DELETE, DROP, ALTER, CREATE,
+        TRUNCATE, GRANT, REVOKE, EXEC, EXECUTE) cause immediate rejection.
         """
+        DANGEROUS_KEYWORDS = [
+            "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE",
+            "TRUNCATE", "GRANT", "REVOKE", "EXEC", "EXECUTE",
+            "COPY", "\\i", ";", "--", "/*", "*/",
+        ]
+
         try:
             schema = await asyncio.to_thread(self.db.get_table_info)
             if len(schema) > 5000:
@@ -114,7 +123,7 @@ class ToolManager:
             prompt = (
                 f"Given the following SQL schema:\n{schema}\n\n"
                 f"Generate a single PostgreSQL SELECT query to answer: {query_text}\n"
-                "Return ONLY the SQL code."
+                "Return ONLY the SQL code. No explanations, no markdown."
             )
 
             sql_query = await self.generation_client.generate_text(prompt=prompt)
@@ -122,6 +131,21 @@ class ToolManager:
                 return "Could not generate SQL query."
 
             sql_query = sql_query.strip().replace("```sql", "").replace("```", "").strip()
+
+            # Safety validation: reject any query containing dangerous keywords
+            sql_upper = sql_query.upper()
+            for keyword in DANGEROUS_KEYWORDS:
+                if keyword in sql_upper:
+                    self.logger.warning(
+                        "SQL query rejected — contains forbidden keyword: %s", keyword
+                    )
+                    return "Query rejected: only read-only SELECT queries are allowed."
+
+            # Ensure it starts with SELECT
+            if not sql_upper.startswith("SELECT"):
+                self.logger.warning("SQL query rejected — does not start with SELECT")
+                return "Query rejected: only SELECT queries are allowed."
+
             result = await asyncio.to_thread(self.db.run, sql_query)
             result = str(result)
             if len(result) > 1500:
@@ -536,47 +560,117 @@ class ToolManager:
             self.logger.error(f"GitHub Tool Error: {str(e)}")
             return f"Error fetching GitHub data: {str(e)}"
 
+    # Python Interpreter tool has been removed for security reasons.
+    # It allowed arbitrary code execution with full system access.
+
     # ------------------------------------------------------------------
-    # Python Interpreter Tool
+    # ArXiv Research Tool
     # ------------------------------------------------------------------
 
-    async def execute_python(self, code: str) -> str:
-        """Execute a short Python snippet and return stdout/stderr."""
-        self.logger.info("Executing Python Tool...")
-        code = code.strip().replace("```python", "").replace("```", "").strip()
+    async def search_arxiv(self, query: str, max_results: int = 3) -> str:
+        """Search ArXiv for academic papers relevant to the query."""
+        try:
+            search_query = query.replace(" ", "+")
+            url = (
+                f"http://export.arxiv.org/api/query?"
+                f"search_query=all:{search_query}"
+                f"&max_results={max_results}"
+                f"&sortBy=relevance"
+            )
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.get(url)
+                resp.raise_for_status()
 
-        def _execute():
-            stdout_capture = io.StringIO()
-            stderr_capture = io.StringIO()
-            safe_globals = {
-                "__builtins__": __builtins__,
-                "asyncio": asyncio,
-                "math": __import__("math"),
-                "datetime": __import__("datetime"),
-                "json": __import__("json"),
-            }
-            orig_stdout, orig_stderr = sys.stdout, sys.stderr
-            try:
-                sys.stdout = stdout_capture
-                sys.stderr = stderr_capture
-                exec(code, safe_globals)
-                out = stdout_capture.getvalue()
-                err = stderr_capture.getvalue()
-                result = ""
-                if out:
-                    result += f"Output:\n{out}\n"
-                if err:
-                    result += f"Errors:\n{err}\n"
-                return result or "Code executed successfully with no output."
-            except Exception:
-                return f"Python Execution Error:\n{traceback.format_exc()}"
-            finally:
-                sys.stdout = orig_stdout
-                sys.stderr = orig_stderr
+            import xml.etree.ElementTree as ET
+            root = ET.fromstring(resp.text)
+            ns = {"atom": "http://www.w3.org/2005/Atom"}
+
+            entries = root.findall("atom:entry", ns)
+            if not entries:
+                return "No relevant academic papers found on ArXiv."
+
+            papers = []
+            for entry in entries[:max_results]:
+                title = entry.find("atom:title", ns)
+                summary = entry.find("atom:summary", ns)
+                published = entry.find("atom:published", ns)
+                authors = entry.findall("atom:author", ns)
+
+                title_text = title.text.strip() if title is not None else "Unknown"
+                summary_text = summary.text.strip() if summary is not None else ""
+                pub_date = published.text[:10] if published is not None else ""
+                author_names = [
+                    a.find("atom:name", ns).text
+                    for a in authors[:3]
+                    if a.find("atom:name", ns) is not None
+                ]
+
+                paper_str = f"- {title_text}"
+                if author_names:
+                    paper_str += f" ({', '.join(author_names)}, {pub_date})"
+                if summary_text:
+                    paper_str += f"\n  {summary_text[:300]}"
+                papers.append(paper_str)
+
+            result = f"ArXiv papers for '{query}':\n" + "\n\n".join(papers)
+            if len(result) > 2000:
+                result = result[:2000] + "\n[...arxiv truncated...]"
+            return result
+
+        except Exception as e:
+            self.logger.error(f"ArXiv Tool Error: {e}")
+            return "Unable to search ArXiv at this time."
+
+    # ------------------------------------------------------------------
+    # StackOverflow Developer Q&A Tool
+    # ------------------------------------------------------------------
+
+    async def search_stackoverflow(self, query: str, max_results: int = 3) -> str:
+        """Search StackOverflow for developer Q&A relevant to the query."""
+        if not self.stackoverflow_api_key:
+            return "StackOverflow search is not configured (Missing STACKOVERFLOW_API_KEY)."
 
         try:
-            return await asyncio.wait_for(asyncio.to_thread(_execute), timeout=5.0)
-        except asyncio.TimeoutError:
-            return "Python Execution Error: script exceeded 5-second timeout."
+            search_query = query.replace(" ", "+")
+            url = (
+                f"https://api.stackexchange.com/2.3/search/advanced?"
+                f"order=desc&sort=relevance&q={search_query}"
+                f"&site=stackoverflow&pagesize={max_results}"
+                f"&key={self.stackoverflow_api_key}"
+                f"&filter=withbody"
+            )
+            async with httpx.AsyncClient(timeout=10.0) as client:
+                resp = await client.get(url)
+                resp.raise_for_status()
+                data = resp.json()
+
+            items = data.get("items", [])
+            if not items:
+                return "No relevant StackOverflow answers found."
+
+            results = []
+            for item in items[:max_results]:
+                title = item.get("title", "Unknown")
+                score = item.get("score", 0)
+                answer_count = item.get("answer_count", 0)
+                link = item.get("link", "")
+                # Strip HTML tags from body
+                import re
+                body = re.sub(r"<[^>]+>", "", item.get("body", "")).strip()
+                body = body[:400]
+
+                result_str = (
+                    f"- [{score} pts, {answer_count} answers] {title}\n"
+                    f"  {body}\n"
+                    f"  {link}"
+                )
+                results.append(result_str)
+
+            output = f"StackOverflow results for '{query}':\n" + "\n\n".join(results)
+            if len(output) > 2000:
+                output = output[:2000] + "\n[...stackoverflow truncated...]"
+            return output
+
         except Exception as e:
-            return f"Python Execution Error: {str(e)}"
+            self.logger.error(f"StackOverflow Tool Error: {e}")
+            return "Unable to search StackOverflow at this time."

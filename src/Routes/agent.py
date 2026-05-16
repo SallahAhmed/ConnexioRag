@@ -1,6 +1,8 @@
 from fastapi import APIRouter, status, Request, Depends
 from typing import Optional
 from fastapi.responses import JSONResponse, StreamingResponse
+from slowapi import Limiter
+from slowapi.util import get_remote_address
 from .schemas.agent import (
     AgentChatRequest
 )
@@ -10,6 +12,8 @@ from utils.security import verify_api_key
 import logging
 
 logger = logging.getLogger('uvicorn.error')
+
+limiter = Limiter(key_func=get_remote_address)
 
 agent_router = APIRouter(
     prefix="/api/v1/nlp/agent",
@@ -48,6 +52,7 @@ def resolve_pid(project_id: int, request: Request) -> Optional[int]:
     return None if project_id == 0 else project_id
 
 @agent_router.post("/chat/{project_id}")
+@limiter.limit("30/minute")
 async def agent_chat(request: Request, project_id: int, chat_request: AgentChatRequest):
     try:
         nlp_controller = get_nlp_controller(request)
@@ -75,6 +80,7 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
         )
 
 @agent_router.get("/chat/stream/{project_id}")
+@limiter.limit("30/minute")
 async def agent_chat_stream(request: Request, project_id: int,
                             query: str, user_id: int,
                             persona: Optional[str] = "student",
@@ -112,6 +118,7 @@ async def agent_chat_stream(request: Request, project_id: int,
 
 
 @agent_router.post("/cache/invalidate/{project_id}")
+@limiter.limit("10/minute")
 async def invalidate_cache(request: Request, project_id: int):
     """Invalidate the in-memory cache for a project's data on the main backend.
     Call this after updating project details, members, or tasks on the backend.
@@ -129,6 +136,7 @@ async def invalidate_cache(request: Request, project_id: int):
 
 
 @agent_router.post("/cache/invalidate/user/{user_id}")
+@limiter.limit("10/minute")
 async def invalidate_user_cache(request: Request, user_id: int):
     """Invalidate the in-memory cache for a user's profile."""
     backend = getattr(request.app, 'backend_client', None)

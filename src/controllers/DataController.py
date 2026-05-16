@@ -12,18 +12,28 @@ class DataController(BaseController):
         self.size_scale = 1048576 # to convert MB to Bytes
 
 
+    _EXTENSION_MAP = {
+        "text/plain": ".txt",
+        "application/pdf": ".pdf",
+    }
+
     def validate_uploaded_file(self, file: UploadFile):
-        print("Validating file: ", file.content_type)
+        self.logger.info("Validating file: %s", file.content_type)
 
         allowed_types = self.app_settings.FILE_ALLOWED_TYPES
         filename = file.filename or ""
         file_ext = os.path.splitext(filename)[-1].lower()
-        ALLOWED_EXTENSIONS = ['.txt', '.pdf']  # Keep in sync with FILE_ALLOWED_TYPES
+
+        # Derive allowed extensions from settings dynamically
+        allowed_extensions = {
+            self._EXTENSION_MAP.get(ct, os.path.splitext(ct)[-1].lower())
+            for ct in allowed_types
+        }
+        allowed_extensions.discard("")
 
         # If content_type is application/octet-stream, check extension
         if file.content_type == "application/octet-stream":
-            # Accept only if extension is allowed (txt, pdf, etc.)
-            if file_ext not in ALLOWED_EXTENSIONS:
+            if file_ext not in allowed_extensions:
                 return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
         else:
             if file.content_type not in allowed_types:
