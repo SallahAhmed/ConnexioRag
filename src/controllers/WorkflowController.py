@@ -1,5 +1,6 @@
 from .BaseController import BaseController
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
+import difflib
 import re
 
 # Short queries matching these patterns bypass the fast-path and go to the LLM classifier,
@@ -15,6 +16,49 @@ _SKIP_FAST_PATH = (
     "forget your", "pretend you", "act as if", "bypass your",
     "jailbreak", "تجاهل تعليم", "تجاوز قيود", "تظاهر أنك",
 )
+
+# Fuzzy matching dictionary for typo-tolerant intent detection.
+# Maps a correctly-spelled term to its most likely intent node.
+_FUZZY_TERM_NODE = {
+    "start": WorkflowNodeEnum.ONBOARDING,
+    "guide": WorkflowNodeEnum.ONBOARDING,
+    "begin": WorkflowNodeEnum.ONBOARDING,
+    "tutorial": WorkflowNodeEnum.ONBOARDING,
+    "teammate": WorkflowNodeEnum.TEAM_FORMATION,
+    "developer": WorkflowNodeEnum.TEAM_FORMATION,
+    "designer": WorkflowNodeEnum.TEAM_FORMATION,
+    "recruit": WorkflowNodeEnum.TEAM_FORMATION,
+    "sprint": WorkflowNodeEnum.PHASE_TRANSITION,
+    "phase": WorkflowNodeEnum.PHASE_TRANSITION,
+    "transition": WorkflowNodeEnum.PHASE_TRANSITION,
+    "advance": WorkflowNodeEnum.PHASE_TRANSITION,
+    "agile": WorkflowNodeEnum.PHASE_TRANSITION,
+    "scrum": WorkflowNodeEnum.PHASE_TRANSITION,
+    "stuck": WorkflowNodeEnum.BLOCKER,
+    "error": WorkflowNodeEnum.BLOCKER,
+    "problem": WorkflowNodeEnum.BLOCKER,
+    "broken": WorkflowNodeEnum.BLOCKER,
+    "crash": WorkflowNodeEnum.BLOCKER,
+    "exception": WorkflowNodeEnum.BLOCKER,
+    "compile": WorkflowNodeEnum.BLOCKER,
+    "timeout": WorkflowNodeEnum.BLOCKER,
+    "issue": WorkflowNodeEnum.BLOCKER,
+    "milestone": WorkflowNodeEnum.MILESTONE_WARNING,
+    "deadline": WorkflowNodeEnum.MILESTONE_WARNING,
+    "overdue": WorkflowNodeEnum.MILESTONE_WARNING,
+    "delay": WorkflowNodeEnum.MILESTONE_WARNING,
+    "hello": WorkflowNodeEnum.GENERAL,
+    "greeting": WorkflowNodeEnum.GENERAL,
+    # Arabic
+    "بداية": WorkflowNodeEnum.ONBOARDING,
+    "فريق": WorkflowNodeEnum.TEAM_FORMATION,
+    "مطور": WorkflowNodeEnum.TEAM_FORMATION,
+    "مرحلة": WorkflowNodeEnum.PHASE_TRANSITION,
+    "مشكلة": WorkflowNodeEnum.BLOCKER,
+    "موعد": WorkflowNodeEnum.MILESTONE_WARNING,
+    "مرحبا": WorkflowNodeEnum.GENERAL,
+}
+_FUZZY_TERMS = list(_FUZZY_TERM_NODE.keys())
 
 class WorkflowController(BaseController):
     def __init__(self, generation_client, template_parser, utility_client=None):
@@ -114,6 +158,17 @@ class WorkflowController(BaseController):
         ]
         if any(kw in query_lower for kw in GENERAL_KEYWORDS):
             return WorkflowNodeEnum.GENERAL
+
+        # 3.5 FUZZY MATCHING: Catch typos in short queries (e.g. "sprnit" → sprint)
+        if len(query_lower) < 50:
+            for word in query_lower.split():
+                if len(word) < 4:
+                    continue
+                matches = difflib.get_close_matches(word, _FUZZY_TERMS, n=1, cutoff=0.8)
+                if matches:
+                    matched_node = _FUZZY_TERM_NODE.get(matches[0])
+                    if matched_node is not None:
+                        return matched_node
 
         # 4. FAST PATH: Short queries under 50 chars → GENERAL
         # (Unless they match SKIP_FAST_PATH patterns like "who is" or jailbreak attempts)

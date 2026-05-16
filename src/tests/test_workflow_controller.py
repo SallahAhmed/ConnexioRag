@@ -4,6 +4,52 @@ import pytest
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 
 
+class TestFuzzyMatching:
+    """Typo-tolerant matching should route misspelled queries to the correct node."""
+
+    @pytest.mark.asyncio
+    async def test_sprint_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("sprnit")
+        assert node == WorkflowNodeEnum.PHASE_TRANSITION, f"Expected PHASE_TRANSITION, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_error_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("eror 500")
+        assert node == WorkflowNodeEnum.BLOCKER, f"Expected BLOCKER, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_stuck_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("stck on login")
+        assert node == WorkflowNodeEnum.BLOCKER, f"Expected BLOCKER, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_deadline_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("dedline miss")
+        assert node == WorkflowNodeEnum.MILESTONE_WARNING, f"Expected MILESTONE_WARNING, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_teammate_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("need a teemate")
+        assert node == WorkflowNodeEnum.TEAM_FORMATION, f"Expected TEAM_FORMATION, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_developer_misspelled(self, workflow_controller):
+        node = await workflow_controller.detect_node("find a devloper")
+        assert node == WorkflowNodeEnum.TEAM_FORMATION, f"Expected TEAM_FORMATION, got {node.value}"
+
+    @pytest.mark.asyncio
+    async def test_short_word_no_false_positive(self, workflow_controller):
+        """Words under 4 chars should NOT trigger fuzzy matching."""
+        node = await workflow_controller.detect_node("hi")
+        assert node == WorkflowNodeEnum.GENERAL
+
+    @pytest.mark.asyncio
+    async def test_unrelated_word_falls_through_to_llm(self, workflow_controller):
+        """Unrelated short words should go to LLM (skip fast-path since pizza matches no keyword)."""
+        node = await workflow_controller.detect_node("pizza")
+        assert node is not None
+
+
 class TestOOSDetection:
     """OOS keyword-based detection (must fire BEFORE LLM call)."""
 
