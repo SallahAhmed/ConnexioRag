@@ -66,6 +66,14 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
             limit=chat_request.limit,
             model_tier=chat_request.model_tier or "auto",
         )
+        # Append source footer when external tools were used
+        answer = result.get("answer", "")
+        sources = result.get("sources", [])
+        if sources:
+            source_names = [s for s in sources if s]
+            if source_names:
+                answer += f"\n\n📚 Sources: {', '.join(source_names)}"
+                result["answer"] = answer
         return JSONResponse(
             content={
                 "signal": ResponseSignal.AGENT_CHAT_SUCCESS.value,

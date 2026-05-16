@@ -75,6 +75,7 @@ class WorkflowController(BaseController):
         query_lower = query.lower().strip()
 
         # 1. OOS KEYWORDS FIRST: Catch off-topic queries immediately before anything else
+        # BUT: Tech/AI/programming history is IN-SCOPE for a dev collaboration assistant
         OOS_KEYWORDS = [
             "capital of", "who is the president", "who is the current",
             "who won the election", "who won the", "population of", "located in",
@@ -89,7 +90,7 @@ class WorkflowController(BaseController):
             "كيف أطبخ", "وصفة", "مكونات الطبق", "طريقة عمل", "طريقة تحضير",
             # Weather
             "weather in", "temperature in", "forecast for", "weather forecast",
-            # History & trivia
+            # History & trivia (EXCEPT programming/tech history)
             "what happened on", "born on", "died in", "year ",
             # Personal/off-topic
             "wearing", "wear ", "clothes", "outfit", "dress", "shirt", "pants",
@@ -106,16 +107,28 @@ class WorkflowController(BaseController):
             "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
             # Arabic philosophy / personal / feelings
             "الحب", "حب ", "مشاعر", "عواطف", "المشاعر", "الحنان",
-            "معنى ", "الغرض من", "هدف في", "فلسفة", "فلسفي",
-            "خوف", "قلق", "اكتئاب", "حزن", "فرح", "سعادة",
-            # Arabic folk / trivia / personal
-            "شخصية ", "مشهور", "مشهورة", "ولد في", "توفي في",
+            "الخوف", "قلق", "اكتئاب", "حزن", "فرح", "سعادة",
+            # Arabic folk / trivia / personal (EXCEPT tech/AI/programming)
+            "مشهور", "مشهورة", "ولد في", "توفي في",
             "مطرب", "مغني", "ممثل", "مسلسل", "فيلم", "أغنية",
             "طبخة", "طبخ", "اكل", "أكل", "شربة", "سلطة",
             "أغاني", "أغان", "مهرجان", "مهرجانات", "كليبات", "دوري",
         ]
+        # Tech/AI/programming exceptions — these are IN-SCOPE even if they match OOS patterns
+        TECH_IN_SCOPE = [
+            "python", "javascript", "programming", "software", "code", "api",
+            "artificial intelligence", "machine learning", "deep learning", "neural",
+            "الذكاء الاصطناعي", "تعلم الآلة", "التعلم العميق", "البرمجة", "المبرمج",
+            "invent", "invented", "creator", "created", "founder", "developed",
+            "security", "vulnerability", "cve", "exploit", "patch", "cyber",
+            "الأمن السيبراني", "الثغرات", "الاختراق", "الحماية",
+        ]
         if any(kw in query_lower for kw in OOS_KEYWORDS):
-            return WorkflowNodeEnum.OUT_OF_SCOPE
+            # Exception: if query contains tech/AI keywords, allow it through
+            if any(kw in query_lower for kw in TECH_IN_SCOPE):
+                pass  # Fall through to project keyword check
+            else:
+                return WorkflowNodeEnum.OUT_OF_SCOPE
 
         # 2. PROJECT KEYWORDS: Catch project-specific intents
         PROJECT_KEYWORDS = {
@@ -218,8 +231,10 @@ class WorkflowController(BaseController):
     async def detect_language(self, query: str) -> str:
         """
         Detects if the language is English or Arabic.
+        Checks Arabic Unicode ranges: Basic (0600-06FF), Extended-A (08A0-08FF),
+        Presentation Forms-A (FB50-FDFF), Presentation Forms-B (FE70-FEFF).
         """
-        if re.search(r'[\u0600-\u06FF]', query):
+        if re.search(r'[\u0600-\u06FF\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', query):
             return "ar"
         return "en"
 

@@ -328,10 +328,143 @@ class NLPController(BaseController):
             )
 
         elif project_id is None:
-            # No project context — skip external tools entirely to avoid Wikipedia/Google
-            # answering general-knowledge trivia. Let the generation model handle the
-            # query using the system prompt guardrails alone.
-            tracer.end_trace(trace_id, step_id, "No project context, skipping external tools")
+            # No project context — but allow external tools for clearly
+            # technical/research queries. Block only for general-knowledge trivia.
+            technical_keywords = [
+                "research", "paper", "latest", "how to", "error", "bug", "fix",
+                "code", "api", "library", "framework", "security", "vulnerability",
+                "github", "stackoverflow", "programming", "developer", "debug",
+                "implementation", "algorithm", "architecture", "design pattern",
+                "بحث", "ورقة", "أحدث", "كود", "برمجة", "مطور", "خطأ", "إصلاح",
+                "أمان", "ثغرة", "مكتبة", "إطار عمل", "خوارزمية",
+            ]
+            is_technical = any(kw in query.lower() for kw in technical_keywords)
+
+            if is_technical:
+                # Run CRAG tool selection (same as project flow)
+                tracer.end_trace(
+                    trace_id, step_id, "No project context but technical query — running CRAG tools"
+                )
+
+                if node in PLATFORM_NODES and not has_kb_content:
+                    self.logger.info("Platform node with empty KB. Using canned response.")
+                    if language == "ar":
+                        retrieved_context.append(
+                            "\n[Platform Guide]: لا تتوفر لديّ وثائق منصة محددة حول هذا "
+                            "الموضوع بعد. يُرجى الرجوع إلى أدلة منصة Connexio."
+                        )
+                    else:
+                        retrieved_context.append(
+                            "\n[Platform Guide]: I don't have specific Connexio platform "
+                            "documentation on this topic yet. Please check the Connexio "
+                            "platform guides or contact your project supervisor."
+                        )
+                    sources.append("Platform Guide")
+                else:
+                    # Decision: pick the best external tool
+                    decision_prompt = (
+                        f'Analyze the user query: "{query}" and select the single best tool.\n'
+                        '- "WIKIPEDIA": General knowledge, history, science, definitions.\n'
+                        '- "GOOGLE": News, recent events, technical stats, product info.\n'
+                        '- "GITHUB": Searching repositories, finding open-source files.\n'
+                        '- "ARXIV": Academic papers, research, ML/AI topics, scientific studies.\n'
+                        '- "STACKOVERFLOW": Developer questions, coding errors, API usage, debugging.\n'
+                        '- "NONE": Conversational or no tool needed.\n'
+                        "Return ONLY one word."
+                    )
+                    choice = await self.utility_client.generate_text(prompt=decision_prompt)
+                    choice = choice.strip().upper() if choice else "NONE"
+
+                    if choice == "GITHUB":
+                        step_id_gh = tracer.start_trace(trace_id, "GitHub Tool Search")
+                        refine = (
+                            f"Extract the GitHub repo name (owner/repo) and mode "
+                            f"('summary','commits','issues') from: {query}. "
+                            "Return ONLY JSON: {\"repo\": \"...\", \"mode\": \"...\"}"
+                        )
+                        gh_raw = await self.utility_client.generate_text(
+                            prompt=refine, chat_history=utility_history
+                        )
+                        try:
+                            gh_info = json.loads(
+                                gh_raw.strip().replace("```json", "").replace("```", "")
+                            )
+                            repo = gh_info.get("repo", "")
+                            if repo and "/" in repo:
+                                gh_result = await self.tool_manager.fetch_github_data(
+                                    repo_name=repo, mode=gh_info.get("mode", "summary")
+                                )
+                            else:
+                                gh_result = "No specific GitHub repository was identified."
+                        except Exception:
+                            gh_result = "Error parsing GitHub request."
+                        retrieved_context.append(f"\n[GitHub Repository Data]:\n{gh_result}")
+                        sources.append("GitHub")
+                        tracer.end_trace(trace_id, step_id_gh, gh_result[:50], usage=self.utility_client.last_usage)
+
+                    elif choice == "ARXIV":
+                        step_id_arxiv = tracer.start_trace(trace_id, "ArXiv Research Search")
+                        refine = f"Create a concise academic search query (2-4 keywords) for: {query}. Return ONLY the query."
+                        refined = await self.utility_client.generate_text(
+                            prompt=refine, chat_history=utility_history
+                        )
+                        refined = (refined or query).strip().strip('"').strip("'")
+                        arxiv_result = await self.tool_manager.search_arxiv(query=refined)
+                        retrieved_context.append(f"\n[Academic Research (ArXiv)]:\n{arxiv_result}")
+                        sources.append("ArXiv")
+                        tracer.end_trace(trace_id, step_id_arxiv, f"Length: {len(arxiv_result)}", usage=self.utility_client.last_usage)
+
+                    elif choice == "STACKOVERFLOW":
+                        step_id_so = tracer.start_trace(trace_id, "StackOverflow Developer Q&A")
+                        refine = f"Create a concise developer search query (2-5 keywords) for: {query}. Return ONLY the query."
+                        refined = await self.utility_client.generate_text(
+                            prompt=refine, chat_history=utility_history
+                        )
+                        refined = (refined or query).strip().strip('"').strip("'")
+                        so_result = await self.tool_manager.search_stackoverflow(query=refined)
+                        retrieved_context.append(f"\n[Developer Q&A (StackOverflow)]:\n{so_result}")
+                        sources.append("StackOverflow")
+                        tracer.end_trace(trace_id, step_id_so, f"Length: {len(so_result)}", usage=self.utility_client.last_usage)
+
+                    elif choice == "GOOGLE":
+                        step_id_web = tracer.start_trace(trace_id, "Google Search Fallback")
+                        refine = f"Create a 3-word Google search query for: {query}. Return ONLY the query."
+                        refined = await self.utility_client.generate_text(
+                            prompt=refine, chat_history=utility_history
+                        )
+                        refined = (refined or query).strip().strip('"').strip("'")
+                        web_result = await self.tool_manager.search_google(query=refined)
+                        retrieved_context.append(f"\n[Live Web Search (Google)]:\n{web_result}")
+                        sources.append("Google Search")
+                        tracer.end_trace(trace_id, step_id_web, f"Length: {len(web_result)}", usage=self.utility_client.last_usage)
+
+                    elif choice == "WIKIPEDIA":
+                        step_id_wiki = tracer.start_trace(trace_id, "Wikipedia Fallback Search")
+                        refine = f"Search Wikipedia for: {query}. Return ONLY the main subject name."
+                        refined = await self.utility_client.generate_text(
+                            prompt=refine, chat_history=utility_history
+                        )
+                        refined = (refined or query).strip().strip('"').strip("'")
+                        wiki_result = await self.tool_manager.search_wiki(
+                            query=refined, lang=language
+                        )
+                        if wiki_result and "Unable to perform" not in wiki_result:
+                            retrieved_context.append(
+                                f"\n[Global Knowledge (Wikipedia)]:\n{wiki_result}"
+                            )
+                            sources.append("Wikipedia")
+                        else:
+                            retrieved_context.append(
+                                "\n[Global Knowledge]: No external information found."
+                            )
+                        tracer.end_trace(trace_id, step_id_wiki, f"Length: {len(wiki_result)}", usage=self.utility_client.last_usage)
+
+                    else:
+                        retrieved_context.append(
+                            "\n[Global Knowledge]: No relevant information found in project domain."
+                        )
+            else:
+                tracer.end_trace(trace_id, step_id, "No project context, skipping external tools")
 
         else:
             # KB was irrelevant/empty and we have a project context → CRAG fallback
