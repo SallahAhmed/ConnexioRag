@@ -271,13 +271,27 @@ class NLPController(BaseController):
             ]
             results = await asyncio.gather(*search_tasks)
         else:
-            search_tasks = [
-                self.tool_manager.search_knowledge_base(
-                    project_id=project_id, query=q, limit=limit
-                )
-                for q in queries_to_search
-            ]
-            results = await asyncio.gather(*search_tasks)
+            print(f"[AGENT] [{now()}] Searching project KB.")
+            try:
+                search_tasks = [
+                    self.tool_manager.search_knowledge_base(
+                        project_id=project_id, query=q, limit=limit
+                    )
+                    for q in queries_to_search
+                ]
+                results = await asyncio.gather(*search_tasks)
+                # If all results are empty, the collection may not exist — fall back to global KB
+                if not any(results):
+                    raise ValueError("empty results")
+            except Exception:
+                print(f"[AGENT] [{now()}] Project collection not found, falling back to global KB.")
+                search_tasks = [
+                    self.tool_manager.search_knowledge_base(
+                        project_id=0, query=q, limit=limit
+                    )
+                    for q in queries_to_search
+                ]
+                results = await asyncio.gather(*search_tasks)
 
         # --- Corrective RAG (CRAG) ---
         kb_results = ""
