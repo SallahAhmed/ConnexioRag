@@ -39,12 +39,19 @@ def get_nlp_controller(request: Request) -> NLPController:
         request.app._nlp_controller = controller
     return controller
 
+def resolve_pid(project_id: int, request: Request) -> Optional[int]:
+    """Resolve effective project ID with override via ?pid= or ?PID= query param."""
+    for key in ("PID", "pid"):
+        override = request.query_params.get(key)
+        if override and override.isdigit() and int(override) > 0:
+            return int(override)
+    return None if project_id == 0 else project_id
+
 @agent_router.post("/chat/{project_id}")
 async def agent_chat(request: Request, project_id: int, chat_request: AgentChatRequest):
     try:
         nlp_controller = get_nlp_controller(request)
-        # project_id=0 is the convention for individual (no-project) chatbot rooms
-        effective_project_id = None if project_id == 0 else project_id
+        effective_project_id = resolve_pid(project_id, request)
         result = await nlp_controller.answer_agent_chat(
             user_id=chat_request.user_id,
             project_id=effective_project_id,
@@ -76,7 +83,7 @@ async def agent_chat_stream(request: Request, project_id: int,
                             model_tier: Optional[str] = "auto"):
     try:
         nlp_controller = get_nlp_controller(request)
-        effective_project_id = None if project_id == 0 else project_id
+        effective_project_id = resolve_pid(project_id, request)
         return StreamingResponse(
             nlp_controller.answer_agent_chat_stream(
                 user_id=user_id,
