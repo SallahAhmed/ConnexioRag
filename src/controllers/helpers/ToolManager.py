@@ -572,12 +572,12 @@ class ToolManager:
         try:
             search_query = query.replace(" ", "+")
             url = (
-                f"http://export.arxiv.org/api/query?"
+                f"https://export.arxiv.org/api/query?"
                 f"search_query=all:{search_query}"
                 f"&max_results={max_results}"
                 f"&sortBy=relevance"
             )
-            async with httpx.AsyncClient(timeout=10.0) as client:
+            async with httpx.AsyncClient(timeout=10.0, follow_redirects=True) as client:
                 resp = await client.get(url)
                 resp.raise_for_status()
 
