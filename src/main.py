@@ -109,6 +109,9 @@ async def startup_span():
         jwt_secret=settings.JWT_SECRET,
         service_user_id=settings.SERVICE_USER_ID,
     )
+
+    from utils.masarx_client import MasarxApiClient
+    app.masarx_client = MasarxApiClient(db_client=app.db_client)
  
     if settings.CONNEXIO_INTERNAL_API_KEY:
         print(

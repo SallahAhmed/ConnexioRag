@@ -121,14 +121,21 @@ POST /chat/{project_id}
     │     GENERAL (short/fast-path) → Llama 4 Scout 17B (cheap)
     │     model_tier="generation" → force GPT-OSS 120B
     │     model_tier="utility" → force Llama 4 Scout 17B
+    │     model_tier="auto" → RAG decides based on intent node
     │
-    ├── 9. LLM Generation (with 429 retry: 1s, 2s, 4s backoff)
+    ├── 9. MasarX Task Data Injection
+    │     When node is BLOCKER/MILESTONE_WARNING/GENERAL and project_id set,
+    │     queries MasarX task table via shared PostgreSQL for live task data.
+    │     Sources include "Tasks" badge.
     │
-    ├── 10. Auto-Escalate (utility → generation)
-    │     If utility answer is empty, echoes query, or contains
-    │     refusal phrase — auto-retry with GPT-OSS 120B
+    ├── 10. LLM Generation (with 429 retry: 1s, 2s, 4s backoff)
     │
-    └── 11. Persist + Return
+    ├── 11. Auto-Escalate (utility → generation)
+    │     If utility answer is empty (<20 chars), echoes query, or contains
+    │     refusal phrase ("only help", "can't help", "specialize in")
+    │     — auto-retry with GPT-OSS 120B
+    │
+    └── 12. Persist + Return
           a. Save user/assistant messages to session
           b. Write trace_{uuid}.json to disk
           c. Return {answer, node, language, sources, session_id}
@@ -562,29 +569,104 @@ POSTGRES_* (Neon.tech credentials)
 
 ---
 
-## 16. Test Commands
+## 16. Multi-System Integration Plan (Pending)
 
-### Quick Test (CLI)
+### 4 Systems Involved
+
+| System | Path | Language | DB |
+|--------|------|----------|----|
+| **RAG** (this repo) | `C:\Users\salla\Connexios\` | Python/FastAPI | PostgreSQL (Neon) |
+| **MasarX Agent** | `F:\MasarX_A\` | Python/FastAPI + LangGraph | PostgreSQL (Neon) |
+| **Backend** | `F:\connexio_back2\` | Node.js/Express | MySQL |
+| **Frontend** | `F:\Connexio_Frontend2\` | React/Vite | — |
+
+### Issues Found (25 Total)
+
+| ID | System | Issue | Severity |
+|----|--------|-------|----------|
+| C1 | RAG+MasarX | 3 separate DB pools to same Neon | 🔴 |
+| C2 | MasarX | Writes webhook results to RAG-owned chunks table | 🔴 |
+| C3 | RAG | No way to call MasarX endpoints | 🔴 |
+| C4 | All 3 | JWT payload expectations differ | 🔴 |
+| C5 | MasarX | db_tool.initialize() creates 4th engine | 🔴 |
+| B1 | Backend | No direct health check for RAG/MasarX | 🟡 |
+| B3 | Backend | ragChat doesn't pass model_tier | 🟡 |
+| H1 | MasarX | DataChunk model may drift from RAG schema | 🟡 |
+| H2 | All 3 | No cross-service health checks | 🟡 |
+| H3 | MasarX | rag_tool.py creates its own embedding client | 🟡 |
+| H4 | MasarX | Cron jobs run sequentially | 🟡 |
+| B5 | Backend | technologies vs skills — two fields same data | 🟡 |
+| F1 | Frontend | Uses Socket.IO not REST — blocks streaming | 🟡 |
+| F2 | Frontend | No model_tier in UI | 🟡 |
+| F3 | Frontend | No streaming — waits for full RAG response | 🟡 |
+| F4 | Frontend | ReactMarkdown overrides "no markdown" rule | 🟡 |
+| F5 | Frontend | Always uses project_id=0 (utility model) | 🟡 |
+| F7 | Frontend | No typing indicator in ChatWidget | 🟢 |
+
+### Execution Phases
+
+| Phase | What | Who | Status |
+|-------|------|-----|--------|
+| **1** | Fix DB pools — share 1 engine | AI | Ready |
+| **2** | Fix schema — own table for webhook results | AI | Ready |
+| **3** | Build MasarxApiClient — RAG reads tasks | AI | Ready |
+| **4** | Backend changes (model_tier, streaming, health) | Teammate | Specs written |
+| **5** | Frontend changes (sources, markdown, typing) | Teammate | Specs written |
+| **6** | MasarX cron parallelism | AI | Ready |
+| **7** | Remove orphan code + data alignment | AI | Ready |
+
+### Handoff File
+Full AI-executable plan with exact code: `docs/SESSION_HANDOFF.md`
+Backend + Frontend specs with line-by-line changes: `F:\Connexio_Frontend2\docs\RAG_INTEGRATION_SPECS.md`
+
+---
+
+## 17. Key Files Reference (Complete)
+
+| File | Purpose |
+|------|---------|
+| `controllers/NLPController.py` | Main pipeline: prepare context → generate → fallback |
+| `controllers/WorkflowController.py` | Intent detection: OOS first → keywords → fast path → LLM |
+| `controllers/helpers/ToolManager.py` | KB search, CRAG tools, project context, MasarX tasks |
+| `Routes/agent.py` | Chat + streaming + cache invalidation endpoints |
+| `Routes/schemas/agent.py` | Pydantic schemas with model_tier + max_length |
+| `stores/llm/templates/locales/en/rag.py` | System prompt + footer prompt |
+| `stores/llm/providers/OpenAIProvider.py` | 429 retry with exponential backoff |
+| `utils/metrics.py` | Rate limiting (30 req/min) + Prometheus |
+| `utils/security.py` | X-API-Key validation with cached settings |
+| `utils/backend_client.py` | REST client to Node.js backend with JWT auth |
+| `docs/CONNEXIOS_RAG_KNOWLEDGE_BASE.md` | This file — full system documentation |
+| `docs/SESSION_HANDOFF.md` | AI-executable multi-system integration plan |
+| `F:\Connexio_Frontend2\docs\RAG_INTEGRATION_SPECS.md` | Backend + frontend code specs |
+
+---
+
+## 18. Test Commands
+
 ```bash
-# Projectless chat
+# Projectless chat (auto mode — RAG decides model)
 curl -X POST https://sallahahmed-connexiorag.hf.space/api/v1/nlp/agent/chat/0 \
-  -H "X-API-Key: YOUR_KEY" -H "Content-Type: application/json" \
-  -d '{"query": "what does Connexio do?", "user_id": 1, "persona": "student"}'
+  -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+  -d '{"query": "what does Connexio do?", "user_id": 1}'
 
 # Force generation model
 curl -X POST .../chat/0 \
   -d '{"query": "explain agile", "user_id": 1, "model_tier": "generation"}'
 
-# Streaming
-curl -X GET "...chat/stream/0?query=hello&user_id=1" -H "X-API-Key: YOUR_KEY"
+# Streaming with model_tier
+curl -X GET "...chat/stream/0?query=hello&user_id=1&model_tier=generation" -H "X-API-Key: $KEY"
 
-# Upload KB file
-curl -X POST .../data/upload-and-process/0 \
-  -H "X-API-Key: YOUR_KEY" -F "file=@document.txt"
+# Upload KB file to global KB
+curl -X POST .../data/upload-and-process/0 -H "X-API-Key: $KEY" -F "file=@doc.txt"
 
-# Invalidate cache
-curl -X POST .../agent/cache/invalidate/11 -H "X-API-Key: YOUR_KEY"
+# Invalidate backend cache
+curl -X POST .../agent/cache/invalidate/11 -H "X-API-Key: $KEY"
 
-# Health check with model config
+# Health with LLM config
 curl https://sallahahmed-connexiorag.hf.space/api/v1/health
+
+# Direct KB search
+curl -X POST .../nlp/index/search/0 \
+  -H "X-API-Key: $KEY" -H "Content-Type: application/json" \
+  -d '{"text": "what does Connexio do?", "limit": 3}'
 ```

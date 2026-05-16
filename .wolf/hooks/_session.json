@@ -1,302 +1,221 @@
 {
-  "session_id": "session-2026-05-14-1837",
-  "started": "2026-05-14T15:37:57.559Z",
+  "session_id": "session-2026-05-16-1144",
+  "started": "2026-05-16T08:44:45.229Z",
   "files_read": {
-    "F:/connexio_back2/modules/chats/chatAIHelpers.js": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T16:09:01.644Z"
+    "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
+      "count": 3,
+      "tokens": 9962,
+      "first_read": "2026-05-16T08:44:51.450Z"
     },
-    "F:/connexio_back2/modules/chats/chats.controller.js": {
+    "f:/connexio_back2/services/aiService.js": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T16:09:12.918Z"
+      "first_read": "2026-05-16T08:45:02.220Z"
     },
-    "F:/connexio_back2/modules/chats/chats.routes.js": {
+    "f:/connexio_back2/modules/ai/ai.routes.js": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T16:09:13.096Z"
+      "first_read": "2026-05-16T08:45:02.770Z"
     },
-    "F:/connexio_back2/socket.js": {
+    "f:/connexio_back2/modules/chats/chatAIHelpers.js": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T16:09:44.248Z"
+      "first_read": "2026-05-16T08:45:05.975Z"
     },
-    "F:/connexio_back2/modules/ai/ai.routes.js": {
-      "count": 1,
+    "f:/connexio_back2/socket.js": {
+      "count": 3,
       "tokens": 0,
-      "first_read": "2026-05-14T16:09:44.521Z"
+      "first_read": "2026-05-16T08:45:06.667Z"
     },
-    "F:/connexio_back2/services/aiService.js": {
+    "f:/connexio_back2/models/Message.js": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T16:10:21.580Z"
+      "first_read": "2026-05-16T08:45:16.177Z"
     },
-    "C:/Users/salla/Connexios/src/Routes/agent.py": {
-      "count": 1,
+    "f:/connexio_back2/modules/chats/chats.controller.js": {
+      "count": 2,
       "tokens": 0,
-      "first_read": "2026-05-14T16:10:21.870Z"
+      "first_read": "2026-05-16T08:45:20.723Z"
     },
-    "C:/Users/salla/Connexios/src/Routes/schemas/agent.py": {
-      "count": 1,
+    "f:/connexio_back2/bootstrap.js": {
+      "count": 2,
       "tokens": 0,
-      "first_read": "2026-05-14T16:15:13.432Z"
+      "first_read": "2026-05-16T08:45:20.997Z"
     },
-    "F:/connexio_back2/models/ChatRoom.js": {
-      "count": 1,
+    "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx": {
+      "count": 2,
       "tokens": 0,
-      "first_read": "2026-05-14T16:15:14.016Z"
+      "first_read": "2026-05-16T08:48:03.364Z"
     },
-    "C:/Users/salla/Connexios/src/models/SessionModel.py": {
+    "f:/Connexio_Frontend2/src/components/ChatWidget.jsx": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T16:15:27.840Z"
+      "first_read": "2026-05-16T08:48:39.930Z"
+    },
+    "f:/MasarX_A/src/tasks/cron_jobs.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-16T08:49:05.661Z"
+    },
+    "f:/MasarX_A/src/stores/vectordb/rag_tool.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-16T08:49:20.980Z"
     },
     "c:/Users/salla/Connexios/.wolf/anatomy.md": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T20:24:33.559Z"
+      "first_read": "2026-05-16T08:49:44.436Z"
     },
-    "c:/Users/salla/Connexios/src/controllers/WorkflowController.py": {
-      "count": 1,
+    "c:/Users/salla/Connexios/.wolf/memory.md": {
+      "count": 2,
       "tokens": 0,
-      "first_read": "2026-05-14T20:24:37.227Z"
-    },
-    "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
-      "count": 4,
-      "tokens": 8638,
-      "first_read": "2026-05-14T20:24:40.978Z"
-    },
-    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:24:48.920Z"
-    },
-    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/workflow.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:24:51.999Z"
-    },
-    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:25:12.699Z"
-    },
-    "c:/Users/salla/Connexios/src/models/enums/WorkflowNodeEnum.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:25:15.879Z"
-    },
-    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:25:19.033Z"
-    },
-    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/workflow.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:25:22.290Z"
+      "first_read": "2026-05-16T08:49:44.909Z"
     },
     "c:/Users/salla/Connexios/.wolf/cerebrum.md": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-14T20:25:30.909Z"
-    },
-    "c:/Users/salla/Connexios/.wolf/buglog.json": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:25:33.715Z"
-    },
-    "c:/Users/salla/Connexios/.wolf/memory.md": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T20:33:26.524Z"
-    },
-    "c:/Users/salla/Connexios/README.md": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T21:01:12.280Z"
-    },
-    "f:/MasarX_A/README.md": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-14T21:01:12.290Z"
-    },
-    "c:/Users/salla/Connexios/CLAUDE.md": {
-      "count": 2,
-      "tokens": 4440,
-      "first_read": "2026-05-14T21:02:13.793Z"
+      "first_read": "2026-05-16T08:49:56.488Z"
     }
   },
   "files_written": [
     {
-      "file": "C:/Users/salla/Connexios/src/Routes/schemas/agent.py",
-      "action": "edit",
-      "tokens": 149,
-      "at": "2026-05-14T16:17:12.959Z"
-    },
-    {
-      "file": "C:/Users/salla/Connexios/src/Routes/agent.py",
-      "action": "edit",
-      "tokens": 190,
-      "at": "2026-05-14T16:17:19.862Z"
-    },
-    {
-      "file": "C:/Users/salla/Connexios/src/Routes/agent.py",
-      "action": "edit",
-      "tokens": 226,
-      "at": "2026-05-14T16:17:30.674Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/chats/chatAIHelpers.js",
-      "action": "edit",
-      "tokens": 136,
-      "at": "2026-05-14T16:18:45.738Z"
-    },
-    {
-      "file": "F:/connexio_back2/socket.js",
-      "action": "edit",
-      "tokens": 285,
-      "at": "2026-05-14T16:19:06.379Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/chats/chats.controller.js",
-      "action": "edit",
-      "tokens": 223,
-      "at": "2026-05-14T16:19:24.164Z"
-    },
-    {
-      "file": "c:/Users/salla/Connexios/src/controllers/WorkflowController.py",
-      "action": "edit",
-      "tokens": 1409,
-      "at": "2026-05-14T20:31:01.835Z"
-    },
-    {
       "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
       "action": "edit",
-      "tokens": 2064,
-      "at": "2026-05-14T20:31:56.263Z"
+      "tokens": 236,
+      "at": "2026-05-16T08:44:58.241Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/models/Message.js",
       "action": "edit",
-      "tokens": 396,
-      "at": "2026-05-14T20:32:09.644Z"
+      "tokens": 76,
+      "at": "2026-05-16T08:46:44.248Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/services/aiService.js",
       "action": "edit",
-      "tokens": 398,
-      "at": "2026-05-14T20:32:20.172Z"
+      "tokens": 111,
+      "at": "2026-05-16T08:46:50.941Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py",
+      "file": "f:/connexio_back2/modules/ai/ai.routes.js",
       "action": "edit",
-      "tokens": 158,
-      "at": "2026-05-14T20:32:46.536Z"
+      "tokens": 342,
+      "at": "2026-05-16T08:47:05.443Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py",
+      "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
       "action": "edit",
-      "tokens": 135,
-      "at": "2026-05-14T20:33:09.004Z"
+      "tokens": 36,
+      "at": "2026-05-16T08:47:10.395Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
       "action": "edit",
-      "tokens": 319,
-      "at": "2026-05-14T20:53:02.203Z"
+      "tokens": 102,
+      "at": "2026-05-16T08:47:16.354Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/socket.js",
       "action": "edit",
-      "tokens": 459,
-      "at": "2026-05-14T20:53:19.339Z"
+      "tokens": 160,
+      "at": "2026-05-16T08:47:24.627Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/socket.js",
       "action": "edit",
-      "tokens": 33,
-      "at": "2026-05-14T20:53:26.402Z"
+      "tokens": 1332,
+      "at": "2026-05-16T08:47:46.504Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/bootstrap.js",
       "action": "edit",
-      "tokens": 398,
-      "at": "2026-05-14T20:53:44.018Z"
+      "tokens": 32,
+      "at": "2026-05-16T08:47:50.904Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/connexio_back2/bootstrap.js",
       "action": "edit",
-      "tokens": 108,
-      "at": "2026-05-14T20:53:59.285Z"
+      "tokens": 272,
+      "at": "2026-05-16T08:47:59.154Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
       "action": "edit",
-      "tokens": 402,
-      "at": "2026-05-14T20:54:11.229Z"
+      "tokens": 145,
+      "at": "2026-05-16T08:48:25.617Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
       "action": "edit",
-      "tokens": 47,
-      "at": "2026-05-14T20:54:18.687Z"
+      "tokens": 523,
+      "at": "2026-05-16T08:48:35.789Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/CLAUDE.md",
+      "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
       "action": "edit",
-      "tokens": 938,
-      "at": "2026-05-14T21:02:49.968Z"
+      "tokens": 63,
+      "at": "2026-05-16T08:48:44.545Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/README.md",
+      "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
       "action": "edit",
-      "tokens": 702,
-      "at": "2026-05-14T21:03:14.128Z"
+      "tokens": 141,
+      "at": "2026-05-16T08:48:51.350Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/README.md",
+      "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
       "action": "edit",
-      "tokens": 714,
-      "at": "2026-05-14T21:03:34.600Z"
+      "tokens": 32,
+      "at": "2026-05-16T08:48:55.303Z"
     },
     {
-      "file": "f:/MasarX_A/README.md",
+      "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
       "action": "edit",
-      "tokens": 234,
-      "at": "2026-05-14T21:03:50.767Z"
+      "tokens": 127,
+      "at": "2026-05-16T08:49:01.981Z"
     },
     {
-      "file": "f:/MasarX_A/README.md",
+      "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
       "action": "edit",
-      "tokens": 538,
-      "at": "2026-05-14T21:04:08.085Z"
+      "tokens": 150,
+      "at": "2026-05-16T08:49:10.993Z"
     },
     {
-      "file": "f:/MasarX_A/README.md",
+      "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
       "action": "edit",
-      "tokens": 513,
-      "at": "2026-05-14T21:04:25.517Z"
+      "tokens": 147,
+      "at": "2026-05-16T08:49:17.091Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+      "action": "edit",
+      "tokens": 8,
+      "at": "2026-05-16T08:49:34.044Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+      "action": "edit",
+      "tokens": 105,
+      "at": "2026-05-16T08:49:39.213Z"
     }
   ],
   "edit_counts": {
-    "src/Routes/schemas/agent.py": 1,
-    "src/Routes/agent.py": 2,
-    "F:/connexio_back2/modules/chats/chatAIHelpers.js": 1,
-    "F:/connexio_back2/socket.js": 1,
-    "F:/connexio_back2/modules/chats/chats.controller.js": 1,
-    "src/controllers/WorkflowController.py": 1,
-    "src/controllers/NLPController.py": 10,
-    "src/stores/llm/templates/locales/en/rag.py": 1,
-    "src/stores/llm/templates/locales/ar/rag.py": 1,
-    "CLAUDE.md": 1,
-    "README.md": 2,
-    "f:/MasarX_A/README.md": 3
+    "src/controllers/NLPController.py": 1,
+    "f:/connexio_back2/models/Message.js": 1,
+    "f:/connexio_back2/services/aiService.js": 1,
+    "f:/connexio_back2/modules/ai/ai.routes.js": 1,
+    "f:/connexio_back2/modules/chats/chatAIHelpers.js": 2,
+    "f:/connexio_back2/socket.js": 2,
+    "f:/connexio_back2/bootstrap.js": 2,
+    "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx": 2,
+    "f:/Connexio_Frontend2/src/components/ChatWidget.jsx": 4,
+    "f:/MasarX_A/src/tasks/cron_jobs.py": 2,
+    "f:/MasarX_A/src/stores/vectordb/rag_tool.py": 2
   },
   "anatomy_hits": 1,
-  "anatomy_misses": 24,
-  "repeated_reads_warned": 4,
+  "anatomy_misses": 14,
+  "repeated_reads_warned": 8,
   "cerebrum_warnings": 0,
-  "stop_count": 9
+  "stop_count": 2
 }

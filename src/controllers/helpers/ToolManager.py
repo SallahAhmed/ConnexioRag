@@ -59,7 +59,8 @@ class ToolManager:
         serpapi_api_key: str = None,
         github_token: str = None,
         reranker=None,
-        backend_client=None,   # BackendApiClient instance (injected from app state)
+        backend_client=None,   # BackendApiClient — REST calls to Node.js backend
+        masarx_client=None,    # MasarxApiClient — direct reads from shared PostgreSQL
     ):
         self.db_engine_url = db_engine_url
         self.generation_client = generation_client
@@ -68,6 +69,7 @@ class ToolManager:
         self.template_parser = template_parser
         self.reranker = reranker
         self.backend_client = backend_client  # May be None in Celery workers
+        self.masarx_client = masarx_client    # May be None in Celery workers
         self.logger = logging.getLogger(__name__)
 
         # SQL tool (RAG's OWN PostgreSQL only — for Text-to-SQL on RAG tables)
@@ -403,6 +405,29 @@ class ToolManager:
         except Exception as e:
             self.logger.error(f"Team Gap Error: {str(e)}")
             return "Error assessing team gaps."
+
+    async def get_masarx_tasks(self, project_id: int) -> str:
+        """
+        Fetches AI-generated tasks from MasarX's PostgreSQL task table via the
+        shared Neon DB. These are sprint tasks created by MasarX's create_tasks
+        subgraph and are distinct from the user-created tasks in MySQL.
+        Returns an empty string if no client or no tasks found.
+        """
+        if not self.masarx_client:
+            return ""
+        try:
+            tasks = await self.masarx_client.get_tasks(project_id)
+            if not tasks:
+                return ""
+            lines = [f"AI-planned tasks for project {project_id}:"]
+            for t in tasks[:10]:
+                status_icon = "✅" if t["status"] == "DONE" else ("🔄" if t["status"] == "IN_PROGRESS" else "⏳")
+                assignee = t.get("assignee_name") or "unassigned"
+                lines.append(f"  {status_icon} [{t['status']}] {t['title']} — {assignee}")
+            return "\n".join(lines)
+        except Exception as e:
+            self.logger.error(f"get_masarx_tasks error: {e}")
+            return ""
 
     async def get_project_context_summary(self, project_id: int) -> str:
         """

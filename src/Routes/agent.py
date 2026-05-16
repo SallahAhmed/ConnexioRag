@@ -34,6 +34,7 @@ def get_nlp_controller(request: Request) -> NLPController:
             db_client=getattr(request.app, 'db_client', None),
             reranker=getattr(request.app, 'reranker', None),
             backend_client=getattr(request.app, 'backend_client', None),
+            masarx_client=getattr(request.app, 'masarx_client', None),
         )
         request.app._nlp_controller = controller
     return controller

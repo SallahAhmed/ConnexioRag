@@ -29,6 +29,7 @@ class NLPController(BaseController):
         db_client=None,
         reranker=None,
         backend_client=None,   # BackendApiClient — injected from app state
+        masarx_client=None,    # MasarxApiClient — reads MasarX PostgreSQL tables
     ):
         super().__init__()
         self.logger = logging.getLogger(__name__)
@@ -42,6 +43,7 @@ class NLPController(BaseController):
         self.db_client = db_client
         self.reranker = reranker
         self.backend_client = backend_client  # May be None in Celery workers
+        self.masarx_client = masarx_client
 
         # --- WorkflowController ---
         self.workflow_controller = WorkflowController(
@@ -70,7 +72,8 @@ class NLPController(BaseController):
                 serpapi_api_key=settings.SERPAPI_API_KEY,
                 github_token=settings.GITHUB_TOKEN,
                 reranker=self.reranker,
-                backend_client=self.backend_client,  # passed through to ToolManager
+                backend_client=self.backend_client,
+                masarx_client=self.masarx_client,
             )
 
     # ------------------------------------------------------------------
@@ -443,6 +446,21 @@ class NLPController(BaseController):
             except Exception as e:
                 self.logger.warning(f"Could not fetch live project context: {e}")
 
+        # --- MasarX AI-planned tasks injection ---
+        if project_id and node in (
+            WorkflowNodeEnum.BLOCKER,
+            WorkflowNodeEnum.MILESTONE_WARNING,
+            WorkflowNodeEnum.GENERAL,
+            WorkflowNodeEnum.PHASE_TRANSITION,
+        ):
+            try:
+                tasks_context = await self.tool_manager.get_masarx_tasks(project_id)
+                if tasks_context:
+                    retrieved_context.append(f"\n[AI-Planned Tasks (MasarX)]:\n{tasks_context}")
+                    sources.append("Tasks")
+            except Exception as e:
+                self.logger.warning(f"Could not fetch MasarX tasks: {e}")
+
         # --- Step 4: Final Prompt Construction ---
         self.template_parser.set_language(language)
 
@@ -549,6 +567,9 @@ class NLPController(BaseController):
                 user_id, project_id, query, persona, session_id, limit, model_tier
             )
         )
+        # Derive use_generation from the selected client so answer_agent_chat can
+        # reference it without re-computing (avoids the out-of-scope local-var bug).
+        use_generation = prompt_client is not self.utility_client
 
         # Short-circuit: out-of-scope queries never reach the generation LLM.
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:

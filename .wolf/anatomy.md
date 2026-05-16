@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-14T21:04:25.502Z
-> Files: 38 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T08:49:39.193Z
+> Files: 51 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -270,6 +270,14 @@
 - `chatAIHelpers.js` — API routes: POST (1 endpoints) (~1655 tok)
 - `chats.controller.js` — modules/chats/chats.controller.js (~7815 tok)
 
+## f:/Connexio_Frontend2/src/components/
+
+- `ChatWidget.jsx` — ChatWidget — renders form (~1740 tok)
+
+## f:/Connexio_Frontend2/src/pages/
+
+- `ConnexioAI.jsx` — formatTime (~4299 tok)
+
 ## f:/MasarX_A/
 
 - `README.md` — Project documentation (~4173 tok)
@@ -281,12 +289,12 @@
 
 ## f:/MasarX_A/src/
 
-- `main.py` — API: 1 endpoints (~1052 tok)
+- `main.py` — API: 1 endpoints (~1537 tok)
 - `requirements.txt` — Python dependencies (~149 tok)
 
 ## f:/MasarX_A/src/Routes/
 
-- `webhook_routes.py` — API: 4 endpoints (~6955 tok)
+- `webhook_routes.py` — API: 4 endpoints (~6610 tok)
 
 ## f:/MasarX_A/src/helpers/
 
@@ -294,20 +302,53 @@
 
 ## f:/MasarX_A/src/models/db_schemas/
 
-- `live_models.py` — ProjectStatus: id, title, id, title + 1 more (~1349 tok)
+- `live_models.py` — ProjectStatus: id, title, description, id + 2 more (~1553 tok)
+
+## f:/MasarX_A/src/stores/vectordb/
+
+- `rag_tool.py` — RAGTool: initialize, hybrid_search (~1094 tok)
+
+## f:/MasarX_A/src/tasks/
+
+- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan (~683 tok)
 
 ## f:/MasarX_A/src/utils/
 
 - `auth.py` — verify_service_token (~337 tok)
 
+## f:/MasarX_A/src/utils/tools/
+
+- `db_tool.py` — DBTool: initialize, seed_data, get_project, update_project_repo + 12 more (~3479 tok)
+
+## f:/connexio_back2/
+
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1069 tok)
+- `socket.js` — API routes: GET (1 endpoints) (~5919 tok)
+
+## f:/connexio_back2/models/
+
+- `Message.js` — Declares messageSchema (~783 tok)
+
+## f:/connexio_back2/modules/ai/
+
+- `ai.routes.js` — API routes: POST, GET (5 endpoints) (~666 tok)
+
+## f:/connexio_back2/modules/chats/
+
+- `chatAIHelpers.js` — API routes: POST (1 endpoints) (~1660 tok)
+
+## f:/connexio_back2/services/
+
+- `aiService.js` — API routes: POST (4 endpoints) (~837 tok)
+
 ## src/
 
 - `celery_app.py` — get_setup_utils (~1461 tok)
-- `main.py` — --- Framework & Core Imports --- (~1564 tok)
+- `main.py` — --- Framework & Core Imports --- (~1613 tok)
 
 ## src/Routes/
 
-- `agent.py` — get_nlp_controller, agent_chat, agent_chat_stream (~1054 tok)
+- `agent.py` — get_nlp_controller, agent_chat, agent_chat_stream, invalidate_cache (~1547 tok)
 - `base.py` — welcome, health_check (~214 tok)
 - `data.py` — Upload_data, process_endpoint, process_and_push_endpoint, upload_and_process (~3346 tok)
 - `projects.py` — ProjectSyncRequest: sync_project (~784 tok)
@@ -318,8 +359,12 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~8638 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~9962 tok)
 - `WorkflowController.py` — pyrefly: ignore [missing-import] (~2573 tok)
+
+## src/controllers/helpers/
+
+- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 5 more (~7350 tok)
 
 ## src/helpers/
 
@@ -349,3 +394,4 @@
 ## src/utils/
 
 - `backend_client.py` — BackendApiClient: close, get_user, get_project, get_project_members + 4 more (~2362 tok)
+- `masarx_client.py` — MasarxApiClient: get_tasks, get_notifications (~942 tok)

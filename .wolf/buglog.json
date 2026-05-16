@@ -240,6 +240,150 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-05-14T21:03:34.604Z"
+    },
+    {
+      "id": "bug-016",
+      "timestamp": "2026-05-16T08:38:09.627Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 20→27 lines (2 removed) | Also: async def save_document(self, doc_data: dict) -> D; \"\"\"Save a generated document to chunks table.\"\"\"",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-16T08:39:08.135Z"
+    },
+    {
+      "id": "bug-017",
+      "timestamp": "2026-05-16T08:38:21.035Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/main.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:38:21.035Z"
+    },
+    {
+      "id": "bug-018",
+      "timestamp": "2026-05-16T08:39:26.963Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+      "root_cause": "18 lines replaced/restructured",
+      "fix": "Rewrote 44→27 lines (18 removed) | Also: from models.db_schemas.live_models import DataChun; stmt = select(DataChunk).where(",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-05-16T08:40:02.030Z"
+    },
+    {
+      "id": "bug-019",
+      "timestamp": "2026-05-16T08:42:18.502Z",
+      "error_message": "Missing await",
+      "file": "src/controllers/helpers/ToolManager.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:42:18.502Z"
+    },
+    {
+      "id": "bug-020",
+      "timestamp": "2026-05-16T08:44:58.245Z",
+      "error_message": "Missing await",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:44:58.245Z"
+    },
+    {
+      "id": "bug-021",
+      "timestamp": "2026-05-16T08:47:46.508Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/connexio_back2/socket.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:47:46.508Z"
+    },
+    {
+      "id": "bug-022",
+      "timestamp": "2026-05-16T08:47:59.157Z",
+      "error_message": "Missing await",
+      "file": "f:/connexio_back2/bootstrap.js",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:47:59.157Z"
+    },
+    {
+      "id": "bug-023",
+      "timestamp": "2026-05-16T08:48:35.793Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:48:35.793Z"
+    },
+    {
+      "id": "bug-024",
+      "timestamp": "2026-05-16T08:49:39.217Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 5→7 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T08:49:39.217Z"
     }
   ]
 }
