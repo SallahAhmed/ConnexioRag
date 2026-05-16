@@ -9,6 +9,7 @@ from slowapi import Limiter
 from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
+from fastapi import Request
 
 # --- Application Routes ---
 from Routes import base, data, nlp, agent
@@ -167,6 +168,16 @@ app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
 app.include_router(agent.agent_router)
 app.include_router(projects_router)
+
+
+# --- UTF-8 Response Middleware ---
+# Ensures Arabic and other non-ASCII characters are encoded correctly
+# in HTTP responses (prevents mojibake on HF Spaces).
+@app.middleware("http")
+async def ensure_utf8_response(request: Request, call_next):
+    response = await call_next(request)
+    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    return response
 
 
 @app.get("/")
