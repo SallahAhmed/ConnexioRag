@@ -283,11 +283,33 @@ def mock_generation_client():
     client = AsyncMock()
     client.generate_text = AsyncMock(return_value="This is a mock response from the generation model about your query.")
     client.generate_text_stream = AsyncMock()
-    async def _stream():
+    async def _generate_text_stream(prompt=None, chat_history=None, **kwargs):
         yield "mock"
         yield " stream"
         yield " response"
-    client.generate_text_stream.return_value = _stream()
+    client.generate_text_stream.side_effect = _generate_text_stream
+    client.last_usage = {"prompt_tokens": 500, "completion_tokens": 100, "total_tokens": 600}
+    client.construct_prompt = MagicMock(side_effect=lambda prompt, role: {"role": role, "content": prompt})
+    client.enums = MagicMock()
+    client.enums.SYSTEM = MagicMock()
+    client.enums.SYSTEM.value = "system"
+    client.enums.USER = MagicMock()
+    client.enums.USER.value = "user"
+    client.enums.ASSISTANT = MagicMock()
+    client.enums.ASSISTANT.value = "assistant"
+    return client
+
+
+@pytest.fixture
+def mock_generation_client():
+    """Mock generation LLM client (70B model)."""
+    client = AsyncMock()
+    client.generate_text = AsyncMock(return_value="This is a mock response from the generation model about your query.")
+    async def _generate_text_stream(prompt=None, chat_history=None, **kwargs):
+        yield "mock"
+        yield " stream"
+        yield " response"
+    client.generate_text_stream = _generate_text_stream
     client.last_usage = {"prompt_tokens": 500, "completion_tokens": 100, "total_tokens": 600}
     client.construct_prompt = MagicMock(side_effect=lambda prompt, role: {"role": role, "content": prompt})
     client.enums = MagicMock()

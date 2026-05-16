@@ -2,14 +2,13 @@ from ..LLMInterface import LLMInterface
 from ..LLMEnums import OpenAIEnums
 # pyrefly: ignore [missing-import]
 from openai import AsyncOpenAI
-import asyncio
 import logging
 from typing import List, Union
-#
+
 class OpenAIProvider(LLMInterface):
 
     def __init__(self, api_key: str, api_url: str=None,
-                       default_input_max_characters: int=5000,
+                       default_input_max_characters: int=1000,
                        default_generation_max_output_tokens: int=1000,
                        default_generation_temperature: float=0.1):
         
@@ -65,42 +64,34 @@ class OpenAIProvider(LLMInterface):
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
-        max_retries = 3
-        for attempt in range(max_retries):
-            try:
-                response = await self.client.chat.completions.create(
-                    model = self.generation_model_id,
-                    messages = local_history,
-                    max_tokens = max_output_tokens,
-                    temperature = temperature
-                )
+        try:
+            response = await self.client.chat.completions.create(
+                model = self.generation_model_id,
+                messages = local_history,
+                max_tokens = max_output_tokens,
+                temperature = temperature
+            )
 
-                if response and response.usage:
-                    self.last_usage = {
-                        "prompt_tokens": response.usage.prompt_tokens,
-                        "completion_tokens": response.usage.completion_tokens,
-                        "total_tokens": response.usage.total_tokens
-                    }
-                    print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
-                else:
-                    self.last_usage = None
-                
-                if not response or not response.choices:
-                    print("DEBUG: Ollama returned an empty response object!")
-                    return ""
+            if response and response.usage:
+                self.last_usage = {
+                    "prompt_tokens": response.usage.prompt_tokens,
+                    "completion_tokens": response.usage.completion_tokens,
+                    "total_tokens": response.usage.total_tokens
+                }
+                print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
+            else:
+                self.last_usage = None
+            
+            if not response or not response.choices:
+                print("DEBUG: Ollama returned an empty response object!")
+                return ""
 
-                answer = response.choices[0].message.content
-                return answer if answer else ""
-                
-            except Exception as e:
-                err_str = str(e)
-                if "429" in err_str and attempt < max_retries - 1:
-                    wait = 2 ** attempt
-                    self.logger.warning(f"Rate limited (429), retrying in {wait}s (attempt {attempt+1}/{max_retries})")
-                    await asyncio.sleep(wait)
-                    continue
-                print(f"DEBUG: OpenAIProvider Error: {err_str}")
-                return f""
+            answer = response.choices[0].message.content
+            return answer if answer else ""
+            
+        except Exception as e:
+            print(f"DEBUG: OpenAIProvider Error: {str(e)}")
+            return f"Error during generation: {str(e)}"
         
     async def generate_text_stream(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
