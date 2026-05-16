@@ -144,7 +144,7 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 | **Task Queue**        | [Celery](https://docs.celeryq.dev/)                                                                                                     | Asynchronous indexing and document processing.                      |
 | **Message Broker**    | [RabbitMQ](https://www.rabbitmq.com/)                                                                                                   | Handling background task distributions.                             |
 | **Database Drivers**  | [SQLAlchemy](https://www.sqlalchemy.org/), [asyncpg](https://github.com/MagicStack/asyncpg), [alembic](https://alembic.sqlalchemy.org/) | ORM, async PostgreSQL driver, and migration tooling.                |
-| **LLM Providers**     | Groq (Llama 3.3 70B, Llama 3.1 8B), OpenAI, Cohere                                                                                      | Multimodal intelligence, tool selection, and intent classification. |
+| **LLM Providers**     | Groq (GPT-OSS 120B, Llama 4 Scout 17B), Cohere                                                                                      | Generation (120B), utility/classification (17B).                    |
 | **Embedding**         | Cohere `embed-multilingual-v3.0` (1024 dims)                                                                                            | Production embedding model for semantic search.                     |
 | **External APIs**     | Wikipedia API, [Google Search](https://serpapi.com/) (SerpApi), [GitHub API](https://docs.github.com/en/rest)                           | External knowledge sources for Corrective RAG.                      |
 | **Monitoring**        | Prometheus & Grafana                                                                                                                    | Real-time performance metrics and dashboards.                       |
@@ -163,56 +163,18 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 - **PGVector (Storage Layer)**: Adds hybrid search capabilities, allowing us to combine relational queries with vector similarity within a single PostgreSQL instance (Neon.tech).
 - **Prometheus & Grafana (Observability Layer)**: Every RAG request and system operation is metered, providing real-time insights into latency, throughput, and error rates.
 
-### 🔐 Environment Configuration
-
-Connexio is highly configurable via environment variables. Key sections in your `.env` file include:
-
-```ini
-# --- Application Settings ---
-APP_NAME="Connexio"
-APP_VERSION="0.1"
-
-# --- Database Configuration (Neon.tech) ---
-POSTGRES_USERNAME="your_postgres_username"
-POSTGRES_PASSWORD="your_postgres_password"
-POSTGRES_HOST="your_neon_host"
-POSTGRES_PORT=5432
-POSTGRES_MAIN_DATABASE="connexio"
-
-# --- LLM & AI Configuration ---
-GENERATION_BACKEND="GROQ"           # Options: GROQ, OPENAI, COHERE
-EMBEDDING_BACKEND="COHERE"          # Options: OPENAI, COHERE
-GROQ_API_KEY="your_groq_api_key"
-COHERE_API_KEY="your_cohere_api_key"
-GENERATION_MODEL_ID="llama-3.3-70b-versatile"
-UTILITY_MODEL_ID="llama-3.1-8b-instant"
-EMBEDDING_MODEL_ID="embed-multilingual-v3.0"
-EMBEDDING_MODEL_SIZE=1024
-
-# --- Backend Integration ---
-CONNEXIO_INTERNAL_API_KEY="shared_api_key"
-JWT_SECRET="shared_jwt_secret"
-SERVICE_USER_ID=1                   # Must match a real MySQL user UID
-MAIN_BACKEND_URL="https://connexio.icu"
-
-# --- Vector DB Configuration ---
-VECTOR_DB_BACKEND="PGVECTOR"        # Options: QDRANT, PGVECTOR
-
-# --- Celery & Task Queue Configuration ---
-CELERY_BROKER_URL="amqp://user:pass@host:5672/vhost"
-CELERY_RESULT_BACKEND="redis://:pass@host:6379/0"
-```
-
-> ⚠️ **Never commit `.env`** — it's in `.gitignore`. On HF Spaces, set secrets via Space Settings → Repository Secrets.
+> ⚠️ **Environment variables** are set as HF Space Repository Secrets. Never commit a `.env` file.
 
 ### 🧠 Intelligent Features
 
 Connexio implements advanced intelligent capabilities beyond basic RAG:
 
-- **Tiered Response Strategy**: Response cost is gated by context value — no project context means no RAG value, so no expensive model is used:
-  - **Tier 0 (0 tokens)** — `OUT_OF_SCOPE`: instant canned refusal, zero LLM calls
-  - **Tier 1 (~100 tokens)** — Projectless sessions (`project_id = 0`): utility 8B model, history capped at last 2 turns
-  - **Tier 2 (full pipeline)** — Project sessions: generation 70B model, full RAG context, live backend data
+- **Intent-Based Model Routing**: Response quality is gated by query intent, not project context:
+  - **OUT_OF_SCOPE** — instant canned refusal, zero LLM calls
+  - **GENERAL intents** (professional questions, career advice, tech topics) — utility **Llama 4 Scout 17B** model
+  - **Auto-Escalate** — if utility model echoes query, refuses, or gives empty answer → auto-retries with **GPT-OSS 120B**
+  - **Project intents** (blocker, milestone, onboarding, team, phase) — **GPT-OSS 120B** directly (quality needed)
+  - **model_tier** param allows manual override: `"generation"` or `"utility"`
 
 - **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
   - ONBOARDING: Guidance for new users
@@ -236,6 +198,9 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
 - **Language Support**: Automatic detection and switching between English and Arabic prompts
 - **Persona Mapping**: Adjusts tone and depth based on user role (student, educator, company representative, early-career professional)
 - **Adaptive Conversational Memory**: Full token-budget window for project sessions; capped at 2 turns for projectless sessions to prevent accumulation across unrelated queries
+- **Rate Limiting & Security**: 30 requests/minute per IP, `max_length=5000` on query input, 429 retry with exponential backoff, cache invalidation endpoints, sanitized knowledge base (no internal infra details exposed)
+- **Global Knowledge Base**: 52 curated files across 8 categories (134 chunks) — answers platform, agile, dev, design, career, business, soft skills, and industry trend questions
+- **Session TTL**: Stale chat sessions auto-cleaned after 30 days via Celery Beat
 - **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization
 
 ---
@@ -301,6 +266,8 @@ If you prefer running locally:
 | :------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `/api/v1/nlp/agent/chat/{project_id}`        | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
 | `/api/v1/nlp/agent/chat/stream/{project_id}` | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
+| `/api/v1/nlp/agent/cache/invalidate/{project_id}` | `POST` | Invalidate in-memory cache for a project's backend data (project, members, tasks). |
+| `/api/v1/nlp/agent/cache/invalidate/user/{user_id}` | `POST` | Invalidate cached user profile from the main backend. |
 
 ### 🔹 Base Endpoints
 
@@ -359,12 +326,12 @@ Connexio uses **Reciprocal Rank Fusion (RRF)** to combine results from multiple 
 
 The `NLPController` manages the conversation flow through a sophisticated agentic loop:
 
-- **Tiered Response Strategy**: Cost scales with context value. The pipeline selects model and history window based on the query's context tier:
-  - **Tier 0** — `OUT_OF_SCOPE`: canned refusal returned immediately, 0 LLM calls
-  - **Tier 1** — No project context (`project_id = 0`): utility 8B model, 12-token system prompt, last 2 turns of history only
-  - **Tier 2** — Project context: generation 70B model, full RAG prompt, full token-budget history
+- **Intent-Based Model Routing**: The pipeline selects model based on query intent:
+  - **OUT_OF_SCOPE** — canned refusal, 0 LLM calls
+  - **Project intents** (blocker, milestone, onboarding, team, phase) — **GPT-OSS 120B** directly
+  - **GENERAL intents** — **Llama 4 Scout 17B** with **auto-escalate** to 120B if answer echoes/refuses
 
-- **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
+- **Intent Detection & Workflow Routing**: Every query is analyzed (OOS keywords first → project keywords → GENERAL → fast path → LLM) and routed to one of seven specialized workflow nodes:
   - **ONBOARDING**: Guidance for new users getting started with the project
   - **TEAM_FORMATION**: Intelligent teammate matching logic based on skills and availability
   - **PHASE_TRANSITION**: Validating deliverables before project advancement
