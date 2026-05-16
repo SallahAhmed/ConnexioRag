@@ -172,7 +172,7 @@ class TestNonStreamingBehavior:
             result = await nlp_controller.answer_agent_chat(
                 user_id=1, project_id=None, query="weather in Cairo",
             )
-        assert result["node"] == "OUT_OF_SCOPE"
+        assert result["node"] == "out_of_scope"
 
     @pytest.mark.asyncio
     async def test_chat_clear_history(self, nlp_controller):
