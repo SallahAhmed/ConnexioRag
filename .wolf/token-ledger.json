@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 253998,
-    "total_reads": 467,
-    "total_writes": 263,
+    "total_tokens_estimated": 300630,
+    "total_reads": 522,
+    "total_writes": 332,
     "total_sessions": 10,
-    "anatomy_hits": 51,
-    "anatomy_misses": 393,
-    "repeated_reads_blocked": 54,
-    "estimated_savings_vs_bare_cli": 132284
+    "anatomy_hits": 58,
+    "anatomy_misses": 441,
+    "repeated_reads_blocked": 83,
+    "estimated_savings_vs_bare_cli": 223342
   },
   "sessions": [
     {
@@ -4626,6 +4626,732 @@
         "writes_count": 20,
         "repeated_reads_blocked": 8,
         "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-05-16-1144",
+      "started": "2026-05-16T08:44:45.229Z",
+      "ended": "2026-05-16T08:59:00.349Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 9962,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chats.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 236,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 111,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 342,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 36,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 160,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 1332,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 272,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 145,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 523,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 63,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 141,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 127,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 150,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 147,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 8,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 105,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 9962,
+        "output_tokens_estimated": 4140,
+        "reads_count": 15,
+        "writes_count": 20,
+        "repeated_reads_blocked": 8,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-05-16-1144",
+      "started": "2026-05-16T08:44:45.229Z",
+      "ended": "2026-05-16T09:46:21.163Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 9962,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chats.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 1537,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 236,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 111,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 342,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 36,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 160,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 1332,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 272,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 145,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 523,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 63,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 141,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 127,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 150,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 147,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 8,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 105,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+          "tokens_estimated": 86,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 54,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 11499,
+        "output_tokens_estimated": 4280,
+        "reads_count": 19,
+        "writes_count": 22,
+        "repeated_reads_blocked": 9,
+        "anatomy_lookups": 2
+      }
+    },
+    {
+      "id": "session-2026-05-16-1144",
+      "started": "2026-05-16T08:44:45.229Z",
+      "ended": "2026-05-16T10:00:53.313Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 9962,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chats.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 1537,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py",
+          "tokens_estimated": 301,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py",
+          "tokens_estimated": 278,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 236,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/models/Message.js",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 111,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/ai/ai.routes.js",
+          "tokens_estimated": 342,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 36,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/chats/chatAIHelpers.js",
+          "tokens_estimated": 102,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 160,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/socket.js",
+          "tokens_estimated": 1332,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 272,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 145,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx",
+          "tokens_estimated": 523,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 63,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 141,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/ChatWidget.jsx",
+          "tokens_estimated": 127,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 150,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+          "tokens_estimated": 147,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 8,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
+          "tokens_estimated": 105,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+          "tokens_estimated": 86,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/main.py",
+          "tokens_estimated": 54,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 30,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 152,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 150,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py",
+          "tokens_estimated": 43,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py",
+          "tokens_estimated": 18,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 12078,
+        "output_tokens_estimated": 4673,
+        "reads_count": 21,
+        "writes_count": 27,
+        "repeated_reads_blocked": 12,
+        "anatomy_lookups": 4
       }
     }
   ],

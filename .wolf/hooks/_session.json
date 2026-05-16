@@ -3,7 +3,7 @@
   "started": "2026-05-16T08:44:45.229Z",
   "files_read": {
     "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
-      "count": 3,
+      "count": 6,
       "tokens": 9962,
       "first_read": "2026-05-16T08:44:51.450Z"
     },
@@ -76,6 +76,36 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-05-16T08:49:56.488Z"
+    },
+    "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-16T09:45:24.672Z"
+    },
+    "f:/MasarX_A/src/main.py": {
+      "count": 1,
+      "tokens": 1537,
+      "first_read": "2026-05-16T09:45:24.747Z"
+    },
+    "f:/MasarX_A/src/.wolf/buglog.json": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-16T09:45:51.328Z"
+    },
+    "c:/Users/salla/Connexios/.wolf/buglog.json": {
+      "count": 2,
+      "tokens": 0,
+      "first_read": "2026-05-16T09:45:55.440Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py": {
+      "count": 1,
+      "tokens": 301,
+      "first_read": "2026-05-16T09:57:21.897Z"
+    },
+    "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py": {
+      "count": 1,
+      "tokens": 278,
+      "first_read": "2026-05-16T10:00:06.055Z"
     }
   },
   "files_written": [
@@ -198,10 +228,52 @@
       "action": "edit",
       "tokens": 105,
       "at": "2026-05-16T08:49:39.213Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+      "action": "edit",
+      "tokens": 86,
+      "at": "2026-05-16T09:45:30.417Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/main.py",
+      "action": "edit",
+      "tokens": 54,
+      "at": "2026-05-16T09:45:47.961Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 30,
+      "at": "2026-05-16T09:59:40.723Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 152,
+      "at": "2026-05-16T09:59:48.615Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 150,
+      "at": "2026-05-16T09:59:56.222Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/en/rag.py",
+      "action": "edit",
+      "tokens": 43,
+      "at": "2026-05-16T10:00:03.016Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/rag.py",
+      "action": "edit",
+      "tokens": 18,
+      "at": "2026-05-16T10:00:10.778Z"
     }
   ],
   "edit_counts": {
-    "src/controllers/NLPController.py": 1,
+    "src/controllers/NLPController.py": 4,
     "f:/connexio_back2/models/Message.js": 1,
     "f:/connexio_back2/services/aiService.js": 1,
     "f:/connexio_back2/modules/ai/ai.routes.js": 1,
@@ -211,11 +283,15 @@
     "f:/Connexio_Frontend2/src/pages/ConnexioAI.jsx": 2,
     "f:/Connexio_Frontend2/src/components/ChatWidget.jsx": 4,
     "f:/MasarX_A/src/tasks/cron_jobs.py": 2,
-    "f:/MasarX_A/src/stores/vectordb/rag_tool.py": 2
+    "f:/MasarX_A/src/stores/vectordb/rag_tool.py": 2,
+    "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py": 1,
+    "f:/MasarX_A/src/main.py": 1,
+    "src/stores/llm/templates/locales/en/rag.py": 1,
+    "src/stores/llm/templates/locales/ar/rag.py": 1
   },
-  "anatomy_hits": 1,
-  "anatomy_misses": 14,
-  "repeated_reads_warned": 8,
+  "anatomy_hits": 4,
+  "anatomy_misses": 17,
+  "repeated_reads_warned": 12,
   "cerebrum_warnings": 0,
-  "stop_count": 2
+  "stop_count": 5
 }

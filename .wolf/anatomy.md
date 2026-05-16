@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T08:49:39.193Z
-> Files: 51 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T10:00:10.766Z
+> Files: 52 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -289,7 +289,7 @@
 
 ## f:/MasarX_A/src/
 
-- `main.py` — API: 1 endpoints (~1537 tok)
+- `main.py` — API: 1 endpoints (~1550 tok)
 - `requirements.txt` — Python dependencies (~149 tok)
 
 ## f:/MasarX_A/src/Routes/
@@ -303,6 +303,10 @@
 ## f:/MasarX_A/src/models/db_schemas/
 
 - `live_models.py` — ProjectStatus: id, title, description, id + 2 more (~1553 tok)
+
+## f:/MasarX_A/src/stores/llm/
+
+- `LLMProviderFactory.py` — LLMProviderFactory: create, create_generation_client, create_utility_client, create_embedding_client (~1008 tok)
 
 ## f:/MasarX_A/src/stores/vectordb/
 
@@ -359,7 +363,7 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~9962 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~9937 tok)
 - `WorkflowController.py` — pyrefly: ignore [missing-import] (~2573 tok)
 
 ## src/controllers/helpers/
@@ -385,11 +389,11 @@
 
 ## src/stores/llm/templates/locales/ar/
 
-- `rag.py` — ### RAG PROMPTS #### (~278 tok)
+- `rag.py` — ### RAG PROMPTS #### (~542 tok)
 
 ## src/stores/llm/templates/locales/en/
 
-- `rag.py` — ### RAG PROMPTS #### (~301 tok)
+- `rag.py` — ### RAG PROMPTS #### (~623 tok)
 
 ## src/utils/
 

@@ -7,7 +7,7 @@
       "error_message": "Significant refactor of ",
       "file": "f:/MasarX_A/src/main.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 4→6 lines (2 removed)",
+      "fix": "Rewrote 4â†’6 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -23,7 +23,7 @@
       "error_message": "Significant refactor of ",
       "file": "src/celery_app.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 15→18 lines (2 removed)",
+      "fix": "Rewrote 15â†’18 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -38,7 +38,7 @@
       "timestamp": "2026-05-12T18:52:16.829Z",
       "error_message": "Missing await",
       "file": "src/Routes/data.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await â€” returned Promise instead of value",
       "fix": "Added await to async call | Also: @data_router.post(\"/upload-and-process/{project_id}\", status; async def upload_and_process(",
       "tags": [
         "auto-detected",
@@ -87,7 +87,7 @@
       "error_message": "Significant refactor of ",
       "file": "CLAUDE.md",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 6→7 lines (3 removed) | Also: | **4** | Backend → RAG: sync upload-and-process e; | **5** | Deploy both Python services to Render.co",
+      "fix": "Rewrote 6â†’7 lines (3 removed) | Also: | **4** | Backend â†’ RAG: sync upload-and-process e; | **5** | Deploy both Python services to Render.co",
       "tags": [
         "auto-detected",
         "refactor",
@@ -103,7 +103,7 @@
       "error_message": "Significant refactor of ",
       "file": "F:/MasarX_A/docs/documentation/AGENT_RAG_INTEGRATION_STRATEGY.md",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 6→6 lines (2 removed)",
+      "fix": "Rewrote 6â†’6 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -135,7 +135,7 @@
       "error_message": "Significant refactor of ",
       "file": "F:/connexio_back2/modules/chats/chats.controller.js",
       "root_cause": "6 lines replaced/restructured",
-      "fix": "Rewrote 11→17 lines (6 removed)",
+      "fix": "Rewrote 11â†’17 lines (6 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -151,7 +151,7 @@
       "error_message": "Significant refactor of ",
       "file": "src/controllers/WorkflowController.py",
       "root_cause": "3 lines replaced/restructured",
-      "fix": "Rewrote 78→97 lines (3 removed)",
+      "fix": "Rewrote 78â†’97 lines (3 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -167,7 +167,7 @@
       "error_message": "Significant refactor of ",
       "file": "src/stores/llm/templates/locales/en/rag.py",
       "root_cause": "18 lines replaced/restructured",
-      "fix": "Rewrote 25→9 lines (18 removed) | Also: \"أنت مستشار ذكاء اصطناعي خبير لمنصة Connexio — منص; \"تساعد Connexio الطلاب والمصممين والمسوقين والمطور",
+      "fix": "Rewrote 25â†’9 lines (18 removed) | Also: \"Ø£Ù†Øª Ù…Ø³ØªØ´Ø§Ø± Ø°ÙƒØ§Ø¡ Ø§ØµØ·Ù†Ø§Ø¹ÙŠ Ø®Ø¨ÙŠØ± Ù„Ù…Ù†ØµØ© Connexio â€” Ù…Ù†Øµ; \"ØªØ³Ø§Ø¹Ø¯ Connexio Ø§Ù„Ø·Ù„Ø§Ø¨ ÙˆØ§Ù„Ù…ØµÙ…Ù…ÙŠÙ† ÙˆØ§Ù„Ù…Ø³ÙˆÙ‚ÙŠÙ† ÙˆØ§Ù„Ù…Ø·ÙˆØ±",
       "tags": [
         "auto-detected",
         "refactor",
@@ -183,7 +183,7 @@
       "error_message": "Significant refactor of ",
       "file": "src/controllers/NLPController.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 25→38 lines (2 removed)",
+      "fix": "Rewrote 25â†’38 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -215,7 +215,7 @@
       "error_message": "Significant refactor of ",
       "file": "CLAUDE.md",
       "root_cause": "8 lines replaced/restructured",
-      "fix": "Rewrote 40→55 lines (8 removed)",
+      "fix": "Rewrote 40â†’55 lines (8 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -231,7 +231,7 @@
       "error_message": "Significant refactor of ",
       "file": "README.md",
       "root_cause": "4 lines replaced/restructured",
-      "fix": "Rewrote 23→28 lines (4 removed) | Also: - **OUT_OF_SCOPE**: Guardrail that automatically r; - **Deep Conversational Memory**: Retains conversa",
+      "fix": "Rewrote 23â†’28 lines (4 removed) | Also: - **OUT_OF_SCOPE**: Guardrail that automatically r; - **Deep Conversational Memory**: Retains conversa",
       "tags": [
         "auto-detected",
         "refactor",
@@ -247,7 +247,7 @@
       "error_message": "Significant refactor of ",
       "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 20→27 lines (2 removed) | Also: async def save_document(self, doc_data: dict) -> D; \"\"\"Save a generated document to chunks table.\"\"\"",
+      "fix": "Rewrote 20â†’27 lines (2 removed) | Also: async def save_document(self, doc_data: dict) -> D; \"\"\"Save a generated document to chunks table.\"\"\"",
       "tags": [
         "auto-detected",
         "refactor",
@@ -262,7 +262,7 @@
       "timestamp": "2026-05-16T08:38:21.035Z",
       "error_message": "Missing await",
       "file": "f:/MasarX_A/src/main.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await â€” returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -279,7 +279,7 @@
       "error_message": "Significant refactor of ",
       "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
       "root_cause": "18 lines replaced/restructured",
-      "fix": "Rewrote 44→27 lines (18 removed) | Also: from models.db_schemas.live_models import DataChun; stmt = select(DataChunk).where(",
+      "fix": "Rewrote 44â†’27 lines (18 removed) | Also: from models.db_schemas.live_models import DataChun; stmt = select(DataChunk).where(",
       "tags": [
         "auto-detected",
         "refactor",
@@ -294,7 +294,7 @@
       "timestamp": "2026-05-16T08:42:18.502Z",
       "error_message": "Missing await",
       "file": "src/controllers/helpers/ToolManager.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await â€” returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -310,7 +310,7 @@
       "timestamp": "2026-05-16T08:44:58.245Z",
       "error_message": "Missing await",
       "file": "src/controllers/NLPController.py",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await â€” returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -326,7 +326,7 @@
       "timestamp": "2026-05-16T08:47:46.508Z",
       "error_message": "Missing error handling in unknown",
       "file": "f:/connexio_back2/socket.js",
-      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "root_cause": "Code path had no error handling â€” exceptions would propagate uncaught",
       "fix": "Added try/catch block",
       "tags": [
         "auto-detected",
@@ -342,7 +342,7 @@
       "timestamp": "2026-05-16T08:47:59.157Z",
       "error_message": "Missing await",
       "file": "f:/connexio_back2/bootstrap.js",
-      "root_cause": "Async call without await — returned Promise instead of value",
+      "root_cause": "Async call without await â€” returned Promise instead of value",
       "fix": "Added await to async call",
       "tags": [
         "auto-detected",
@@ -375,7 +375,7 @@
       "error_message": "Significant refactor of ",
       "file": "f:/MasarX_A/src/stores/vectordb/rag_tool.py",
       "root_cause": "2 lines replaced/restructured",
-      "fix": "Rewrote 5→7 lines (2 removed)",
+      "fix": "Rewrote 5â†’7 lines (2 removed)",
       "tags": [
         "auto-detected",
         "refactor",
@@ -384,6 +384,88 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-16T08:49:39.217Z"
+    },
+    {
+      "id": "bug-025",
+      "timestamp": "2026-05-16T12:00:00.000Z",
+      "error_message": "AttributeError: 'LLMProviderFactory' object has no attribute 'create_utility_client'",
+      "file": "f:/MasarX_A/src/stores/llm/LLMProviderFactory.py",
+      "root_cause": "create_utility_client() was commented out in MasarX LLMProviderFactory; main.py added call to it during this session without uncommenting it first",
+      "fix": "Uncommented create_utility_client() in LLMProviderFactory.py; used getattr fallback for UTILITY_BACKEND; updated main.py to fall back to GENERATION_MODEL_ID when UTILITY_MODEL_ID is None",
+      "tags": [
+        "startup",
+        "llm",
+        "masarx",
+        "AttributeError"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T12:00:00.000Z"
+    },
+    {
+      "id": "bug-026",
+      "timestamp": "2026-05-16T09:59:40.726Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 8→4 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T09:59:40.726Z"
+    },
+    {
+      "id": "bug-027",
+      "timestamp": "2026-05-16T10:00:03.018Z",
+      "error_message": "Incorrect value in code",
+      "file": "src/stores/llm/templates/locales/en/rag.py",
+      "root_cause": "Had \"Persona: $persona | Context: $node\"",
+      "fix": "Changed to \"Audience: $persona learner | Context: $node\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-05-16T10:00:10.781Z"
+    },
+    {
+      "id": "bug-028",
+      "timestamp": "2026-05-16T13:00:00.000Z",
+      "error_message": "Projectless chat returns \"No results provided.\" for greetings; Documentation badge on all responses",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Global KB (project_id=0) searched for all projectless sessions and relevance grader was bypassed (always True). Injected irrelevant docs. Footer also said \"Answer using context above\" even when context empty.",
+      "fix": "Removed relevance bypass for projectless mode. Added context_string.strip() check: empty context uses footer_prompt=query directly.",
+      "tags": [
+        "prompt",
+        "projectless",
+        "kb_search",
+        "relevance_grader"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T13:00:00.000Z"
+    },
+    {
+      "id": "bug-029",
+      "timestamp": "2026-05-16T13:00:00.000Z",
+      "error_message": "AI says \"I am a student\" when asked who are you",
+      "file": "src/controllers/NLPController.py, en/rag.py, ar/rag.py",
+      "root_cause": "System prompts said \"Persona: student\" literally. Model echoed persona label as its own identity.",
+      "fix": "Removed Persona: label from utility prompt. Changed generation template to \"Audience:  learner\" in EN and AR.",
+      "tags": [
+        "prompt",
+        "persona",
+        "identity"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-16T13:00:00.000Z"
     }
   ]
 }

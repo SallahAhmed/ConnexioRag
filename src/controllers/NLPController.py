@@ -287,12 +287,8 @@ class NLPController(BaseController):
                 kb_results += f"\n[Results for: {q}]\n{res}\n"
                 has_kb_content = True
 
-        # Bypass relevance grader for projectless mode — global KB is curated content
         if not has_kb_content:
             is_kb_relevant = False
-            kb_usage = {}
-        elif not project_id:
-            is_kb_relevant = True
             kb_usage = {}
         else:
             is_kb_relevant = await self.workflow_controller.grade_relevance(
@@ -489,12 +485,13 @@ class NLPController(BaseController):
             }
             guide = persona_guide.get(persona.lower(), persona_guide["student"])
             system_prompt = (
-                f"أنت Connexio AI، مساعد تعاون في المشاريع. الشخصية: {persona}. "
-                f"{guide} كن موجزاً ومفيداً. استخدم المعرفة المتاحة للإجابة. لا تستخدم رؤوس markdown."
+                f"أنت Connexio AI، مساعد تعاون ذكي في المشاريع. "
+                f"{guide} "
+                f"كن طبيعياً ومحادثاً. أجب دائماً بنفس لغة المستخدم. لا تستخدم رؤوس markdown."
                 if language == "ar"
                 else f"You are Connexio AI, a project collaboration assistant. "
-                     f"Persona: {persona}. {guide} "
-                     f"Use the provided knowledge to answer. Be concise and helpful. "
+                     f"{guide} "
+                     f"Be natural and conversational. Reply in the same language as the user. "
                      f"Do not use markdown headers."
             )
             prompt_client = self.utility_client
@@ -505,9 +502,12 @@ class NLPController(BaseController):
         history_budget = total_token_budget - base_tokens - 200
         final_history = self._get_truncated_history(history, history_budget, encoding)
 
-        footer_prompt = self.template_parser.get(
-            "rag", "footer_prompt", {"query": query, "context": context_string}
-        )
+        if context_string.strip():
+            footer_prompt = self.template_parser.get(
+                "rag", "footer_prompt", {"query": query, "context": context_string}
+            )
+        else:
+            footer_prompt = query
 
         chat_history = [
             prompt_client.construct_prompt(prompt=system_prompt, role="system")
