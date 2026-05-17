@@ -689,7 +689,8 @@ class ToolManager:
             return "StackOverflow search is not configured (Missing STACKOVERFLOW_API_KEY)."
 
         try:
-            search_query = query.replace(" ", "+")
+            import urllib.parse
+            search_query = urllib.parse.quote(query)
             url = (
                 f"https://api.stackexchange.com/2.3/search/advanced?"
                 f"order=desc&sort=relevance&q={search_query}"

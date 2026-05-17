@@ -90,8 +90,8 @@ class OpenAIProvider(LLMInterface):
             return answer if answer else ""
             
         except Exception as e:
-            print(f"DEBUG: OpenAIProvider Error: {str(e)}")
-            return f"Error during generation: {str(e)}"
+            self.logger.error("OpenAIProvider Error: %s", str(e))
+            return ""
         
     async def generate_text_stream(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
@@ -128,8 +128,8 @@ class OpenAIProvider(LLMInterface):
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            print(f"DEBUG: OpenAIProvider Streaming Error: {str(e)}")
-            yield f"Error: {str(e)}"
+            self.logger.error("OpenAIProvider Streaming Error: %s", str(e))
+            yield ""
 
     async def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         
