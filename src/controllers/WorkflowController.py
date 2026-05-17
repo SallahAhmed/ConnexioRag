@@ -70,11 +70,22 @@ class WorkflowController(BaseController):
     async def detect_node(self, query: str) -> WorkflowNodeEnum:
         """
         Detects the workflow node from the user query.
-        Order: OOS keywords → project keywords → GENERAL keywords → fast path → LLM.
+        Order: Jailbreak keywords → OOS keywords → project keywords → GENERAL keywords → fast path → LLM.
         """
         query_lower = query.lower().strip()
 
-        # 1. OOS KEYWORDS FIRST: Catch off-topic queries immediately before anything else
+        # 0. JAILBREAK KEYWORDS FIRST: Strict bypass-prevention, always OUT_OF_SCOPE (no exceptions)
+        JAILBREAK_KEYWORDS = [
+            "your system prompt", "show me your prompt", "ignore your instructions",
+            "ignore previous instructions", "disregard your instructions",
+            "pretend you are not", "pretend you have no", "bypass your rules",
+            "override your", "jailbreak", "developer mode", "dan mode",
+            "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
+        ]
+        if any(kw in query_lower for kw in JAILBREAK_KEYWORDS):
+            return WorkflowNodeEnum.OUT_OF_SCOPE
+
+        # 1. OOS KEYWORDS: Catch off-topic queries immediately before anything else
         # BUT: Tech/AI/programming history is IN-SCOPE for a dev collaboration assistant
         OOS_KEYWORDS = [
             "capital of", "who is the president", "who is the current",
@@ -97,14 +108,8 @@ class WorkflowController(BaseController):
             "eat ", "eating", "drink", "drinking", "hungry", "thirsty",
             "my name is", "my age", "how old",
             "dream ", "dreams", "sleep", "asleep", "woke up",
-            # Jailbreak
-            "your system prompt", "show me your prompt", "ignore your instructions",
-            "ignore previous instructions", "disregard your instructions",
-            "pretend you are not", "pretend you have no", "bypass your rules",
-            "override your", "jailbreak", "developer mode", "dan mode",
             # Arabic OOS
             "عاصمة", "الطقس في", "من هو رئيس", "قل لي نكتة", "من فاز",
-            "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
             # Arabic philosophy / personal / feelings
             "الحب", "حب ", "مشاعر", "عواطف", "المشاعر", "الحنان",
             "الخوف", "قلق", "اكتئاب", "حزن", "فرح", "سعادة",
