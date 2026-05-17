@@ -181,10 +181,21 @@ class NLPController(BaseController):
         # --- Step 1: Intent & Language ---
         explicit_language = language is not None
         step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
-        language = language or await self.workflow_controller.detect_language(query)
-        query_language = language  # preserve — URL content must never override this
-        self.template_parser.set_language(language)
-        node = await self.workflow_controller.detect_node(query)
+
+        # extra_context (file upload) → skip detection, always GENERAL, explicit language or en
+        is_file_query = bool(extra_context)
+        if is_file_query:
+            language = language or "en"
+            query_language = language
+            node = WorkflowNodeEnum.GENERAL
+            self.template_parser.set_language(language)
+            self.logger.info("File query — skipping intent/language detection, using GENERAL/%s", language)
+        else:
+            language = language or await self.workflow_controller.detect_language(query)
+            query_language = language
+            self.template_parser.set_language(language)
+            node = await self.workflow_controller.detect_node(query)
+
         tracer.end_trace(
             trace_id, step_id,
             {"node": node.value, "language": language},
@@ -235,6 +246,10 @@ class NLPController(BaseController):
         # to give the LLM rich conversational memory without context overflow.
         if not project_id:
             history = history[-20:] if len(history) > 20 else history
+
+        # File queries (upload-and-query): cap history to last 4 messages (2 turns)
+        if is_file_query:
+            history = history[-4:] if len(history) > 4 else history
 
         # Initialize lists here so they are available for memory timeline injection
         retrieved_context = []
@@ -326,6 +341,7 @@ class NLPController(BaseController):
         if extra_context:
             retrieved_context.append(extra_context)
             sources.append("Document")
+            is_memory_query = True  # skip KB retrieval + CRAG — file content IS the source
 
         # --- Token budgeting ---
         try:
@@ -438,7 +454,7 @@ class NLPController(BaseController):
                         sources.append(source_name)
 
         # --- Live backend context injection (project summary from main backend) ---
-        if project_id and self.backend_client and node not in (WorkflowNodeEnum.OUT_OF_SCOPE,):
+        if project_id and self.backend_client and node not in (WorkflowNodeEnum.OUT_OF_SCOPE,) and not is_file_query:
             try:
                 live_summary = await self.tool_manager.get_project_context_summary(
                     project_id=project_id
@@ -454,7 +470,7 @@ class NLPController(BaseController):
             WorkflowNodeEnum.MILESTONE_WARNING,
             WorkflowNodeEnum.GENERAL,
             WorkflowNodeEnum.PHASE_TRANSITION,
-        ):
+        ) and not is_file_query:
             try:
                 tasks_context = await self.tool_manager.get_masarx_tasks(project_id)
                 if tasks_context:
@@ -477,7 +493,16 @@ class NLPController(BaseController):
             or (model_tier == "auto" and node in PROJECT_NODES)
         )
 
-        if use_generation:
+        if extra_context:
+            system_prompt = (
+                "You are Connexio AI, a document analysis assistant. "
+                "Answer the user's question based ONLY on the document content provided below. "
+                "Be concise and accurate. Do not use markdown headers or emojis. "
+                "If the document doesn't contain enough information, say so."
+                f" Reply in {language.upper()}."
+            )
+            prompt_client = self.generation_client
+        elif use_generation:
             if node == WorkflowNodeEnum.ONBOARDING and not project_id and language == "en":
                 system_prompt = (
                     "You are Connexio AI — a project collaboration advisor for new users. "
