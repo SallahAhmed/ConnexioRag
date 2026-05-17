@@ -1,7 +1,8 @@
-from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request
+from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request, Form
 from fastapi.responses import JSONResponse
 import os
 import asyncio
+from typing import Optional
 from helpers.config import get_settings, Settings
 from controllers import DataController, ProjectController, ProcessController
 import aiofiles
@@ -22,14 +23,16 @@ from sqlalchemy.future import select
 logger = logging.getLogger('uvicorn.error')
 
 
-async def _background_index(
+async def _process_and_index(
     db_client, generation_client, embedding_client, vectordb_client, template_parser,
     project_id: int, asset_id: int, file_id: str,
-    chunk_size: int, overlap_size: int, do_reset: int
-):
-    """Fire-and-forget: chunk a file, persist to PostgreSQL, then index into vector DB."""
+    chunk_size: int, overlap_size: int, do_reset: int = 0
+) -> int:
+    """Process a file into chunks, persist to PostgreSQL, then index into vector DB.
+    Returns the number of chunks indexed. This is the synchronous (awaited) version.
+    """
     try:
-        logger.info(f"[background_index] Starting: project={project_id}, asset={asset_id}")
+        logger.info(f"[_process_and_index] Starting: project={project_id}, asset={asset_id}")
 
         project_model = await ProjectModel.create_instance(db_client=db_client)
         project = await project_model.get_project_or_create_one(project_id=project_id)
@@ -51,8 +54,8 @@ async def _background_index(
         try:
             file_content = process_controller.get_file_content(file_id=file_id)
         except Exception as e:
-            logger.error(f"[background_index] Cannot read file {file_id}: {e}")
-            return
+            logger.error(f"[_process_and_index] Cannot read file {file_id}: {e}")
+            return 0
 
         file_chunks = process_controller.process_file_content(
             file_content=file_content,
@@ -62,8 +65,8 @@ async def _background_index(
         )
 
         if not file_chunks:
-            logger.warning(f"[background_index] No chunks from file {file_id}")
-            return
+            logger.warning(f"[_process_and_index] No chunks from file {file_id}")
+            return 0
 
         chunk_records = [
             DataChunk(
@@ -85,8 +88,8 @@ async def _background_index(
             saved_chunks = result.scalars().all()
 
         if not saved_chunks:
-            logger.error(f"[background_index] No saved chunks found for asset={asset_id}")
-            return
+            logger.error(f"[_process_and_index] No saved chunks found for asset={asset_id}")
+            return 0
 
         collection_name = nlp_controller.create_collection_name(project_id=project.project_id)
         await vectordb_client.create_collection(
@@ -101,9 +104,23 @@ async def _background_index(
             chunks_ids=chunks_ids,
         )
 
-        logger.info(f"[background_index] Done: project={project_id}, indexed={len(saved_chunks)} chunks")
+        logger.info(f"[_process_and_index] Done: project={project_id}, indexed={len(saved_chunks)} chunks")
+        return len(saved_chunks)
     except Exception as e:
-        logger.error(f"[background_index] Failed: project={project_id}, error={e}")
+        logger.error(f"[_process_and_index] Failed: project={project_id}, error={e}")
+        return 0
+
+
+async def _background_index(
+    db_client, generation_client, embedding_client, vectordb_client, template_parser,
+    project_id: int, asset_id: int, file_id: str,
+    chunk_size: int, overlap_size: int, do_reset: int
+):
+    """Fire-and-forget wrapper around _process_and_index."""
+    await _process_and_index(
+        db_client, generation_client, embedding_client, vectordb_client, template_parser,
+        project_id, asset_id, file_id, chunk_size, overlap_size, do_reset,
+    )
 
 
 data_router = APIRouter(
@@ -302,6 +319,140 @@ async def upload_and_process(
             "status": "accepted",
             "file_id": str(asset_record.asset_id),
         },
+    )
+
+
+@data_router.post("/upload-and-query/{project_id}")
+async def upload_and_query(
+    request: Request,
+    project_id: int,
+    file: UploadFile,
+    query: str = Form(..., min_length=1, max_length=5000),
+    user_id: int = Form(...),
+    persona: str = Form("student"),
+    session_id: Optional[int] = Form(None),
+    limit: int = Form(5),
+    model_tier: str = Form("auto"),
+    language: Optional[str] = Form(None),
+    chunk_size: int = Form(100),
+    overlap_size: int = Form(20),
+    app_settings: Settings = Depends(get_settings),
+):
+    """Upload a file, index it into the knowledge base, and immediately answer a
+    question about its content — all in a single request.
+
+    This endpoint replaces the fire-and-forget pattern with a synchronous
+    flow: ingest → embed → search → generate, so the caller gets a meaningful
+    answer instead of just a "file received" acknowledgment.
+    """
+    project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
+    project = await project_model.get_project_or_create_one(project_id=project_id)
+
+    # 1. Validate file
+    data_controller = DataController()
+    is_valid, result_signal = data_controller.validate_uploaded_file(file=file)
+    if not is_valid:
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"signal": result_signal},
+        )
+
+    # 2. Save file to disk
+    file_path, file_id = data_controller.generate_unique_filepath(
+        orig_file_name=file.filename,
+        project_id=project_id,
+    )
+    try:
+        async with aiofiles.open(file_path, "wb") as f:
+            while chunk := await file.read(app_settings.FILE_DEFAULT_CHUNK_SIZE):
+                await f.write(chunk)
+    except Exception as e:
+        logger.error(f"[upload_and_query] Write error: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            content={"signal": ResponseSignal.FILE_UPLOAD_FAILED.value},
+        )
+
+    # 3. Create asset record
+    asset_model = await AssetModel.create_instance(db_client=request.app.db_client)
+    asset_resource = Asset(
+        asset_project_id=project.project_id,
+        asset_type=AssetTypeEnum.FILE.value,
+        asset_name=file_id,
+        asset_size=os.path.getsize(file_path),
+    )
+    asset_record = await asset_model.create_asset(asset=asset_resource)
+
+    # 4. Process file into chunks and index into vector DB  (synchronous)
+    chunks_indexed = await _process_and_index(
+        db_client=request.app.db_client,
+        generation_client=request.app.generation_client,
+        embedding_client=request.app.embedding_client,
+        vectordb_client=request.app.vectordb_client,
+        template_parser=request.app.template_parser,
+        project_id=project_id,
+        asset_id=asset_record.asset_id,
+        file_id=file_id,
+        chunk_size=chunk_size,
+        overlap_size=overlap_size,
+    )
+
+    # 5. If no chunks were indexed, skip the chat and return early
+    if chunks_indexed == 0:
+        return JSONResponse(
+            status_code=status.HTTP_202_ACCEPTED,
+            content={
+                "status": "no_content",
+                "file_id": str(asset_record.asset_id),
+                "chunks_indexed": 0,
+                "message": "File was saved but could not be indexed (no extractable text).",
+            },
+        )
+
+    # 6. Answer the user's question using the freshly indexed content
+    chat_controller = NLPController(
+        vectordb_client=request.app.vectordb_client,
+        generation_client=request.app.generation_client,
+        utility_client=request.app.utility_client,
+        embedding_client=request.app.embedding_client,
+        template_parser=request.app.template_parser,
+        settings=getattr(request.app, "settings", None),
+        db_client=getattr(request.app, "db_client", None),
+        reranker=getattr(request.app, "reranker", None),
+        backend_client=getattr(request.app, "backend_client", None),
+        masarx_client=getattr(request.app, "masarx_client", None),
+    )
+    try:
+        result = await chat_controller.answer_agent_chat(
+            user_id=user_id,
+            project_id=project_id,
+            query=query,
+            persona=persona,
+            session_id=session_id,
+            limit=limit,
+            model_tier=model_tier or "auto",
+            language=language,
+        )
+    except Exception as e:
+        logger.error(f"[upload_and_query] Chat failed: {e}")
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={
+                "status": "chat_failed",
+                "file_id": str(asset_record.asset_id),
+                "chunks_indexed": chunks_indexed,
+                "error": str(e),
+            },
+        )
+
+    # 7. Return the answer along with indexing metadata
+    return JSONResponse(
+        content={
+            "status": "completed",
+            "file_id": str(asset_record.asset_id),
+            "chunks_indexed": chunks_indexed,
+            **result,
+        }
     )
 
 

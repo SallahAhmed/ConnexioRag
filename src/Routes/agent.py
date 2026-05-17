@@ -65,6 +65,7 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
             session_id=chat_request.session_id,
             limit=chat_request.limit,
             model_tier=chat_request.model_tier or "auto",
+            language=chat_request.language,
         )
         # Append source footer when external tools were used
         answer = result.get("answer", "")
@@ -94,7 +95,8 @@ async def agent_chat_stream(request: Request, project_id: int,
                             persona: Optional[str] = "student",
                             session_id: Optional[int] = None,
                             limit: Optional[int] = 5,
-                            model_tier: Optional[str] = "auto"):
+                            model_tier: Optional[str] = "auto",
+                            language: Optional[str] = None):
     try:
         nlp_controller = get_nlp_controller(request)
         effective_project_id = resolve_pid(project_id, request)
@@ -107,6 +109,7 @@ async def agent_chat_stream(request: Request, project_id: int,
                 session_id=session_id,
                 limit=limit,
                 model_tier=model_tier,
+                language=language,
             ),
             media_type="text/event-stream",
             headers={

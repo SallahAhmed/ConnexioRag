@@ -167,6 +167,7 @@ class NLPController(BaseController):
         session_id: Optional[int] = None,
         limit: int = 5,
         model_tier: str = "auto",
+        language: Optional[str] = None,
     ):
         """
         Prepares chat history, retrieves context from all sources, and
@@ -178,7 +179,7 @@ class NLPController(BaseController):
 
         # --- Step 1: Intent & Language ---
         step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
-        language = await self.workflow_controller.detect_language(query)
+        language = language or await self.workflow_controller.detect_language(query)
         query_language = language  # preserve — URL content must never override this
         self.template_parser.set_language(language)
         node = await self.workflow_controller.detect_node(query)
@@ -470,9 +471,32 @@ class NLPController(BaseController):
         )
 
         if use_generation:
-            system_prompt = self.template_parser.get(
-                "rag", "system_prompt", {"persona": persona, "node": node.value}
-            )
+            if node == WorkflowNodeEnum.ONBOARDING and not project_id and language == "en":
+                system_prompt = (
+                    "You are Connexio AI — a project collaboration advisor for new users. "
+                    f"Audience: {persona} learner | Context: onboarding\n\n"
+                    "Welcome the user warmly. Give them 2-3 specific first actions they can take right now, "
+                    "such as exploring the platform's features, starting a project, finding teammates, "
+                    "or asking about a specific domain they're interested in.\n"
+                    "Be conversational, encouraging, and end with one natural follow-up question.\n"
+                    "IMPORTANT: Do NOT ask the user to provide more context or specify a project. "
+                    "Assume they are truly new and guide them like a helpful mentor."
+                )
+            elif node == WorkflowNodeEnum.ONBOARDING and not project_id and language == "ar":
+                system_prompt = (
+                    "أنت Connexio AI — مستشار تعاون في المشاريع للمستخدمين الجدد. "
+                    f"الجمهور: {persona} | السياق: ترحيب\n\n"
+                    "رحب بالمستخدم بحرارة. أعطه 2-3 خطوات أولى محددة يمكنه اتخاذها الآن، "
+                    "مثل استكشاف مميزات المنصة، بدء مشروع، البحث عن أعضاء فريق، "
+                    "أو السؤال عن مجال معين يهتم به.\n"
+                    "كن محادثاً ومشجعاً، واختتم بسؤال متابعة طبيعي.\n"
+                    "مهم: لا تطلب من المستخدم توفير سياق أو تحديد مشروع. "
+                    "افترض أنه جديد بالفعل ووجهه كمرشد مفيد."
+                )
+            else:
+                system_prompt = self.template_parser.get(
+                    "rag", "system_prompt", {"persona": persona, "node": node.value}
+                )
             prompt_client = self.generation_client
         else:
             persona_guide = {
@@ -693,8 +717,9 @@ class NLPController(BaseController):
         session_id: Optional[int] = None,
         limit: int = 5,
         model_tier: str = "auto",
+        language: Optional[str] = None,
     ):
-        self.logger.info(f"answer_agent_chat called with model_tier={model_tier}")
+        self.logger.info(f"answer_agent_chat called with model_tier={model_tier}, language={language}")
         # Fast path — history clear
         clear_commands = [
             "clear history", "forget everything", "new topic",
@@ -723,7 +748,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit, model_tier
+                user_id, project_id, query, persona, session_id, limit, model_tier, language=language
             )
         )
         # Derive use_generation from the selected client so answer_agent_chat can
@@ -802,6 +827,17 @@ class NLPController(BaseController):
                 else:
                     self.logger.warning("Escalation failed — keeping utility answer.")
 
+        # Post-generation language correction: if the model responded in a different
+        # language than detected, correct the response language metadata.
+        if answer:
+            answer_has_arabic = bool(re.search(r'[\u0600-\u06FF]', answer))
+            if answer_has_arabic and language != "ar":
+                self.logger.info(f"Language correction: '{language}' -> 'ar' (answer contains Arabic)")
+                language = "ar"
+            elif not answer_has_arabic and language == "ar" and not re.search(r'[\u0600-\u06FF]', query):
+                self.logger.info(f"Language correction: 'ar' -> 'en' (query+answer are English)")
+                language = "en"
+
         # Fallback if still empty after primary + potential escalation
         if not answer or not answer.strip():
             fallback_msg = (
@@ -843,6 +879,7 @@ class NLPController(BaseController):
         session_id: Optional[int] = None,
         limit: int = 5,
         model_tier: str = "auto",
+        language: Optional[str] = None,
     ):
         # Fast path — history clear
         clear_commands = [
@@ -872,7 +909,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit, model_tier
+                user_id, project_id, query, persona, session_id, limit, model_tier, language=language
             )
         )
 
