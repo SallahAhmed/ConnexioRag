@@ -1,38 +1,29 @@
-from ..LLMInterface import LLMInterface
-from ..LLMEnums import OpenAIEnums
-# pyrefly: ignore [missing-import]
-from openai import AsyncOpenAI
+from .BaseProvider import BaseProvider
+from stores.llm.LLMEnums import OpenAIEnums, DocumentTypeEnum
+from typing import Union, List
 import logging
-from typing import List, Union
 
-class OpenAIProvider(LLMInterface):
+class OpenAIProvider(BaseProvider):
 
-    def __init__(self, api_key: str, api_url: str=None,
-                       default_input_max_characters: int=1000,
-                       default_generation_max_output_tokens: int=1000,
-                       default_generation_temperature: float=0.1):
-        
-        self.api_key = api_key
-        self.api_url = api_url
+    def __init__(self, api_key, api_url, default_input_max_characters=1000,
+                 default_generation_max_output_tokens=None,
+                 default_generation_temperature=0.1,
+                 generation_model_id=None,
+                 embedding_model_id=None,
+                 embedding_size=None):
+        super().__init__(api_key, api_url, default_input_max_characters,
+                         default_generation_max_output_tokens,
+                         default_generation_temperature)
 
-        self.default_input_max_characters = default_input_max_characters
-        self.default_generation_max_output_tokens = default_generation_max_output_tokens
-        self.default_generation_temperature = default_generation_temperature
+        self.logger = logging.getLogger(__name__)
 
-        self.generation_model_id = None
+        self.generation_model_id = generation_model_id
+        self.embedding_model_id = embedding_model_id
+        self.embedding_size = embedding_size
 
-        self.embedding_model_id = None
-        self.embedding_size = None
-
-        self.client = AsyncOpenAI(
-            api_key = self.api_key,
-            base_url = self.api_url if self.api_url and len(self.api_url) else None,
-            timeout = 180.0 # 3 minute timeout for local CPU generation
-        )
+        self.client = self.create_client()
 
         self.enums = OpenAIEnums
-        self.logger = logging.getLogger(__name__)
-        self.last_usage = None
 
     def set_generation_model(self, model_id: str):
         self.generation_model_id = model_id
@@ -41,20 +32,43 @@ class OpenAIProvider(LLMInterface):
         self.embedding_model_id = model_id
         self.embedding_size = embedding_size
 
-    def process_text(self, text: str):
+    def process_text(self, text):
         return text[:self.default_input_max_characters].strip()
+
+    def create_client(self):
+
+        from openai import AsyncOpenAI
+
+        if self.api_key and self.api_url:
+            return AsyncOpenAI(
+                api_key=self.api_key,
+                base_url=self.api_url,
+            )
+
+        if self.api_key and not self.api_url:
+            return AsyncOpenAI(
+                api_key=self.api_key,
+            )
+
+        if not self.api_key and self.api_url:
+            return AsyncOpenAI(
+                api_key="sk-no-key-required",
+                base_url=self.api_url,
+            )
+
+        return None
 
     async def generate_text(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
-        
+
         if not self.client:
             self.logger.error("OpenAI client was not set")
-            return None
+            return ""
 
         if not self.generation_model_id:
             self.logger.error("Generation model for OpenAI was not set")
-            return None
-        
+            return ""
+
         max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
         temperature = temperature if temperature else self.default_generation_temperature
 
@@ -81,31 +95,31 @@ class OpenAIProvider(LLMInterface):
                 print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
             else:
                 self.last_usage = None
-            
+
             if not response or not response.choices:
                 print("DEBUG: Ollama returned an empty response object!")
                 return ""
 
             answer = response.choices[0].message.content
             return answer if answer else ""
-            
+
         except Exception as e:
-            print(f"DEBUG: OpenAIProvider Error: {str(e)}")
-            return f"Error during generation: {str(e)}"
-        
+            self.logger.error("OpenAIProvider Error: %s", str(e))
+            return ""
+
     async def generate_text_stream(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
-        
+
         if not self.client:
             self.logger.error("OpenAI client was not set")
-            yield None
+            yield ""
             return
 
         if not self.generation_model_id:
             self.logger.error("Generation model for OpenAI was not set")
-            yield None
+            yield ""
             return
-        
+
         max_output_tokens = max_output_tokens if max_output_tokens else self.default_generation_max_output_tokens
         temperature = temperature if temperature else self.default_generation_temperature
 
@@ -128,15 +142,15 @@ class OpenAIProvider(LLMInterface):
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            print(f"DEBUG: OpenAIProvider Streaming Error: {str(e)}")
-            yield f"Error: {str(e)}"
+            self.logger.error("OpenAIProvider Streaming Error: %s", str(e))
+            yield ""
 
     async def embed_text(self, text: Union[str, List[str]], document_type: str = None):
-        
+
         if not self.client:
             self.logger.error("OpenAI client was not set")
             return None
-        
+
         if isinstance(text, str):
             text = [text]
 
@@ -152,7 +166,7 @@ class OpenAIProvider(LLMInterface):
         if not self.embedding_model_id:
             self.logger.error("Embedding model for OpenAI was not set")
             return None
-        
+
         response = await self.client.embeddings.create(
             model = self.embedding_model_id,
             input = text,

@@ -444,16 +444,22 @@ class NLPController(BaseController):
                         sources.append(source_name)
 
                 else:
-                    # Mixed or all-ambiguous — filtered KB + 1 CRAG tool to supplement
-                    tracer.end_trace(trace_id, step_id, f"Mixed grades — KB + 1 CRAG tool")
-                    retrieved_context.extend(kb_context)
-                    sources.append("Vector DB")
-                    crag_results = await self._run_crag_tools(
-                        query, language, utility_history, trace_id, max_tools=1
-                    )
-                    for source_name, result_text in crag_results:
-                        retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
-                        sources.append(source_name)
+                    # Mixed — filtered KB. Skip CRAG when KB already has relevant
+                    # docs for a project query (external tools rarely add value).
+                    if n_rel > 0 and project_id and node == WorkflowNodeEnum.GENERAL:
+                        tracer.end_trace(trace_id, step_id, "Mixed grades — KB sufficient (CRAG skipped)")
+                        retrieved_context.extend(kb_context)
+                        sources.append("Vector DB")
+                    else:
+                        tracer.end_trace(trace_id, step_id, f"Mixed grades — KB + 1 CRAG tool")
+                        retrieved_context.extend(kb_context)
+                        sources.append("Vector DB")
+                        crag_results = await self._run_crag_tools(
+                            query, language, utility_history, trace_id, max_tools=1
+                        )
+                        for source_name, result_text in crag_results:
+                            retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
+                            sources.append(source_name)
 
         # --- Live backend context injection (project summary from main backend) ---
         if project_id and self.backend_client and node not in (WorkflowNodeEnum.OUT_OF_SCOPE,) and not is_file_query:
