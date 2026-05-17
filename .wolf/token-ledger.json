@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 320490,
-    "total_reads": 525,
-    "total_writes": 332,
+    "total_tokens_estimated": 376724,
+    "total_reads": 536,
+    "total_writes": 343,
     "total_sessions": 12,
-    "anatomy_hits": 61,
-    "anatomy_misses": 441,
-    "repeated_reads_blocked": 83,
-    "estimated_savings_vs_bare_cli": 223942
+    "anatomy_hits": 68,
+    "anatomy_misses": 444,
+    "repeated_reads_blocked": 86,
+    "estimated_savings_vs_bare_cli": 263538
   },
   "sessions": [
     {
@@ -5386,6 +5386,160 @@
         "writes_count": 0,
         "repeated_reads_blocked": 0,
         "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-17-2144",
+      "started": "2026-05-17T18:44:04.604Z",
+      "ended": "2026-05-17T19:03:01.088Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 9937,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 2573,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 7350,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/rag-tool-prioritization-overhaul.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 19860,
+        "output_tokens_estimated": 0,
+        "reads_count": 4,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 3
+      }
+    },
+    {
+      "id": "session-2026-05-17-2144",
+      "started": "2026-05-17T18:44:04.604Z",
+      "ended": "2026-05-17T19:21:28.769Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 12732,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 2573,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 7350,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/docs/rag-tool-prioritization-overhaul.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/main.py",
+          "tokens_estimated": 1613,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/relevance_grading.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "C:/Users/salla/Connexios/docs/rag-tool-prioritization-overhaul.md",
+          "tokens_estimated": 5734,
+          "action": "create"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 40,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 1042,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 801,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py",
+          "tokens_estimated": 314,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/relevance_grading.py",
+          "tokens_estimated": 264,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 114,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 136,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 1307,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 32,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 2322,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 24268,
+        "output_tokens_estimated": 12106,
+        "reads_count": 7,
+        "writes_count": 11,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 4
       }
     }
   ],

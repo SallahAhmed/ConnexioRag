@@ -288,6 +288,64 @@ class ToolManager:
             self.logger.error(f"Knowledge Base Tool Error: {str(e)}")
             return f"Error searching knowledge base: {str(e)}"
 
+    async def search_knowledge_base_raw(self, project_id, query: str, limit: int = 5):
+        """Same retrieval as search_knowledge_base but returns list of raw doc objects.
+        Enables batch relevance grading. Returns [] on failure or empty KB."""
+        try:
+            vectors = await self.embedding_client.embed_text(text=query, document_type="query")
+            if not vectors or len(vectors) == 0:
+                return []
+
+            query_vector = vectors[0]
+            k = 60
+            scores = {}
+            doc_map = {}
+
+            def add_results(results, prefix=""):
+                if not results:
+                    return
+                for rank, doc in enumerate(results):
+                    doc_id = prefix + doc.text
+                    doc_map[doc_id] = doc
+                    scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
+
+            project_collection = self._get_collection_name(project_id)
+            try:
+                project_results = await self.vectordb_client.hybrid_search(
+                    collection_name=project_collection, query=query, vector=query_vector, limit=limit * 2,
+                )
+            except Exception:
+                project_results = await self.vectordb_client.search_by_vector(
+                    collection_name=project_collection, vector=query_vector, limit=limit * 2,
+                )
+            add_results(project_results, "proj_")
+
+            try:
+                global_results = await self.vectordb_client.hybrid_search(
+                    collection_name=self.get_global_collection_name(), query=query, vector=query_vector, limit=limit * 2,
+                )
+            except Exception:
+                global_results = await self.vectordb_client.search_by_vector(
+                    collection_name=self.get_global_collection_name(), vector=query_vector, limit=limit * 2,
+                )
+            add_results(global_results, "global_")
+
+            if not scores:
+                return []
+
+            sorted_doc_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)[:limit]
+
+            if self.reranker and sorted_doc_ids:
+                docs_to_rerank = [doc_map[did] for did in sorted_doc_ids]
+                reranked = await self.reranker.rerank(query=query, documents=docs_to_rerank, top_k=limit)
+                return reranked
+            else:
+                return [doc_map[did] for did in sorted_doc_ids]
+
+        except Exception as e:
+            self.logger.error(f"Knowledge Base Raw Tool Error: {str(e)}")
+            return []
+
     # ------------------------------------------------------------------
     # Main Backend REST Tools (replacing the broken SQL-based methods)
     # ------------------------------------------------------------------

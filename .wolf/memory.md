@@ -3,6 +3,16 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+## Session: 2026-05-17
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 10:00 | Reviewed and updated RAG tool prioritization plan | docs/rag-tool-prioritization-overhaul.md | Added Issue 7 (language bug), Issue 8 (unconfigured tools), batch grading decision, force_tool fix | ~800 |
+| 10:05 | Added grade_relevance_batch() + fixed grade_relevance() client mismatch | WorkflowController.py | One-call batch grading returning strings; utility_client used for both history and generation | ~400 |
+| 10:10 | Added search_knowledge_base_raw() | ToolManager.py | Returns raw doc objects for batch grading | ~300 |
+| 10:12 | Softened relevance grader prompts | en/relevance_grading.py, ar/relevance_grading.py | Removed "strict and highly critical"; added generous grading guidance | ~200 |
+| 10:15 | Rewrote NLPController: language bug fix, _run_crag_tools(), new KB decision block | NLPController.py | Fixed URL language override; unified CRAG dispatch; batch grading; dead code removed | ~2000 |
+
 ## Session: 2026-05-12 20:02
 
 | Time | Action | File(s) | Outcome | ~Tokens |
@@ -266,3 +276,15 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+| 22:12 | Created docs/rag-tool-prioritization-overhaul.md | — | ~5351 |
+| 22:13 | Edited src/controllers/WorkflowController.py | added 1 import(s) | ~40 |
+| 22:13 | Edited src/controllers/WorkflowController.py | modified grade_relevance() | ~1042 |
+| 22:14 | Edited src/controllers/helpers/ToolManager.py | modified search_knowledge_base_raw() | ~801 |
+| 22:14 | Edited src/stores/llm/templates/locales/en/relevance_grading.py | keyword() → match() | ~314 |
+| 22:14 | Edited src/stores/llm/templates/locales/ar/relevance_grading.py | expanded (+10 lines) | ~264 |
+| 22:15 | Edited src/controllers/NLPController.py | 5→6 lines | ~114 |
+| 22:17 | Edited src/controllers/NLPController.py | modified strip() | ~136 |
+| 22:18 | Edited src/controllers/NLPController.py | reduced (-259 lines) | ~1307 |
+| 22:18 | Edited src/controllers/NLPController.py | 2→2 lines | ~32 |
+| 22:19 | Edited src/controllers/NLPController.py | modified _run_crag_tools() | ~2322 |
+| 22:21 | Session end: 11 writes across 5 files (rag-tool-prioritization-overhaul.md, WorkflowController.py, ToolManager.py, relevance_grading.py, NLPController.py) | 7 reads | ~36374 tok |

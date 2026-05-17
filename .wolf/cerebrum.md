@@ -47,6 +47,18 @@
 
 ## Do-Not-Repeat
 
+- **[2026-05-17] Do not override `language` from URL content in `_prepare_chat_context()`.**
+  The old code re-detected language from downloaded URL content and overwrote the `language` variable (commit 37a1930). This caused English-asking users who pasted Arabic URLs to receive Arabic responses. `query_language` is now saved at Step 1 and used at Step 4. URL content is context data — never change the response language based on a pasted document.
+
+- **[2026-05-17] `grade_relevance()` returns `bool`, not the string `"AMBIGUOUS"`.**
+  `return "AMBIGUOUS" in grade` evaluates to `True` (bool), not the string. The decision matrix in the new CRAG block uses `grade_relevance_batch()` which returns explicit strings. Never use `grade_relevance()` where a 3-way string result is needed.
+
+- **[2026-05-17] Do not add unconfigured tools to the CRAG decision prompt.**
+  If SERPAPI/GITHUB/STACKOVERFLOW keys are missing, `_run_crag_tools()` excludes those tools from the decision prompt. Adding them causes the LLM to select a tool whose handler returns an error string that enters the RAG context as real knowledge.
+
+- **[2026-05-17] Per-doc grading with N individual LLM calls is too slow.**
+  Use `grade_relevance_batch()` which grades all docs in one LLM call. N sequential calls multiply latency (5 docs = 5x delay). Batch is same latency as single-blob grading with per-doc accuracy.
+
 <!-- Mistakes made and corrected. Each entry prevents the same mistake recurring. -->
 <!-- Format: [YYYY-MM-DD] Description of what went wrong and what to do instead. -->
 
@@ -67,6 +79,15 @@
 
 - **[2026-05-16] ToolManager.get_project_context_summary must unwrap `data` field from backend API responses.**
   The Node.js backend wraps all responses in `{ success: true, data: ... }`. Reading `project_data.get('PName')` directly returns `None` because `PName` is inside `project_data['data']`. Always use `project_raw.get("data") or project_raw` first.
+
+- **[2026-05-17] CRAG tool dispatch is unified in `NLPController._run_crag_tools()`.**
+  Previously duplicated 100+ lines in two branches. Now: `force_tool="GOOGLE"` for temporal, LLM picks from available-only tools otherwise. Returns `[(source_name, text)]` with error strings filtered out.
+
+- **[2026-05-17] KB decision matrix uses `grade_relevance_batch()` and a separate `kb_context` list.**
+  Matrix: all-RELEVANT → KB only; all-IRRELEVANT → 2 CRAG tools; mixed/ambiguous → KB + 1 CRAG tool; empty KB → 2 CRAG tools. `kb_context` is a separate list so KB can be discarded cleanly without string-prefix filtering.
+
+- **[2026-05-17] Relevance grader prompts softened in both en and ar templates.**
+  Changed from "strict and highly critical" to "generous — domain context is valuable even without a direct answer." AMBIGUOUS now covers partial relevance, not just near-misses.
 
 ## Decision Log
 

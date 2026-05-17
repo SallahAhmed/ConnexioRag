@@ -1,6 +1,7 @@
 from .BaseController import BaseController
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
 import difflib
+import json
 import re
 
 # Short queries matching these patterns bypass the fast-path and go to the LLM classifier,
@@ -285,10 +286,12 @@ class WorkflowController(BaseController):
             "document": context[:2000]
         })
 
+        # Use utility_client for both history construction and generation to avoid
+        # provider mismatch when generation and utility clients differ.
         chat_history = [
-            self.generation_client.construct_prompt(
+            self.utility_client.construct_prompt(
                 prompt=system_prompt,
-                role=self.generation_client.enums.SYSTEM.value
+                role=self.utility_client.enums.SYSTEM.value
             )
         ]
 
@@ -297,8 +300,6 @@ class WorkflowController(BaseController):
                 prompt=user_prompt, chat_history=chat_history
             )
             grade = response.strip().upper()
-            
-            # Robust boundary check
             if "IRRELEVANT" in grade or "NO" in grade:
                 return False
             if "YES" in grade or "RELEVANT" in grade:
@@ -306,4 +307,49 @@ class WorkflowController(BaseController):
             return "AMBIGUOUS" in grade
         except Exception as e:
             self.logger.error(f"Guidance/Grading Error: {str(e)}")
-            return True # Fallback to true to avoid blocking the user if grading fails
+            return True
+
+    async def grade_relevance_batch(self, query: str, docs: list) -> list:
+        """
+        Grade N documents for relevance in a single LLM call.
+        Returns a list of "RELEVANT", "AMBIGUOUS", or "IRRELEVANT" strings,
+        one per doc in input order. Falls back to all-RELEVANT on parse failure.
+        """
+        if not docs:
+            return []
+
+        docs_text = "\n\n".join([
+            f"[Doc {i+1}]: {d.text[:800]}"
+            for i, d in enumerate(docs)
+        ])
+
+        prompt = (
+            f'Query: "{query}"\n\n'
+            f"Documents to grade:\n{docs_text}\n\n"
+            f"Grade each document as RELEVANT, AMBIGUOUS, or IRRELEVANT.\n"
+            f"- RELEVANT: directly answers or provides useful domain context\n"
+            f"- AMBIGUOUS: same general topic but doesn't directly address the question\n"
+            f"- IRRELEVANT: completely unrelated or false-positive keyword match\n\n"
+            f"Be generous — domain context is valuable even without a direct answer.\n"
+            f"Return ONLY a JSON array with one grade per document in order.\n"
+            f'Example for 3 docs: ["RELEVANT", "AMBIGUOUS", "IRRELEVANT"]'
+        )
+
+        try:
+            response = await self.utility_client.generate_text(prompt=prompt)
+            raw = (response or "").strip().replace("```json", "").replace("```", "")
+            grades = json.loads(raw)
+            normalized = []
+            for g in grades:
+                g_up = str(g).strip().upper()
+                if "IRRELEVANT" in g_up:
+                    normalized.append("IRRELEVANT")
+                elif "AMBIGUOUS" in g_up:
+                    normalized.append("AMBIGUOUS")
+                else:
+                    normalized.append("RELEVANT")
+            while len(normalized) < len(docs):
+                normalized.append("RELEVANT")
+            return normalized[:len(docs)]
+        except Exception:
+            return ["RELEVANT"] * len(docs)

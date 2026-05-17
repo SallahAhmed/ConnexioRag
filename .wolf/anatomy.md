@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-16T10:00:10.766Z
-> Files: 52 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-17T19:19:27.275Z
+> Files: 55 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ./
 
@@ -270,6 +270,10 @@
 - `chatAIHelpers.js` — API routes: POST (1 endpoints) (~1655 tok)
 - `chats.controller.js` — modules/chats/chats.controller.js (~7815 tok)
 
+## docs/
+
+- `rag-tool-prioritization-overhaul.md` — RAG Tool Prioritization Overhaul — Implementation Plan (~5017 tok)
+
 ## f:/Connexio_Frontend2/src/components/
 
 - `ChatWidget.jsx` — ChatWidget — renders form (~1740 tok)
@@ -363,12 +367,12 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~9937 tok)
-- `WorkflowController.py` — pyrefly: ignore [missing-import] (~2573 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~12732 tok)
+- `WorkflowController.py` — Short queries matching these patterns bypass the fast-path and go to the LLM classifier, (~4809 tok)
 
 ## src/controllers/helpers/
 
-- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 5 more (~7350 tok)
+- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 4 more (~9449 tok)
 
 ## src/helpers/
 
@@ -390,10 +394,12 @@
 ## src/stores/llm/templates/locales/ar/
 
 - `rag.py` — ### RAG PROMPTS #### (~542 tok)
+- `relevance_grading.py` — ### Decompose Query Prompt #### (~482 tok)
 
 ## src/stores/llm/templates/locales/en/
 
 - `rag.py` — ### RAG PROMPTS #### (~623 tok)
+- `relevance_grading.py` — ### Decompose Query Prompt #### (~549 tok)
 
 ## src/utils/
 
