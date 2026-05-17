@@ -231,6 +231,10 @@ class NLPController(BaseController):
         if not project_id:
             history = history[-20:] if len(history) > 20 else history
 
+        # Initialize lists here so they are available for memory timeline injection
+        retrieved_context = []
+        sources = []
+
         # --- Memory Intent Detection ---
         # Detect when the user is asking about past conversations
         # and inject a chronological timeline to help the LLM summarize accurately.
@@ -287,8 +291,6 @@ class NLPController(BaseController):
         ]
 
         # --- Step 3: Knowledge Base Retrieval ---
-        retrieved_context = []
-        sources = []
         queries_to_search = [query]
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
