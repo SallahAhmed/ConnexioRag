@@ -800,7 +800,6 @@ class NLPController(BaseController):
         except Exception as e:
             self.logger.error(f"Failed to save trace: {e}")
 
-        # Log the sources in the server logs but do not pass them to the user/UI
         if sources:
             self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
 
@@ -808,7 +807,7 @@ class NLPController(BaseController):
             "answer": answer,
             "node": node.value,
             "language": language,
-            "sources": [],
+            "sources": sources,
             "session_id": session_id,
         }
 
@@ -898,13 +897,12 @@ class NLPController(BaseController):
             prompt=footer_prompt, chat_history=chat_history
         ):
             if not metadata_sent:
-                # Log the sources in the server logs but do not pass them to the user/UI
                 if sources:
                     self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
                 metadata = {
                     "node": node.value,
                     "language": language,
-                    "sources": [],
+                    "sources": sources,
                     "session_id": session_id,
                     "trace_id": trace_id,
                     "event": "meta",

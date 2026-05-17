@@ -1,5 +1,9 @@
 FROM ghcr.io/astral-sh/uv:0.11.7-python3.13-trixie
 
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+ENV PYTHONUTF8=1
+
 WORKDIR /app
 
 # Install additional system dependencies for lxml and other packages
