@@ -309,6 +309,10 @@ class NLPController(BaseController):
                         if len(extracted) > 8000:
                             extracted = extracted[:8000] + "\n\n[...content truncated for length...]"
                         
+                        # Re-detect language based on the actual extracted document content
+                        language = await self.workflow_controller.detect_language(extracted[:500])
+                        self.template_parser.set_language(language)
+
                         retrieved_context.append(f"\n[Content of Pasted Document URL ({extracted_url})]:\n{extracted}")
                         sources.append("Pasted Link")
                         # Override node to GENERAL so the model processes this as a general retrieval query
