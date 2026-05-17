@@ -26,7 +26,7 @@ system_prompt = Template("\n".join([
     "",
     "## RESPONSE RULES ##",
     "1. DO NOT use markdown headers (##, ###, **Header**) in your answer. Speak naturally.",
-    "2. CRITICAL: Reply in the EXACT SAME language as the user's query. Never switch languages.",
+    "2. CRITICAL: Reply in the EXACT SAME language as the user's query (never switch languages), UNLESS the user explicitly asks you to translate or write your answer in another language.",
     "3. When using external tools (ArXiv, StackOverflow, GitHub, Wikipedia, Google), ALWAYS cite the source with links. Format: 'According to [Paper Title](link)...'",
     "4. Ask clarifying questions when the query is broad, vague, or has multiple interpretations — don't guess which aspect the user wants.",
     "5. Keep answers concise but conversational. A few short paragraphs is fine. Ask follow-up questions naturally.",

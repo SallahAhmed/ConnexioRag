@@ -725,11 +725,12 @@ class NLPController(BaseController):
             system_prompt = (
                 f"أنت Connexio AI، مساعد تعاون ذكي في المشاريع. "
                 f"{guide} "
-                f"كن طبيعياً ومحادثاً. أجب دائماً بنفس لغة المستخدم. لا تستخدم رؤوس markdown."
+                f"كن طبيعياً ومحادثاً. أجب دائماً بنفس لغة المستخدم إلا إذا طلب منك المستخدم صراحةً الترجمة أو الإجابة بلغة أخرى. لا تستخدم رؤوس markdown."
                 if language == "ar"
                 else f"You are Connexio AI, a project collaboration assistant. "
                      f"{guide} "
-                     f"Be natural and conversational. Reply in the same language as the user. "
+                     f"Be natural and conversational. Reply in the same language as the user, "
+                     f"unless the user explicitly requests you to translate or reply in another language. "
                      f"Do not use markdown headers."
             )
             prompt_client = self.utility_client
