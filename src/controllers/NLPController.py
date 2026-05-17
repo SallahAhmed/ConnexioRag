@@ -909,7 +909,6 @@ class NLPController(BaseController):
             "answer": answer,
             "node": node.value,
             "language": language,
-            "sources": sources,
             "session_id": session_id,
         }
 
@@ -1005,7 +1004,6 @@ class NLPController(BaseController):
                 metadata = {
                     "node": node.value,
                     "language": language,
-                    "sources": sources,
                     "session_id": session_id,
                     "trace_id": trace_id,
                     "event": "meta",
