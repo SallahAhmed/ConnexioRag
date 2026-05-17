@@ -74,6 +74,24 @@ class WorkflowController(BaseController):
         """
         query_lower = query.lower().strip()
 
+        # Pre-process: if it starts with jailbreak instructions but has safe topics, strip the jailbreak part
+        clean_query = query_lower
+        for prefix in [
+            "ignore previous instructions and tell me",
+            "ignore previous instructions and",
+            "ignore previous instructions",
+            "disregard your instructions and tell me",
+            "disregard your instructions and",
+            "disregard your instructions",
+            "تجاهل تعليماتك و أخبرني",
+            "تجاهل تعليماتك و",
+            "تجاهل تعليماتك",
+        ]:
+            clean_query = clean_query.replace(prefix, "")
+        clean_query = clean_query.strip()
+        if clean_query:
+            query_lower = clean_query
+
         # 0. JAILBREAK KEYWORDS FIRST: Strict bypass-prevention, always OUT_OF_SCOPE (no exceptions)
         JAILBREAK_KEYWORDS = [
             "your system prompt", "show me your prompt", "ignore your instructions",
@@ -127,6 +145,7 @@ class WorkflowController(BaseController):
             "invent", "invented", "creator", "created", "founder", "developed",
             "security", "vulnerability", "cve", "exploit", "patch", "cyber",
             "الأمن السيبراني", "الثغرات", "الاختراق", "الحماية",
+            "بايثون", "جافا", "رست", "سي بلس", "كود", "أكواد", "مشروع"
         ]
         if any(kw in query_lower for kw in OOS_KEYWORDS):
             # Exception: if query contains tech/AI keywords, allow it through
