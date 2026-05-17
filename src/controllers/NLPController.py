@@ -4,6 +4,7 @@ from stores.llm.LLMEnums import DocumentTypeEnum
 from typing import List, Optional
 import json
 import sys
+import re
 from .WorkflowController import WorkflowController
 from .helpers.ToolManager import ToolManager
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
@@ -273,7 +274,6 @@ class NLPController(BaseController):
         # --- Pasted URL Automatic Processing & Extraction ---
         # Detect if the query contains a URL anywhere inside it, download and extract its text
         # content dynamically, and feed it into prompt context.
-        import re
         url_match = re.search(r'(https?://[^\s]+)', query)
         if url_match:
             extracted_url = url_match.group(1).strip()
@@ -518,6 +518,13 @@ class NLPController(BaseController):
                 )
             )
 
+        # Pipeline summary log
+        model_name = getattr(prompt_client, 'generation_model_id', 'unknown')
+        self.logger.info(
+            f"[RAG PIPELINE] Node: {node.value} | Model: {model_name} | "
+            f"Sources: {list(set(sources))} | Lang: {language}"
+        )
+
         return chat_history, footer_prompt, session_id, node, language, list(set(sources)), trace_id, prompt_client, final_history
 
     # ------------------------------------------------------------------
@@ -665,6 +672,12 @@ class NLPController(BaseController):
             except Exception as e:
                 self.logger.warning(f"CRAG tool {choice} failed: {e}")
 
+        if tool_results:
+            tool_names = [t[0] for t in tool_results]
+            self.logger.info(f"[RAG TOOLS] Fired: {tool_names}")
+        else:
+            self.logger.info(f"[RAG TOOLS] None fired (all returned errors or NONE selected)")
+
         return tool_results
 
     # ------------------------------------------------------------------
@@ -753,6 +766,11 @@ class NLPController(BaseController):
 
         # Auto-escalate: if utility model gave a bad answer, retry with generation
         if prompt_client == self.utility_client and not use_generation:
+            # Detect language mismatch: English query → Arabic answer (or vice versa)
+            query_has_arabic = bool(re.search(r'[\u0600-\u06FF]', query))
+            answer_has_arabic = bool(re.search(r'[\u0600-\u06FF]', answer or ""))
+            lang_mismatch = (query_has_arabic and not answer_has_arabic) or (not query_has_arabic and answer_has_arabic)
+
             is_bad = (
                 not answer or not answer.strip()
                 or len(answer.strip()) < 20
@@ -760,9 +778,13 @@ class NLPController(BaseController):
                 or "only help" in answer.lower()
                 or "can't help" in answer.lower()
                 or "specialize in" in answer.lower()
+                or lang_mismatch
             )
             if is_bad:
-                self.logger.info(f"Utility answer subpar. Escalating to generation model.")
+                if lang_mismatch:
+                    self.logger.info(f"Utility answer language mismatch (query={'ar' if query_has_arabic else 'en'}, answer={'ar' if answer_has_arabic else 'en'}). Escalating.")
+                else:
+                    self.logger.info(f"Utility answer subpar. Escalating to generation model.")
                 gen_system = self.template_parser.get(
                     "rag", "system_prompt", {"persona": persona, "node": node.value}
                 )
@@ -801,7 +823,7 @@ class NLPController(BaseController):
             self.logger.error(f"Failed to save trace: {e}")
 
         if sources:
-            self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
+            self.logger.info(f"[RAG SOURCES] {sources}")
 
         return {
             "answer": answer,
@@ -867,7 +889,7 @@ class NLPController(BaseController):
                 await self.session_model.append_message(session_id, "user", query, node.value)
                 await self.session_model.append_message(session_id, "assistant", answer, node.value)
             import json as _json
-            yield f"data: {_json.dumps({'node': node.value, 'language': language, 'sources': [], 'session_id': session_id, 'event': 'meta'})}\n\n"
+            yield f"data: {_json.dumps({'node': node.value, 'language': language, 'sources': sources, 'session_id': session_id, 'event': 'meta'})}\n\n"
             yield f"data: {_json.dumps({'text': answer})}\n\n"
             yield "data: [DONE]\n\n"
             return
@@ -897,8 +919,6 @@ class NLPController(BaseController):
             prompt=footer_prompt, chat_history=chat_history
         ):
             if not metadata_sent:
-                if sources:
-                    self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
                 metadata = {
                     "node": node.value,
                     "language": language,
@@ -914,6 +934,13 @@ class NLPController(BaseController):
                 yield f"data: {_json.dumps({'text': chunk})}\n\n"
 
         tracer.end_trace(trace_id, step_id, full_answer)
+
+        # Pipeline summary log
+        model_name = getattr(prompt_client, 'generation_model_id', 'unknown')
+        self.logger.info(
+            f"[RAG PIPELINE] Node: {node.value} | Model: {model_name} | "
+            f"Sources: {list(set(sources))} | Lang: {language}"
+        )
 
         try:
             os.makedirs("traces", exist_ok=True)
