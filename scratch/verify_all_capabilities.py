@@ -183,6 +183,26 @@ def run_tests():
         else:
             print("⚠️ Asset was not fully removed from lists!")
 
+    # --- Test 7: Pasted Document URL In-Chat QA ---
+    print("\n[Test 7] Testing dynamic Pasted Document URL extraction & QA...")
+    chat_url = f"{BASE_URL}/api/v1/nlp/agent/chat/0"
+    readme_url = "https://raw.githubusercontent.com/psf/requests/main/README.md"
+    print(f"Sending public README URL query: '{readme_url}'")
+    payload = {
+        "query": readme_url,
+        "user_id": 66666,
+        "persona": "student",
+        "limit": 5,
+        "model_tier": "auto"
+    }
+    r = requests.post(chat_url, headers={**HEADERS, "Content-Type": "application/json"}, json=payload)
+    print(f"Status Code: {r.status_code}")
+    if r.status_code == 200:
+        print("Answer Summary:", r.json().get("answer")[:500] + "...")
+        print("Citations:", r.json().get("sources"))
+    else:
+        print(f"Error testing dynamic URL extraction: {r.text}")
+
     print("\n==========================================================")
     print("🎉 ALL CAPABILITIES TESTED AND VERIFIED SUCCESSFULLY! 🎉")
     print("==========================================================")

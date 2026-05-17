@@ -269,6 +269,54 @@ class NLPController(BaseController):
 
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
+        # --- Pasted URL Automatic Processing & Extraction ---
+        # Detect if the query is a single URL, download and extract its text
+        # content dynamically, and feed it into prompt context.
+        import urllib.parse
+        parsed_url = urllib.parse.urlparse(query.strip())
+        if parsed_url.scheme in ('http', 'https') and parsed_url.netloc:
+            self.logger.info(f"[URL Parser] Detected URL in query: {query}")
+            try:
+                import httpx
+                async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
+                    resp = await client.get(query.strip())
+                if resp.status_code == 200:
+                    content_type = resp.headers.get("content-type", "").lower()
+                    content_bytes = resp.content
+                    parsed_text = None
+
+                    # 1. Word / docx format (via magic bytes or MIME-type)
+                    if "officedocument.wordprocessingml" in content_type or content_bytes.startswith(b"PK\x03\x04"):
+                        import docx2txt
+                        import io
+                        parsed_text = docx2txt.process(io.BytesIO(content_bytes))
+                    # 2. PDF format (via magic bytes or MIME-type)
+                    elif "application/pdf" in content_type or content_bytes.startswith(b"%PDF"):
+                        import fitz  # PyMuPDF
+                        doc = fitz.open(stream=content_bytes, filetype="pdf")
+                        parsed_text = "\n".join(page.get_text() for page in doc)
+                    # 3. Plain text / fallback
+                    else:
+                        try:
+                            parsed_text = content_bytes.decode("utf-8")
+                        except Exception:
+                            parsed_text = content_bytes.decode("latin-1")
+
+                    if parsed_text and parsed_text.strip():
+                        extracted = parsed_text.strip()
+                        # Limit to 8000 characters to keep it clean and fits context
+                        if len(extracted) > 8000:
+                            extracted = extracted[:8000] + "\n\n[...content truncated for length...]"
+                        
+                        retrieved_context.append(f"\n[Content of Pasted Document URL ({query.strip()})]:\n{extracted}")
+                        sources.append("Pasted Link")
+                        # Override node to GENERAL so the model processes this as a general retrieval query
+                        node = WorkflowNodeEnum.GENERAL
+                        # Skip database retrieval since we already got the document content directly
+                        is_memory_query = True
+            except Exception as e:
+                self.logger.error(f"[URL Parser] Failed to download or parse query URL: {e}")
+
         # --- Token budgeting ---
         try:
             encoding = tiktoken.get_encoding("cl100k_base")
