@@ -7,7 +7,7 @@ import re
 # because they could be trivia, jailbreak attempts, or historical questions.
 _SKIP_FAST_PATH = (
     "who is ", "who was ", "who were ", "who's ",
-    "what is ", "what was ", "what are ", "what does ",
+    "what is ", "what are ", "what does ",
     "من هو ", "من كان ", "من هي ", "من كانت ",
     "ما هو ", "ما هي ", "ماذا ", "لماذا ",
     "كيف ", "أين ", "متى ", "هل ",

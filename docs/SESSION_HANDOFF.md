@@ -19,19 +19,19 @@
 
 ### API Key for RAG testing:
 ```
-CONNEXIO_INTERNAL_API_KEY = 90abeeeaa98cec6d68c47bebf65400ba3eb4cdb89ca87d0958d9c3b25533b091
+CONNEXIO_INTERNAL_API_KEY = <CONNEXIO_INTERNAL_API_KEY>
 ```
 
 ### JWT Secret (shared across all 3 backends):
 ```
-JWT_SECRET = hd-3stnG5V9m9SNuMlOwXRkkAdg_WaCCfdVjC7bZXLdfLxKUWjjrCyYXt1GnCQ3Sc9bxq-fXcJ91PRrTaHpz0Q
+JWT_SECRET = <JWT_SECRET>
 ```
 
 ### SERVICE_USER_ID on all systems = 2 (UID with backend access)
 
 ### Groq API Key:
 ```
-GROQ_API_KEY = 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
+GROQ_API_KEY = <GROQ_API_KEY>
 ```
 
 ## 3. RAG Current State (Already Complete)

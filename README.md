@@ -138,18 +138,25 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 | Category              | Technology                                                                                                                              | Role                                                                |
 | :-------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------ |
 | **Framework**         | [FastAPI](https://fastapi.tiangolo.com/)                                                                                                | High-performance async API development.                             |
+| **Reverse Proxy**     | [Nginx](https://nginx.org/)                                                                                                             | Reverse proxy and load balancer for Docker stack.                   |
 | **AI Orchestration**  | [LangChain](https://www.langchain.com/)                                                                                                 | Document loading, splitting, and tool management.                   |
-| **Vector DB**         | [pgvector](https://github.com/pgvector/pgvector)                                                                                        | Semantic search and long-term memory via PostgreSQL.                |
+| **Vector DB**         | [pgvector](https://github.com/pgvector/pgvector), [Qdrant](https://qdrant.tech/)                                                        | Semantic search via PostgreSQL or standalone Qdrant (switchable).   |
 | **Relational DB**     | [PostgreSQL](https://www.postgresql.org/) (Neon.tech)                                                                                   | Project metadata, session management, and chat history.             |
 | **Task Queue**        | [Celery](https://docs.celeryq.dev/)                                                                                                     | Asynchronous indexing and document processing.                      |
 | **Message Broker**    | [RabbitMQ](https://www.rabbitmq.com/)                                                                                                   | Handling background task distributions.                             |
+| **Cache / Backend**   | [Redis](https://redis.io/)                                                                                                              | Celery result backend and in-memory caching.                        |
 | **Database Drivers**  | [SQLAlchemy](https://www.sqlalchemy.org/), [asyncpg](https://github.com/MagicStack/asyncpg), [alembic](https://alembic.sqlalchemy.org/) | ORM, async PostgreSQL driver, and migration tooling.                |
-| **LLM Providers**     | Groq (GPT-OSS 120B, Llama 4 Scout 17B), Cohere                                                                                      | Generation (120B), utility/classification (17B).                    |
+| **LLM Providers**     | Groq (GPT-OSS 120B, Llama 4 Scout 17B), OpenAI, Cohere                                                                                  | Generation (120B), utility/classification (17B), embeddings.        |
 | **Embedding**         | Cohere `embed-multilingual-v3.0` (1024 dims)                                                                                            | Production embedding model for semantic search.                     |
+| **Document Processing**| [PyMuPDF](https://pymupdf.readthedocs.io/) (fitz)                                                                                      | PDF text extraction and parsing.                                    |
+| **NLP**               | [NLTK](https://www.nltk.org/)                                                                                                           | Natural language processing utilities.                              |
 | **External APIs**     | Wikipedia API, [Google Search](https://serpapi.com/) (SerpApi), [GitHub API](https://docs.github.com/en/rest)                           | External knowledge sources for Corrective RAG.                      |
-| **Monitoring**        | Prometheus & Grafana                                                                                                                    | Real-time performance metrics and dashboards.                       |
+| **Token Management**  | [tiktoken](https://github.com/openai/tiktoken)                                                                                          | Token counting and budget enforcement.                              |
+| **AI Guidance**       | [guidance](https://github.com/guidance-ai/guidance)                                                                                     | Structured generation and constrained decoding.                     |
+| **Monitoring**        | [Prometheus](https://prometheus.io/) & [Grafana](https://grafana.com/)                                                                  | Real-time performance metrics and dashboards.                       |
 | **Worker Monitoring** | [Flower](https://github.com/mher/flower)                                                                                                | Celery worker monitoring and management.                            |
 | **Auth**              | [PyJWT](https://pyjwt.readthedocs.io/)                                                                                                  | Service JWT generation for backend auth.                            |
+| **Async I/O**         | [aiofiles](https://github.com/Tinche/aiofiles)                                                                                          | Async file operations for uploads and processing.                   |
 
 ---
 
@@ -185,20 +192,23 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
   - GENERAL: Conversational AI grounded in project context
   - OUT_OF_SCOPE: Guardrail that rejects off-topic queries. Catches trivia, history (`"who is X"` bypasses the short-query fast-path), jailbreak attempts (`"your system prompt"`, `"ignore your instructions"`), cooking, weather, sports, and Arabic equivalents. Returns a canned response with zero LLM cost.
 
-- **Corrective RAG (CRAG)**: Only activates when a project context exists (`project_id` is set). When internal knowledge is insufficient, the system dynamically triggers external tools:
-  - Wikipedia & Google (SerpApi) for live web search and general definitions
-  - GitHub API for extracting repository issues, commits, and summaries
-  - Python Interpreter for executing logic, math, and data processing
+- **Corrective RAG (CRAG)**: Activates when internal knowledge is insufficient. For project sessions, it dynamically triggers external tools. For technical queries without project context, it still activates research tools (ArXiv, StackOverflow, GitHub) to provide real-time answers:
+  - **ArXiv API** for academic papers, research, and ML/AI topics
+  - **StackOverflow API** for developer Q&A, coding errors, and API usage
+  - **Wikipedia & Google (SerpApi)** for live web search and general definitions
+  - **GitHub API** for extracting repository issues, commits, and summaries
+  - **Backend REST** for live user/project/member/task data via `BackendApiClient`
 
 - **Multi-Source Intelligence**: Combines information from:
   - SQL Database: Real-time project metrics, user skills, and task history
   - Vector Knowledge Base: Semantic search through project documentation
-  - External APIs: Wikipedia, Google, GitHub for additional context (project sessions only)
+  - External APIs: Wikipedia, Google, GitHub, ArXiv, StackOverflow for additional context
+  - Backend REST: Live user/project/member/task data via `BackendApiClient`
 
 - **Language Support**: Automatic detection and switching between English and Arabic prompts
 - **Persona Mapping**: Adjusts tone and depth based on user role (student, educator, company representative, early-career professional)
 - **Adaptive Conversational Memory**: Full token-budget window for project sessions; capped at 2 turns for projectless sessions to prevent accumulation across unrelated queries
-- **Rate Limiting & Security**: 30 requests/minute per IP, `max_length=5000` on query input, 429 retry with exponential backoff, cache invalidation endpoints, sanitized knowledge base (no internal infra details exposed)
+- **Rate Limiting & Security**: 30 requests/minute per IP, `max_length=5000` on query input, 429 retry with exponential backoff, cache invalidation endpoints, sanitized knowledge base (no internal infra details exposed), `CONNEXIO_INTERNAL_API_KEY` required for all endpoints (no dev bypass in production)
 - **Global Knowledge Base**: 52 curated files across 8 categories (134 chunks) — answers platform, agile, dev, design, career, business, soft skills, and industry trend questions
 - **Session TTL**: Stale chat sessions auto-cleaned after 30 days via Celery Beat
 - **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization
@@ -343,10 +353,12 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
 - **Language Detection**: Automatically switches between English and Arabic prompts based on user input.
 - **Adaptive Conversational Memory**: Full token-budget window for project sessions. Projectless sessions cap history at the last 2 turns (4 messages) to prevent token accumulation across unrelated queries.
 - **Persona Mapping**: Adjusts the tone, depth, and terminology of the answer based on the user's role (student, educator, company representative, or early-career professional).
-- **Corrective RAG (CRAG)**: Only activates when `project_id` is set. When the internal knowledge base is insufficient or irrelevant, the system triggers external tools:
+- **Corrective RAG (CRAG)**: Activates when `project_id` is set and internal knowledge is insufficient. For technical queries without project context, CRAG still activates research tools (ArXiv, StackOverflow, GitHub) to provide real-time answers:
   - **Wikipedia & Google (SerpApi)** for live web search, general definitions, and current information
   - **GitHub API** for extracting repository issues, commits, and code summaries
-  - **Python Interpreter** for executing logic, mathematical calculations, and data processing tasks
+  - **ArXiv API** for academic papers, research, and ML/AI topics
+  - **StackOverflow API** for developer Q&A, coding errors, and API usage
+  - **Backend REST** for live user/project/member/task data via `BackendApiClient`
 - **Internal Tracing**: Every step is logged by the `TraceManager`, allowing developers to visualize the AI's "thought process", latency, and decision-making for debugging and optimization.
 
 ---
@@ -358,7 +370,7 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
 | `src/main.py`                            | FastAPI entry — startup, DB, LLM/vector/RAG clients  |
 | `src/utils/backend_client.py`            | REST client to Node.js backend (with JWT auth)       |
 | `src/controllers/NLPController.py`       | Chat, search, context preparation, CRAG fallback     |
-| `src/controllers/helpers/ToolManager.py` | SQL tool, KB search, GitHub, Python, project context |
+| `src/controllers/helpers/ToolManager.py` | SQL tool, KB search, GitHub, ArXiv, StackOverflow, project context |
 | `src/controllers/DataController.py`      | File upload and processing control                   |
 | `src/controllers/ProjectController.py`   | Project sync between backend ↔ RAG                   |
 | `src/Routes/data.py`                     | `/upload-and-process`, `/sync`, `/process` endpoints |
