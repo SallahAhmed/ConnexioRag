@@ -432,7 +432,7 @@ async def upload_and_query(
             persona=persona,
             session_id=session_id,
             limit=limit,
-            model_tier=model_tier or "auto",
+            model_tier="generation",  # skip utility model — go straight to 70B
             language=language,
             extra_context=extra_context,
         )
