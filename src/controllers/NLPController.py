@@ -648,7 +648,13 @@ class NLPController(BaseController):
             raw = await self.utility_client.generate_text(prompt=decision_prompt)
             raw = (raw or "").strip()
             try:
-                parsed = json.loads(raw.replace("```json", "").replace("```", ""))
+                # Use regex to extract JSON object
+                json_match = re.search(r'\{.*\}', raw, re.DOTALL)
+                if json_match:
+                    json_str = json_match.group(0)
+                else:
+                    json_str = raw.replace("```json", "").replace("```", "")
+                parsed = json.loads(json_str)
                 tools = [t.strip().upper() for t in parsed.get("tools", []) if t.strip().upper() != "NONE"]
             except Exception:
                 # Fallback: scan raw text for any known tool name
@@ -674,9 +680,13 @@ class NLPController(BaseController):
                         prompt=refine, chat_history=utility_history
                     )
                     try:
-                        gh_info = json.loads(
-                            gh_raw.strip().replace("```json", "").replace("```", "")
-                        )
+                        gh_raw_clean = gh_raw.strip()
+                        json_match = re.search(r'\{.*\}', gh_raw_clean, re.DOTALL)
+                        if json_match:
+                            gh_raw_clean = json_match.group(0)
+                        else:
+                            gh_raw_clean = gh_raw_clean.replace("```json", "").replace("```", "")
+                        gh_info = json.loads(gh_raw_clean)
                         repo = gh_info.get("repo", "")
                         result = (
                             await self.tool_manager.fetch_github_data(

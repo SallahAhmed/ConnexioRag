@@ -3,11 +3,11 @@ from typing import List
 import os
 
 class Settings(BaseSettings):
-    
+
     APP_NAME: str = "Connexio"
     APP_VERSION: str = "0.1"
 
-    FILE_ALLOWED_TYPES: list = ["application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    FILE_ALLOWED_TYPES: list = ["application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/markdown"]
     FILE_MAX_SIZE: int = 15
     FILE_DEFAULT_CHUNK_SIZE: int = 1024
 
