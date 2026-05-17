@@ -294,8 +294,8 @@ class NLPController(BaseController):
         queries_to_search = [query]
 
         step_id = tracer.start_trace(trace_id, "Knowledge Base Retrieval")
-        if node == WorkflowNodeEnum.OUT_OF_SCOPE:
-            self.logger.info("Query is OUT OF SCOPE. Skipping retrieval.")
+        if node == WorkflowNodeEnum.OUT_OF_SCOPE or is_memory_query:
+            self.logger.info("Query is OUT OF SCOPE or memory recall. Skipping retrieval.")
             results = [[]]
         elif not project_id:
             self.logger.info("Searching global KB.")

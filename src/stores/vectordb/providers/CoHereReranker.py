@@ -22,7 +22,16 @@ class CoHereReranker(RerankerInterface):
         if not documents:
             return []
 
-        doc_texts = [d.text for d in documents]
+        # Sanitize texts to prevent Cohere 400 error on empty/whitespace-only strings
+        doc_texts = [
+            (d.text if d.text and d.text.strip() else "[empty]")
+            for d in documents
+        ]
+        
+        # If all documents are empty, bypass the API call entirely
+        if all(text == "[empty]" for text in doc_texts):
+            return documents[:top_k]
+
         try:
             response = await self.client.rerank(
                 model=self.model,
