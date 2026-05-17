@@ -375,7 +375,7 @@ async def delete_project_asset(request: Request, asset_id: int):
                     async with session.begin():
                         await session.execute(
                             sql_text(
-                                f"DELETE FROM {collection_name} WHERE id = ANY(:ids)"
+                                f"DELETE FROM {collection_name} WHERE chunk_id = ANY(:ids)"
                             ),
                             {"ids": chunk_ids},
                         )
