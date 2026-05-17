@@ -32,12 +32,12 @@ class DataController(BaseController):
         }
         allowed_extensions.discard("")
 
-        # If content_type is application/octet-stream, check extension
-        if file.content_type == "application/octet-stream":
-            if file_ext not in allowed_extensions:
+        # If content_type is application/octet-stream or extension matches .docx, check extension fallback
+        if file.content_type == "application/octet-stream" or file_ext == ".docx":
+            if file_ext not in allowed_extensions and file_ext != ".docx":
                 return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
         else:
-            if file.content_type not in allowed_types:
+            if file.content_type not in allowed_types and file_ext != ".docx":
                 return False, ResponseSignal.FILE_TYPE_NOT_SUPPORTED.value
 
         # Check file size if available
