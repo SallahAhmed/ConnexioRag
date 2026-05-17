@@ -270,16 +270,17 @@ class NLPController(BaseController):
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
         # --- Pasted URL Automatic Processing & Extraction ---
-        # Detect if the query is a single URL, download and extract its text
+        # Detect if the query contains a URL anywhere inside it, download and extract its text
         # content dynamically, and feed it into prompt context.
-        import urllib.parse
-        parsed_url = urllib.parse.urlparse(query.strip())
-        if parsed_url.scheme in ('http', 'https') and parsed_url.netloc:
-            self.logger.info(f"[URL Parser] Detected URL in query: {query}")
+        import re
+        url_match = re.search(r'(https?://[^\s]+)', query)
+        if url_match:
+            extracted_url = url_match.group(1).strip()
+            self.logger.info(f"[URL Parser] Detected URL in query: {extracted_url}")
             try:
                 import httpx
                 async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
-                    resp = await client.get(query.strip())
+                    resp = await client.get(extracted_url)
                 if resp.status_code == 200:
                     content_type = resp.headers.get("content-type", "").lower()
                     content_bytes = resp.content
@@ -308,7 +309,7 @@ class NLPController(BaseController):
                         if len(extracted) > 8000:
                             extracted = extracted[:8000] + "\n\n[...content truncated for length...]"
                         
-                        retrieved_context.append(f"\n[Content of Pasted Document URL ({query.strip()})]:\n{extracted}")
+                        retrieved_context.append(f"\n[Content of Pasted Document URL ({extracted_url})]:\n{extracted}")
                         sources.append("Pasted Link")
                         # Override node to GENERAL so the model processes this as a general retrieval query
                         node = WorkflowNodeEnum.GENERAL
@@ -887,13 +888,18 @@ class NLPController(BaseController):
         except Exception as e:
             self.logger.error(f"Failed to save trace: {e}")
 
+        # Log the sources in the server logs but do not pass them to the user/UI
+        if sources:
+            self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
+
         return {
             "answer": answer,
             "node": node.value,
             "language": language,
-            "sources": sources,
+            "sources": [],
             "session_id": session_id,
         }
+
 
     async def answer_agent_chat_stream(
         self,
@@ -980,10 +986,13 @@ class NLPController(BaseController):
             prompt=footer_prompt, chat_history=chat_history
         ):
             if not metadata_sent:
+                # Log the sources in the server logs but do not pass them to the user/UI
+                if sources:
+                    self.logger.info(f"[RAG SOURCES] Sources used: {sources}")
                 metadata = {
                     "node": node.value,
                     "language": language,
-                    "sources": sources,
+                    "sources": [],
                     "session_id": session_id,
                     "trace_id": trace_id,
                     "event": "meta",
