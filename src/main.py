@@ -121,8 +121,18 @@ async def lifespan(app: FastAPI):
         logger.error("Vector DB connection failed: %s", e)
         raise RuntimeError(f"Cannot start without Vector DB: {e}") from e
 
-    # --- Reranker Setup (Disabled) ---
-    app.reranker = None
+    # --- Reranker Setup (Cohere Multilingual) ---
+    try:
+        from stores.vectordb.providers.CoHereReranker import CoHereReranker
+        if getattr(settings, "COHERE_API_KEY", None):
+            app.reranker = CoHereReranker(api_key=settings.COHERE_API_KEY)
+            logger.info("Cohere reranker (rerank-multilingual-v3.0) initialized.")
+        else:
+            app.reranker = None
+            logger.warning("COHERE_API_KEY not set — reranking disabled.")
+    except Exception as e:
+        app.reranker = None
+        logger.error("Failed to initialize Cohere reranker: %s", e)
 
     # --- Template Parser Setup ---
     app.template_parser = TemplateParser(

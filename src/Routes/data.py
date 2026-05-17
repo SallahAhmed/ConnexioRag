@@ -303,3 +303,96 @@ async def upload_and_process(
             "file_id": str(asset_record.asset_id),
         },
     )
+
+
+@data_router.get("/assets/{project_id}")
+async def get_project_assets(request: Request, project_id: int):
+    """List all indexed files for a project (called by the Node.js backend)."""
+    asset_model = await AssetModel.create_instance(db_client=request.app.db_client)
+    assets = await asset_model.get_all_project_assets(
+        asset_project_id=project_id,
+        asset_type=AssetTypeEnum.FILE.value,
+    )
+    return {
+        "success": True,
+        "assets": [
+            {
+                "asset_id": a.asset_id,
+                "asset_name": a.asset_name,
+                "asset_size": a.asset_size,
+                "created_at": a.created_at.isoformat() if a.created_at else None,
+            }
+            for a in assets
+        ],
+    }
+
+
+@data_router.delete("/assets/{asset_id}")
+async def delete_project_asset(request: Request, asset_id: int):
+    """
+    Fully remove an asset: delete its SQL record, chunks, physical file,
+    and the corresponding PGVector rows.
+    Called by the Node.js backend after the team leader triggers deletion.
+    """
+    from sqlalchemy.sql import text as sql_text
+
+    db_client = request.app.db_client
+    asset_model = await AssetModel.create_instance(db_client=db_client)
+    chunk_model = await ChunkModel.create_instance(db_client=db_client)
+
+    # 1. Fetch asset details
+    async with db_client() as session:
+        result = await session.execute(
+            select(Asset).where(Asset.asset_id == asset_id)
+        )
+        asset = result.scalar_one_or_none()
+
+    if not asset:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={"success": False, "message": "Asset not found"},
+        )
+
+    project_id = asset.asset_project_id
+    file_id = asset.asset_name
+
+    # 2. Get associated chunk IDs
+    chunks = await chunk_model.get_chunks_by_asset_id(asset_id=asset_id)
+    chunk_ids = [c.chunk_id for c in chunks]
+
+    # 3. Remove matching rows from the dynamic PGVector collection table
+    if chunk_ids:
+        nlp_controller = NLPController(
+            vectordb_client=request.app.vectordb_client,
+            generation_client=request.app.generation_client,
+            embedding_client=request.app.embedding_client,
+            template_parser=request.app.template_parser,
+        )
+        collection_name = nlp_controller.create_collection_name(project_id=project_id)
+        if await request.app.vectordb_client.is_collection_existed(collection_name):
+            try:
+                async with db_client() as session:
+                    async with session.begin():
+                        await session.execute(
+                            sql_text(
+                                f"DELETE FROM {collection_name} WHERE id = ANY(:ids)"
+                            ),
+                            {"ids": chunk_ids},
+                        )
+            except Exception as q_err:
+                logger.error(f"[RAG] Failed to delete PGVector rows: {q_err}")
+
+    # 4. Remove the physical file from disk
+    project_path = ProjectController().get_project_path(project_id=project_id)
+    file_path = os.path.join(project_path, file_id)
+    if os.path.exists(file_path):
+        try:
+            os.remove(file_path)
+        except Exception as f_err:
+            logger.error(f"[RAG] Physical file removal failed: {f_err}")
+
+    # 5. Drop SQL chunk records then asset record
+    await chunk_model.delete_chunks_by_asset_id(asset_id=asset_id)
+    await asset_model.delete_asset_by_id(asset_id=asset_id)
+
+    return {"success": True, "message": "Asset and vectors deleted successfully"}

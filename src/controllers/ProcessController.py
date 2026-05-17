@@ -3,6 +3,7 @@ from .ProjectController import ProjectController
 import os
 from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import PyMuPDFLoader
+from langchain_community.document_loaders import Docx2txtLoader
 from models import ProcessingEnum
 from typing import List
 from dataclasses import dataclass
@@ -39,6 +40,9 @@ class ProcessController(BaseController):
 
         if file_ext == ProcessingEnum.PDF.value:
             return PyMuPDFLoader(file_path)
+
+        if file_ext == ProcessingEnum.DOCX.value:
+            return Docx2txtLoader(file_path)
         
         return None
 
@@ -77,29 +81,23 @@ class ProcessController(BaseController):
         return chunks
 
     def process_simpler_splitter(self, texts: List[str], metadatas: List[dict], chunk_size: int, splitter_tag: str="\n"):
-        
+        """Sliding-window chunker with 150-char overlap for better RAG retrieval."""
         full_text = " ".join(texts)
-
-        # split by splitter_tag
-        lines = [ doc.strip() for doc in full_text.split(splitter_tag) if len(doc.strip()) > 1 ]
-
+        overlap = 150
         chunks = []
-        current_chunk = ""
+        start = 0
+        text_len = len(full_text)
 
-        for line in lines:
-            current_chunk += line + splitter_tag
-            if len(current_chunk) >= chunk_size:
+        while start < text_len:
+            end = min(start + chunk_size, text_len)
+            chunk_text = full_text[start:end].strip()
+            if len(chunk_text) > 5:
                 chunks.append(Document(
-                    page_content=current_chunk.strip(),
+                    page_content=chunk_text,
                     metadata={}
                 ))
-
-                current_chunk = ""
-
-        if current_chunk:
-            chunks.append(Document(
-                page_content=current_chunk.strip(),
-                metadata={}
-            ))
+            if end == text_len:
+                break
+            start += (chunk_size - overlap)
 
         return chunks

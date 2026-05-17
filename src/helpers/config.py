@@ -7,8 +7,8 @@ class Settings(BaseSettings):
     APP_NAME: str = "Connexio"
     APP_VERSION: str = "0.1"
 
-    FILE_ALLOWED_TYPES: list = ["application/pdf", "text/plain"]
-    FILE_MAX_SIZE: int = 10
+    FILE_ALLOWED_TYPES: list = ["application/pdf", "text/plain", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"]
+    FILE_MAX_SIZE: int = 15
     FILE_DEFAULT_CHUNK_SIZE: int = 1024
 
     POSTGRES_USERNAME: str

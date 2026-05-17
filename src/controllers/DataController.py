@@ -15,6 +15,7 @@ class DataController(BaseController):
     _EXTENSION_MAP = {
         "text/plain": ".txt",
         "application/pdf": ".pdf",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
     }
 
     def validate_uploaded_file(self, file: UploadFile):

@@ -71,7 +71,7 @@ class SessionModel(BaseDataModel):
 
     async def append_message(self, session_id: int, role: str, content: str,
                               workflow_node: str = None):
-        """Appends a message to the chat history JSONB array."""
+        """Appends a message to the chat history JSONB array in a single transaction."""
         message = {
             "role": role,
             "content": content,
@@ -79,24 +79,19 @@ class SessionModel(BaseDataModel):
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
 
-        chat_session = await self.get_session(session_id)
-        if not chat_session:
-            return None
-
-        # Build updated history
-        current_history = chat_session.chat_history or []
-        current_history.append(message)
-
         async with self.db_client() as session:
-            stmt = (
-                update(ChatSession)
-                .where(ChatSession.session_id == session_id)
-                .values(
-                    chat_history=current_history,
-                    last_workflow_node=workflow_node
+            async with session.begin():
+                result = await session.execute(
+                    select(ChatSession).where(ChatSession.session_id == session_id)
                 )
-            )
-            await session.execute(stmt)
+                chat_session = result.scalar_one_or_none()
+                if not chat_session:
+                    return None
+
+                current_history = list(chat_session.chat_history or [])
+                current_history.append(message)
+                chat_session.chat_history = current_history
+                chat_session.last_workflow_node = workflow_node
             await session.commit()
 
         return message

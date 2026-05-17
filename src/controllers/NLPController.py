@@ -226,10 +226,42 @@ class NLPController(BaseController):
         else:
             history = []
 
-        # Without project context there is nothing to RAG about — cap history
-        # at 2 turns (4 messages) to prevent accumulation across unrelated queries.
+        # Without project context, cap history at 20 messages (10 turns)
+        # to give the LLM rich conversational memory without context overflow.
         if not project_id:
-            history = history[-4:] if len(history) > 4 else history
+            history = history[-20:] if len(history) > 20 else history
+
+        # --- Memory Intent Detection ---
+        # Detect when the user is asking about past conversations
+        # and inject a chronological timeline to help the LLM summarize accurately.
+        memory_keywords = [
+            "what did we talk about", "what was the last thing", "what we discussed",
+            "yesterday", "last conversation", "previous conversation", "our last chat",
+            "ماذا تحدثنا", "عن ماذا تكلمنا", "آخر شيء", "آخر محادثة", "الأمس",
+            "المحادثة السابقة", "تحدثنا بالأمس",
+        ]
+        is_memory_query = any(kw in query.lower() for kw in memory_keywords)
+
+        if is_memory_query and history:
+            memory_summary = []
+            for i, msg in enumerate(history):
+                if language == "ar":
+                    role_label = "المستخدم" if msg["role"] == "user" else "المساعد الذكي"
+                else:
+                    role_label = "User" if msg["role"] == "user" else "Assistant"
+                memory_summary.append(f"[{i+1}] {role_label}: {msg['content']}")
+
+            summary_text = "\n".join(memory_summary)
+            if language == "ar":
+                retrieved_context.append(
+                    f"\n[سجل المحادثات السابقة لتجيب المستخدم بدقة عما تحدثتم عنه]:\n{summary_text}"
+                )
+            else:
+                retrieved_context.append(
+                    f"\n[Previous Conversation History to help you answer about past talks]:\n{summary_text}"
+                )
+            sources.append("Conversation Memory")
+            node = WorkflowNodeEnum.GENERAL
 
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
@@ -328,22 +360,14 @@ class NLPController(BaseController):
             )
 
         elif project_id is None:
-            # No project context — but allow external tools for clearly
-            # technical/research queries. Block only for general-knowledge trivia.
-            technical_keywords = [
-                "research", "paper", "latest", "how to", "error", "bug", "fix",
-                "code", "api", "library", "framework", "security", "vulnerability",
-                "github", "stackoverflow", "programming", "developer", "debug",
-                "implementation", "algorithm", "architecture", "design pattern",
-                "بحث", "ورقة", "أحدث", "كود", "برمجة", "مطور", "خطأ", "إصلاح",
-                "أمان", "ثغرة", "مكتبة", "إطار عمل", "خوارزمية",
-            ]
-            is_technical = any(kw in query.lower() for kw in technical_keywords)
+            # No project context — the classifier has already filtered out-of-scope
+            # queries, so all remaining queries here are in-scope. Allow external tools.
+            is_technical = True
 
             if is_technical:
                 # Run CRAG tool selection (same as project flow)
                 tracer.end_trace(
-                    trace_id, step_id, "No project context but technical query — running CRAG tools"
+                    trace_id, step_id, "No project context but in-scope query — running CRAG tools"
                 )
 
                 if node in PLATFORM_NODES and not has_kb_content:

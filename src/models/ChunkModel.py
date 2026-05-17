@@ -67,3 +67,20 @@ class ChunkModel(BaseDataModel):
             total_count = records_count.scalar()
 
         return total_count
+
+    async def get_chunks_by_asset_id(self, asset_id: int):
+        """Return all chunks that belong to a specific uploaded asset."""
+        async with self.db_client() as session:
+            stmt = select(DataChunk).where(DataChunk.chunk_asset_id == asset_id)
+            result = await session.execute(stmt)
+            records = result.scalars().all()
+        return records
+
+    async def delete_chunks_by_asset_id(self, asset_id: int):
+        """Delete all chunks associated with a specific asset (used when deleting a file)."""
+        async with self.db_client() as session:
+            async with session.begin():
+                stmt = delete(DataChunk).where(DataChunk.chunk_asset_id == asset_id)
+                result = await session.execute(stmt)
+            await session.commit()
+        return result.rowcount
