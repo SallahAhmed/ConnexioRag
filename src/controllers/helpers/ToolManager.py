@@ -310,25 +310,28 @@ class ToolManager:
                     scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
 
             project_collection = self._get_collection_name(project_id)
-            try:
-                project_results = await self.vectordb_client.hybrid_search(
-                    collection_name=project_collection, query=query, vector=query_vector, limit=limit * 2,
-                )
-            except Exception:
-                project_results = await self.vectordb_client.search_by_vector(
-                    collection_name=project_collection, vector=query_vector, limit=limit * 2,
-                )
-            add_results(project_results, "proj_")
+            if await self.vectordb_client.is_collection_existed(project_collection):
+                try:
+                    project_results = await self.vectordb_client.hybrid_search(
+                        collection_name=project_collection, query=query, vector=query_vector, limit=limit * 2,
+                    )
+                except Exception:
+                    project_results = await self.vectordb_client.search_by_vector(
+                        collection_name=project_collection, vector=query_vector, limit=limit * 2,
+                    )
+                add_results(project_results, "proj_")
 
-            try:
-                global_results = await self.vectordb_client.hybrid_search(
-                    collection_name=self.get_global_collection_name(), query=query, vector=query_vector, limit=limit * 2,
-                )
-            except Exception:
-                global_results = await self.vectordb_client.search_by_vector(
-                    collection_name=self.get_global_collection_name(), vector=query_vector, limit=limit * 2,
-                )
-            add_results(global_results, "global_")
+            global_collection = self.get_global_collection_name()
+            if await self.vectordb_client.is_collection_existed(global_collection):
+                try:
+                    global_results = await self.vectordb_client.hybrid_search(
+                        collection_name=global_collection, query=query, vector=query_vector, limit=limit * 2,
+                    )
+                except Exception:
+                    global_results = await self.vectordb_client.search_by_vector(
+                        collection_name=global_collection, vector=query_vector, limit=limit * 2,
+                    )
+                add_results(global_results, "global_")
 
             if not scores:
                 return []
