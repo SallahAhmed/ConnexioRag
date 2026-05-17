@@ -431,6 +431,7 @@ class NLPController(BaseController):
                     # All relevant — KB sufficient, no CRAG needed
                     tracer.end_trace(trace_id, step_id, f"All {n_total} docs relevant — KB only")
                     retrieved_context.extend(kb_context)
+                    sources.append("Vector DB")
 
                 elif n_rel == 0 and n_amb == 0:
                     # All irrelevant — discard KB, fire 2 CRAG tools
@@ -446,6 +447,7 @@ class NLPController(BaseController):
                     # Mixed or all-ambiguous — filtered KB + 1 CRAG tool to supplement
                     tracer.end_trace(trace_id, step_id, f"Mixed grades — KB + 1 CRAG tool")
                     retrieved_context.extend(kb_context)
+                    sources.append("Vector DB")
                     crag_results = await self._run_crag_tools(
                         query, language, utility_history, trace_id, max_tools=1
                     )
@@ -817,6 +819,7 @@ class NLPController(BaseController):
             }
 
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": False})
+        print(f"[RAG SOURCE] {' / '.join(sources) if sources else 'NONE'}", file=sys.stderr)
         answer = await prompt_client.generate_text(
             prompt=footer_prompt, chat_history=chat_history
         )
@@ -994,6 +997,7 @@ class NLPController(BaseController):
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": True})
 
         import json as _json
+        print(f"[RAG SOURCE] {' / '.join(sources) if sources else 'NONE'}", file=sys.stderr)
         async for chunk in prompt_client.generate_text_stream(
             prompt=footer_prompt, chat_history=chat_history
         ):
