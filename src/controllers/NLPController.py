@@ -390,7 +390,19 @@ class NLPController(BaseController):
                 kb_results += f"\n[Results for: {q}]\n{res}\n"
                 has_kb_content = True
 
-        if not has_kb_content:
+        is_temporal_query = False
+        temporal_keywords = [
+            "this year", "latest", "recent", "trend", "current", "news", "currently",
+            "هذا العام", "أحدث", "آخر الأخبار", "اتجاهات", "جديد"
+        ]
+        if any(kw in query.lower() for kw in temporal_keywords):
+            is_temporal_query = True
+            self.logger.info(f"[RAG TEMPORAL] Detected temporal query: '{query}' -> Bypassing KB relevance.")
+
+        if is_temporal_query:
+            is_kb_relevant = False
+            kb_usage = {}
+        elif not has_kb_content:
             is_kb_relevant = False
             kb_usage = {}
         else:
@@ -451,8 +463,13 @@ class NLPController(BaseController):
                         '- "NONE": Conversational or no tool needed.\n'
                         "Return ONLY one word."
                     )
-                    choice = await self.utility_client.generate_text(prompt=decision_prompt)
-                    choice = choice.strip().upper() if choice else "NONE"
+                    if is_temporal_query:
+                        choice = "GOOGLE"
+                    else:
+                        choice = await self.utility_client.generate_text(prompt=decision_prompt)
+                        choice = choice.strip().upper() if choice else "NONE"
+                    
+                    self.logger.info(f"[RAG TOOL CHOICE] Query: '{query}' -> Selected Tool: {choice}")
 
                     if choice == "GITHUB":
                         step_id_gh = tracer.start_trace(trace_id, "GitHub Tool Search")
@@ -577,8 +594,13 @@ class NLPController(BaseController):
                     '- "NONE": Conversational or no tool needed.\n'
                     "Return ONLY one word."
                 )
-                choice = await self.utility_client.generate_text(prompt=decision_prompt)
-                choice = choice.strip().upper() if choice else "NONE"
+                if is_temporal_query:
+                    choice = "GOOGLE"
+                else:
+                    choice = await self.utility_client.generate_text(prompt=decision_prompt)
+                    choice = choice.strip().upper() if choice else "NONE"
+                
+                self.logger.info(f"[RAG TOOL CHOICE] Query: '{query}' -> Selected Tool: {choice}")
 
                 if choice == "GITHUB":
                     step_id_gh = tracer.start_trace(trace_id, "GitHub Tool Search")

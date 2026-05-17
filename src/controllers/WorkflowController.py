@@ -100,8 +100,13 @@ class WorkflowController(BaseController):
             "override your", "jailbreak", "developer mode", "dan mode",
             "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
         ]
-        if any(kw in query_lower for kw in JAILBREAK_KEYWORDS):
-            return WorkflowNodeEnum.OUT_OF_SCOPE
+        # 0.5 CONVERSATIONAL FOLLOW-UPS: Instantly mark follow-up questions containing reference to AI as GENERAL
+        CONVERSATIONAL_FOLLOW_UPS = [
+            "you mean", "you meant", "you say", "you said", "did you", "you refer",
+            "you referring", "mean by", "meant by", "قصدك", "تقصد", "قلت", "قلته"
+        ]
+        if any(kw in query_lower for kw in CONVERSATIONAL_FOLLOW_UPS):
+            return WorkflowNodeEnum.GENERAL
 
         # 1. OOS KEYWORDS: Catch off-topic queries immediately before anything else
         # BUT: Tech/AI/programming history is IN-SCOPE for a dev collaboration assistant
@@ -120,7 +125,7 @@ class WorkflowController(BaseController):
             # Weather
             "weather in", "temperature in", "forecast for", "weather forecast",
             # History & trivia (EXCEPT programming/tech history)
-            "what happened on", "born on", "died in", "year ",
+            "what happened on", "born on", "died in",
             # Personal/off-topic
             "wearing", "wear ", "clothes", "outfit", "dress", "shirt", "pants",
             "eat ", "eating", "drink", "drinking", "hungry", "thirsty",

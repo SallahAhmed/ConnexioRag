@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 300630,
-    "total_reads": 522,
+    "total_tokens_estimated": 320490,
+    "total_reads": 525,
     "total_writes": 332,
-    "total_sessions": 11,
-    "anatomy_hits": 58,
+    "total_sessions": 12,
+    "anatomy_hits": 61,
     "anatomy_misses": 441,
     "repeated_reads_blocked": 83,
-    "estimated_savings_vs_bare_cli": 223342
+    "estimated_savings_vs_bare_cli": 223942
   },
   "sessions": [
     {
@@ -5352,6 +5352,40 @@
         "writes_count": 27,
         "repeated_reads_blocked": 12,
         "anatomy_lookups": 4
+      }
+    },
+    {
+      "id": "session-2026-05-17-2144",
+      "started": "2026-05-17T18:44:04.604Z",
+      "ended": "2026-05-17T18:50:27.842Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 9937,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+          "tokens_estimated": 2573,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 7350,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 19860,
+        "output_tokens_estimated": 0,
+        "reads_count": 3,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 3
       }
     }
   ],
