@@ -168,6 +168,7 @@ class NLPController(BaseController):
         limit: int = 5,
         model_tier: str = "auto",
         language: Optional[str] = None,
+        extra_context: Optional[str] = None,
     ):
         """
         Prepares chat history, retrieves context from all sources, and
@@ -178,6 +179,7 @@ class NLPController(BaseController):
         print(f"\n[AGENT] [{now()}] Query: {query[:50]}...", file=sys.stderr)
 
         # --- Step 1: Intent & Language ---
+        explicit_language = language is not None
         step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
         language = language or await self.workflow_controller.detect_language(query)
         query_language = language  # preserve — URL content must never override this
@@ -319,6 +321,11 @@ class NLPController(BaseController):
                         is_memory_query = True
             except Exception as e:
                 self.logger.error(f"[URL Parser] Failed to download or parse query URL: {e}")
+
+        # --- Extra context injection (used by upload-and-query for file content) ---
+        if extra_context:
+            retrieved_context.append(extra_context)
+            sources.append("Document")
 
         # --- Token budgeting ---
         try:
@@ -532,6 +539,14 @@ class NLPController(BaseController):
         else:
             footer_prompt = query
 
+        # When language was explicitly set by the caller, reinforce it
+        # to prevent chat history from pulling the model into a different language.
+        if explicit_language:
+            if language == "ar":
+                footer_prompt += "\n\nمهم جداً: يجب عليك الرد باللغة العربية فقط. لا تستخدم لغة أخرى تحت أي ظرف."
+            else:
+                footer_prompt += "\n\nIMPORTANT: You MUST reply in English only. Do not use any other language under any circumstances."
+
         chat_history = [
             prompt_client.construct_prompt(prompt=system_prompt, role="system")
         ]
@@ -718,6 +733,7 @@ class NLPController(BaseController):
         limit: int = 5,
         model_tier: str = "auto",
         language: Optional[str] = None,
+        extra_context: Optional[str] = None,
     ):
         self.logger.info(f"answer_agent_chat called with model_tier={model_tier}, language={language}")
         # Fast path — history clear
@@ -748,7 +764,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit, model_tier, language=language
+                user_id, project_id, query, persona, session_id, limit, model_tier, language=language, extra_context=extra_context
             )
         )
         # Derive use_generation from the selected client so answer_agent_chat can
@@ -880,6 +896,7 @@ class NLPController(BaseController):
         limit: int = 5,
         model_tier: str = "auto",
         language: Optional[str] = None,
+        extra_context: Optional[str] = None,
     ):
         # Fast path — history clear
         clear_commands = [
@@ -909,7 +926,7 @@ class NLPController(BaseController):
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
-                user_id, project_id, query, persona, session_id, limit, model_tier, language=language
+                user_id, project_id, query, persona, session_id, limit, model_tier, language=language, extra_context=extra_context
             )
         )
 

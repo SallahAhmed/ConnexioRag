@@ -383,33 +383,35 @@ async def upload_and_query(
     )
     asset_record = await asset_model.create_asset(asset=asset_resource)
 
-    # 4. Process file into chunks and index into vector DB  (synchronous)
-    chunks_indexed = await _process_and_index(
-        db_client=request.app.db_client,
-        generation_client=request.app.generation_client,
-        embedding_client=request.app.embedding_client,
-        vectordb_client=request.app.vectordb_client,
-        template_parser=request.app.template_parser,
-        project_id=project_id,
-        asset_id=asset_record.asset_id,
-        file_id=file_id,
-        chunk_size=chunk_size,
-        overlap_size=overlap_size,
+    # 4. Read file content synchronously for immediate answer context
+    process_controller = ProcessController(project_id=project_id)
+    try:
+        file_content = process_controller.get_file_content(file_id=file_id)
+        full_text = " ".join([doc.page_content for doc in file_content])
+        if len(full_text) > 8000:
+            full_text = full_text[:8000] + "\n[...content truncated...]"
+        extra_context = f"[Uploaded Document '{file.filename}']:\n{full_text}"
+    except Exception as e:
+        logger.warning(f"[upload_and_query] Could not read file content: {e}")
+        extra_context = None
+
+    # 5. Start background indexing (fire-and-forget, does not block the answer)
+    asyncio.create_task(
+        _process_and_index(
+            db_client=request.app.db_client,
+            generation_client=request.app.generation_client,
+            embedding_client=request.app.embedding_client,
+            vectordb_client=request.app.vectordb_client,
+            template_parser=request.app.template_parser,
+            project_id=project_id,
+            asset_id=asset_record.asset_id,
+            file_id=file_id,
+            chunk_size=chunk_size,
+            overlap_size=overlap_size,
+        )
     )
 
-    # 5. If no chunks were indexed, skip the chat and return early
-    if chunks_indexed == 0:
-        return JSONResponse(
-            status_code=status.HTTP_202_ACCEPTED,
-            content={
-                "status": "no_content",
-                "file_id": str(asset_record.asset_id),
-                "chunks_indexed": 0,
-                "message": "File was saved but could not be indexed (no extractable text).",
-            },
-        )
-
-    # 6. Answer the user's question using the freshly indexed content
+    # 6. Answer the user's question using the file content as direct context
     chat_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
         generation_client=request.app.generation_client,
@@ -432,6 +434,7 @@ async def upload_and_query(
             limit=limit,
             model_tier=model_tier or "auto",
             language=language,
+            extra_context=extra_context,
         )
     except Exception as e:
         logger.error(f"[upload_and_query] Chat failed: {e}")
@@ -440,17 +443,16 @@ async def upload_and_query(
             content={
                 "status": "chat_failed",
                 "file_id": str(asset_record.asset_id),
-                "chunks_indexed": chunks_indexed,
                 "error": str(e),
             },
         )
 
-    # 7. Return the answer along with indexing metadata
+    # 7. Return the answer (indexing continues in background)
     return JSONResponse(
         content={
             "status": "completed",
             "file_id": str(asset_record.asset_id),
-            "chunks_indexed": chunks_indexed,
+            "chunks_indexed": "background",
             **result,
         }
     )
