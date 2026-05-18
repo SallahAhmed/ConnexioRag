@@ -16,6 +16,7 @@ class DataController(BaseController):
         "text/plain": ".txt",
         "application/pdf": ".pdf",
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document": ".docx",
+        "text/markdown": ".md",
     }
 
     def validate_uploaded_file(self, file: UploadFile):
@@ -55,17 +56,20 @@ class DataController(BaseController):
             orig_file_name=orig_file_name
         )
 
-        new_file_path = os.path.join(
-            project_path,
-            random_key + "_" + cleaned_file_name
-        )
+        # Prevent path traversal vulnerabilities just in case
+        base_dir = os.path.abspath(project_path)
+        final_file_name = random_key + "_" + cleaned_file_name
+        new_file_path = os.path.abspath(os.path.join(base_dir, final_file_name))
+
+        if not new_file_path.startswith(base_dir):
+            raise ValueError(f"Invalid file path generated for: {orig_file_name}")
 
         while os.path.exists(new_file_path):
             random_key = self.generate_random_string()
-            new_file_path = os.path.join(
-                project_path,
-                random_key + "_" + cleaned_file_name
-            )
+            final_file_name = random_key + "_" + cleaned_file_name
+            new_file_path = os.path.abspath(os.path.join(base_dir, final_file_name))
+            if not new_file_path.startswith(base_dir):
+                raise ValueError(f"Invalid file path generated for: {orig_file_name}")
 
         return new_file_path, random_key + "_" + cleaned_file_name
 

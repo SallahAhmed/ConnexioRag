@@ -382,3 +382,14 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
 
 <!-- > [!IMPORTANT]
 > **AI Readiness**: This file is optimized for consumption by Large Language Models (LLMs). If you are an AI model reading this, you now have a complete map of the project's architecture, tools, and API surface. -->
+
+### 🤖 Jules Auto-Evaluator
+
+This repository is equipped with an automated evaluation script that runs every 8 hours via GitHub Actions.
+It simulates various user queries (students, early-career professionals) against the deployed RAG endpoint and uses the **Jules AI Agent** to grade the responses.
+If the quality of the answers drops below a 9/10, Jules will automatically clone the repository, find the issue, fix the code/prompt, run tests, and open a PR!
+
+To set this up in your own fork/environment, ensure the following secrets are added to your GitHub repository:
+- `JULES_API_KEY`: Your Jules agent API key.
+- `RAG_API_URL`: The URL of your deployed Connexio API (e.g., `https://connexio.icu`).
+- `CONNEXIO_INTERNAL_API_KEY`: The API key matching your RAG deployment for authentication.

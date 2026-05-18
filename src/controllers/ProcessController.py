@@ -27,15 +27,17 @@ class ProcessController(BaseController):
     def get_file_loader(self, file_id: str):
 
         file_ext = self.get_file_extension(file_id=file_id)
-        file_path = os.path.join(
-            self.project_path,
-            file_id
-        )
+        # Ensure the file path doesn't escape the project path (path traversal prevention)
+        base_dir = os.path.abspath(self.project_path)
+        file_path = os.path.abspath(os.path.join(base_dir, file_id))
+
+        if not file_path.startswith(base_dir):
+            raise ValueError(f"Invalid file_id path traversal detected: {file_id}")
 
         if not os.path.exists(file_path):
             return None
 
-        if file_ext == ProcessingEnum.TXT.value:
+        if file_ext == ProcessingEnum.TXT.value or file_ext == ProcessingEnum.MD.value:
             return TextLoader(file_path, encoding="utf-8")
 
         if file_ext == ProcessingEnum.PDF.value:
@@ -43,7 +45,7 @@ class ProcessController(BaseController):
 
         if file_ext == ProcessingEnum.DOCX.value:
             return Docx2txtLoader(file_path)
-        
+
         return None
 
     def get_file_content(self, file_id: str):
