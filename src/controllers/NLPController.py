@@ -444,16 +444,22 @@ class NLPController(BaseController):
                         sources.append(source_name)
 
                 else:
-                    # Mixed or all-ambiguous — filtered KB + 1 CRAG tool to supplement
-                    tracer.end_trace(trace_id, step_id, f"Mixed grades — KB + 1 CRAG tool")
-                    retrieved_context.extend(kb_context)
-                    sources.append("Vector DB")
-                    crag_results = await self._run_crag_tools(
-                        query, language, utility_history, trace_id, max_tools=1
-                    )
-                    for source_name, result_text in crag_results:
-                        retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
-                        sources.append(source_name)
+                    # Mixed — filtered KB. Skip CRAG when KB already has relevant
+                    # docs for a project query (external tools rarely add value).
+                    if n_rel > 0 and project_id and node == WorkflowNodeEnum.GENERAL:
+                        tracer.end_trace(trace_id, step_id, "Mixed grades — KB sufficient (CRAG skipped)")
+                        retrieved_context.extend(kb_context)
+                        sources.append("Vector DB")
+                    else:
+                        tracer.end_trace(trace_id, step_id, f"Mixed grades — KB + 1 CRAG tool")
+                        retrieved_context.extend(kb_context)
+                        sources.append("Vector DB")
+                        crag_results = await self._run_crag_tools(
+                            query, language, utility_history, trace_id, max_tools=1
+                        )
+                        for source_name, result_text in crag_results:
+                            retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
+                            sources.append(source_name)
 
         # --- Live backend context injection (project summary from main backend) ---
         if project_id and self.backend_client and node not in (WorkflowNodeEnum.OUT_OF_SCOPE,) and not is_file_query:
@@ -648,13 +654,7 @@ class NLPController(BaseController):
             raw = await self.utility_client.generate_text(prompt=decision_prompt)
             raw = (raw or "").strip()
             try:
-                # Use regex to extract JSON object
-                json_match = re.search(r'\{.*\}', raw, re.DOTALL)
-                if json_match:
-                    json_str = json_match.group(0)
-                else:
-                    json_str = raw.replace("```json", "").replace("```", "")
-                parsed = json.loads(json_str)
+                parsed = json.loads(raw.replace("```json", "").replace("```", ""))
                 tools = [t.strip().upper() for t in parsed.get("tools", []) if t.strip().upper() != "NONE"]
             except Exception:
                 # Fallback: scan raw text for any known tool name
@@ -680,13 +680,9 @@ class NLPController(BaseController):
                         prompt=refine, chat_history=utility_history
                     )
                     try:
-                        gh_raw_clean = gh_raw.strip()
-                        json_match = re.search(r'\{.*\}', gh_raw_clean, re.DOTALL)
-                        if json_match:
-                            gh_raw_clean = json_match.group(0)
-                        else:
-                            gh_raw_clean = gh_raw_clean.replace("```json", "").replace("```", "")
-                        gh_info = json.loads(gh_raw_clean)
+                        gh_info = json.loads(
+                            gh_raw.strip().replace("```json", "").replace("```", "")
+                        )
                         repo = gh_info.get("repo", "")
                         result = (
                             await self.tool_manager.fetch_github_data(
@@ -773,6 +769,38 @@ class NLPController(BaseController):
         extra_context: Optional[str] = None,
     ):
         self.logger.info(f"answer_agent_chat called with model_tier={model_tier}, language={language}")
+
+        # Fast path — greetings (skip ALL LLM calls, RAG, KB, etc.)
+        GREETINGS_EN = {"hello", "hi", "hey", "hi there", "hello there",
+                        "good morning", "good afternoon", "good evening",
+                        "whats up", "sup", "howdy", "greetings",
+                        "how are you", "how are you doing", "how's it going"}
+        GREETINGS_AR = {"مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً"}
+        clean_query = query.strip().lower().rstrip("?!.,;:")
+        is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
+        greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN
+        if clean_query in greeting_set:
+            lang = language or ("ar" if is_ar else "en")
+            sid = 0
+            if self.db_client:
+                chat_session = await self.session_model.get_or_create_session(
+                    user_id=user_id, project_id=project_id, persona=persona, language=lang
+                )
+                sid = chat_session.session_id
+                await self.session_model.append_message(sid, "user", query, "general")
+            greeting_responses = {
+                "en": "Hello! How can I help you with your project today?",
+                "ar": "مرحباً! كيف يمكنني مساعدتك في مشروعك اليوم؟",
+            }
+            answer = greeting_responses.get(lang, greeting_responses["en"])
+            if self.db_client:
+                await self.session_model.append_message(sid, "assistant", answer, "general")
+            print(f"[RAG SOURCE] GREETING", file=sys.stderr)
+            return {
+                "answer": answer, "node": "general",
+                "language": lang, "sources": [], "session_id": sid,
+            }
+
         # Fast path — history clear
         clear_commands = [
             "clear history", "forget everything", "new topic",
@@ -958,6 +986,38 @@ class NLPController(BaseController):
             )
             import json as _json
             yield f"data: {_json.dumps({'answer': msg, 'session_id': sid, 'node': 'general', 'language': lang})}\n\n"
+            yield "data: [DONE]\n\n"
+            return
+
+        # Fast path — greetings (skip ALL LLM calls)
+        GREETINGS_EN = {"hello", "hi", "hey", "hi there", "hello there",
+                        "good morning", "good afternoon", "good evening",
+                        "whats up", "sup", "howdy", "greetings",
+                        "how are you", "how are you doing", "how's it going"}
+        GREETINGS_AR = {"مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً"}
+        clean_query = query.strip().lower().rstrip("?!.,;:")
+        is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
+        greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN
+        if clean_query in greeting_set:
+            lang = language or ("ar" if is_ar else "en")
+            sid = 0
+            if self.db_client:
+                chat_session = await self.session_model.get_or_create_session(
+                    user_id=user_id, project_id=project_id, persona=persona, language=lang
+                )
+                sid = chat_session.session_id
+                await self.session_model.append_message(sid, "user", query, "general")
+            greeting_responses = {
+                "en": "Hello! How can I help you with your project today?",
+                "ar": "مرحباً! كيف يمكنني مساعدتك في مشروعك اليوم؟",
+            }
+            answer = greeting_responses.get(lang, greeting_responses["en"])
+            if self.db_client:
+                await self.session_model.append_message(sid, "assistant", answer, "general")
+            import json as _json
+            print(f"[RAG SOURCE] GREETING", file=sys.stderr)
+            yield f"data: {_json.dumps({'node': 'general', 'language': lang, 'session_id': sid, 'event': 'meta'})}\n\n"
+            yield f"data: {_json.dumps({'text': answer})}\n\n"
             yield "data: [DONE]\n\n"
             return
 
