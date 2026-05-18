@@ -7,18 +7,22 @@ on:
   workflow_dispatch:
     # Allows manual triggering from the GitHub Actions UI
 
+# Opt-in to the modern Node.js 24 runtime system-wide
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   evaluate-and-fix:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Upgraded from v3 (supports Node 20/24)
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5  # Upgraded from v4 (supports Node 20/24)
         with:
-          python-version: '3.11' # Update to match your desired python version
+          python-version: '3.13.9'
 
       - name: Install dependencies
         run: |
