@@ -28,6 +28,20 @@ from utils.backend_client import BackendApiClient
 
 logger = logging.getLogger(__name__)
 
+# --- Sentry Error Tracking (initialized before app creation) ---
+# The [fastapi] extra auto-enables Starlette/FastAPI integrations. No-op if DSN unset.
+import sentry_sdk
+
+_sentry_settings = get_settings()
+if _sentry_settings.SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=_sentry_settings.SENTRY_DSN,
+        environment=_sentry_settings.SENTRY_ENVIRONMENT,
+        traces_sample_rate=_sentry_settings.SENTRY_TRACES_SAMPLE_RATE,
+        send_default_pii=False,
+    )
+    logger.info("Sentry enabled (env=%s).", _sentry_settings.SENTRY_ENVIRONMENT)
+
 # --- App Initialization ---
 app = FastAPI(
     title="Connexios RAG API",

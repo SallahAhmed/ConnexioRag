@@ -70,6 +70,11 @@ class Settings(BaseSettings):
     SERVICE_USER_ID: int | None = None
     MAIN_BACKEND_URL: str = "https://connexio.icu"
 
+    # --- Observability (Sentry) ---
+    SENTRY_DSN: str | None = None
+    SENTRY_ENVIRONMENT: str = "production"
+    SENTRY_TRACES_SAMPLE_RATE: float = 0.1
+
     model_config = SettingsConfigDict(
         env_file=os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"),
         env_file_encoding="utf-8",
