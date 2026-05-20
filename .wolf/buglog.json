@@ -597,6 +597,70 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-17T19:19:27.290Z"
+    },
+    {
+      "id": "bug-038",
+      "timestamp": "2026-05-20T13:14:31.067Z",
+      "error_message": "CSS fix: 5",
+      "file": "../Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "root_cause": "5: On mount, fetch any in-flight pending plan as fallback for missed sockets. → fetch any in-flight pending plan (mount fallback for missed sockets,",
+      "fix": "Changed 5: On mount, fetch any in-flight pending plan as fallback for missed sockets. → fetch any in-flight pending plan (mount fallback for missed sockets,",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-20T13:14:31.067Z"
+    },
+    {
+      "id": "bug-039",
+      "timestamp": "2026-05-20T13:14:44.337Z",
+      "error_message": "Null/undefined access in ",
+      "file": "../Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-20T13:14:44.337Z"
+    },
+    {
+      "id": "bug-040",
+      "timestamp": "2026-05-20T13:16:20.538Z",
+      "error_message": "Null/undefined access in ",
+      "file": "../Connexio_Front2/src/components/AIAgentPanel.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-20T13:16:20.538Z"
+    },
+    {
+      "id": "bug-041",
+      "timestamp": "2026-05-20T13:16:58.084Z",
+      "error_message": "Significant refactor of ",
+      "file": "../Connexio_Front2/src/components/AIAgentPanel.jsx",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 8→3 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-05-20T13:16:58.084Z"
     }
   ]
 }
