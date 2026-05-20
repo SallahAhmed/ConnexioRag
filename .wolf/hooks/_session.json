@@ -1,122 +1,130 @@
 {
-  "session_id": "session-2026-05-17-2144",
-  "started": "2026-05-17T18:44:04.604Z",
+  "session_id": "session-2026-05-20-1553",
+  "started": "2026-05-20T12:53:13.206Z",
   "files_read": {
-    "C:/Users/salla/Connexios/src/controllers/NLPController.py": {
-      "count": 4,
-      "tokens": 12732,
-      "first_read": "2026-05-17T18:49:37.750Z"
-    },
-    "C:/Users/salla/Connexios/src/controllers/WorkflowController.py": {
-      "count": 1,
-      "tokens": 2573,
-      "first_read": "2026-05-17T18:49:38.131Z"
-    },
-    "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py": {
-      "count": 1,
-      "tokens": 7350,
-      "first_read": "2026-05-17T18:49:38.293Z"
-    },
-    "C:/Users/salla/Connexios/docs/rag-tool-prioritization-overhaul.md": {
+    "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-17T19:01:26.072Z"
+      "first_read": "2026-05-20T12:55:44.629Z"
     },
-    "C:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py": {
+    "d:/Github Repositries/connexio_back2/modules/ai/ai.routes.js": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-17T19:09:03.294Z"
+      "first_read": "2026-05-20T12:55:58.121Z"
     },
-    "C:/Users/salla/Connexios/src/main.py": {
-      "count": 1,
-      "tokens": 1613,
-      "first_read": "2026-05-17T19:09:03.307Z"
-    },
-    "C:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/relevance_grading.py": {
+    "d:/Github Repositries/ConnexioRag/.wolf/cerebrum.md": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-17T19:09:03.453Z"
+      "first_read": "2026-05-20T13:11:17.533Z"
+    },
+    "d:/Github Repositries/Connexio_Front2/src/api/axiosInstance.js": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:11:23.226Z"
+    },
+    "d:/Github Repositries/Connexio_Front2/src/api/socket.js": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:11:27.271Z"
+    },
+    "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:11:48.722Z"
+    },
+    "d:/Github Repositries/connexio_back2/services/aiService.js": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:12:11.067Z"
+    },
+    "d:/Github Repositries/ConnexioRag/.wolf/memory.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:18:08.473Z"
+    },
+    "d:/Github Repositries/ConnexioRag/.wolf/anatomy.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-20T13:18:38.146Z"
     }
   },
   "files_written": [
     {
-      "file": "C:/Users/salla/Connexios/docs/rag-tool-prioritization-overhaul.md",
+      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
       "action": "create",
-      "tokens": 5734,
-      "at": "2026-05-17T19:12:37.232Z"
+      "tokens": 5500,
+      "at": "2026-05-20T13:14:10.601Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
       "action": "edit",
-      "tokens": 40,
-      "at": "2026-05-17T19:13:10.229Z"
+      "tokens": 49,
+      "at": "2026-05-20T13:14:18.200Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/WorkflowController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
       "action": "edit",
-      "tokens": 1042,
-      "at": "2026-05-17T19:13:37.650Z"
+      "tokens": 158,
+      "at": "2026-05-20T13:14:31.064Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
       "action": "edit",
-      "tokens": 801,
-      "at": "2026-05-17T19:14:00.038Z"
+      "tokens": 125,
+      "at": "2026-05-20T13:14:44.333Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/en/relevance_grading.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
       "action": "edit",
-      "tokens": 314,
-      "at": "2026-05-17T19:14:24.267Z"
+      "tokens": 162,
+      "at": "2026-05-20T13:14:54.067Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/stores/llm/templates/locales/ar/relevance_grading.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx",
       "action": "edit",
-      "tokens": 264,
-      "at": "2026-05-17T19:14:55.865Z"
+      "tokens": 867,
+      "at": "2026-05-20T13:15:18.299Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx",
       "action": "edit",
-      "tokens": 114,
-      "at": "2026-05-17T19:15:15.307Z"
+      "tokens": 818,
+      "at": "2026-05-20T13:15:40.577Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "d:/Github Repositries/connexio_back2/modules/ai/ai.routes.js",
       "action": "edit",
-      "tokens": 136,
-      "at": "2026-05-17T19:17:31.600Z"
+      "tokens": 228,
+      "at": "2026-05-20T13:15:49.937Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
       "action": "edit",
-      "tokens": 1307,
-      "at": "2026-05-17T19:18:41.498Z"
+      "tokens": 290,
+      "at": "2026-05-20T13:16:20.536Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
       "action": "edit",
-      "tokens": 32,
-      "at": "2026-05-17T19:18:56.969Z"
+      "tokens": 119,
+      "at": "2026-05-20T13:16:51.270Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
       "action": "edit",
-      "tokens": 2322,
-      "at": "2026-05-17T19:19:27.287Z"
+      "tokens": 17,
+      "at": "2026-05-20T13:16:58.081Z"
     }
   ],
   "edit_counts": {
-    "docs/rag-tool-prioritization-overhaul.md": 1,
-    "src/controllers/WorkflowController.py": 2,
-    "src/controllers/helpers/ToolManager.py": 1,
-    "src/stores/llm/templates/locales/en/relevance_grading.py": 1,
-    "src/stores/llm/templates/locales/ar/relevance_grading.py": 1,
-    "src/controllers/NLPController.py": 5
+    "../Connexio_Front2/src/components/AIAgentPanel.jsx": 4,
+    "../Connexio_Front2/src/pages/ProjectDetail.jsx": 4,
+    "../Connexio_Front2/src/context/AppContext.jsx": 2,
+    "../connexio_back2/modules/ai/ai.routes.js": 1
   },
-  "anatomy_hits": 4,
-  "anatomy_misses": 2,
-  "repeated_reads_warned": 3,
+  "anatomy_hits": 0,
+  "anatomy_misses": 9,
+  "repeated_reads_warned": 0,
   "cerebrum_warnings": 0,
-  "stop_count": 3
+  "stop_count": 2
 }
