@@ -1,130 +1,153 @@
 {
-  "session_id": "session-2026-05-20-1553",
-  "started": "2026-05-20T12:53:13.206Z",
+  "session_id": "session-2026-05-20-0235",
+  "started": "2026-05-20T23:35:37.981Z",
   "files_read": {
-    "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T12:55:44.629Z"
+    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": {
+      "count": 2,
+      "tokens": 9248,
+      "first_read": "2026-05-20T23:40:32.446Z"
     },
-    "d:/Github Repositries/connexio_back2/modules/ai/ai.routes.js": {
+    "f:/MasarX_A/src/utils/prompts/doc_prompts.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T12:55:58.121Z"
+      "first_read": "2026-05-20T23:40:38.617Z"
     },
-    "d:/Github Repositries/ConnexioRag/.wolf/cerebrum.md": {
+    "f:/MasarX_A/src/utils/prompts/audit_prompts.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T13:11:17.533Z"
+      "first_read": "2026-05-20T23:40:41.238Z"
     },
-    "d:/Github Repositries/Connexio_Front2/src/api/axiosInstance.js": {
+    "f:/MasarX_A/src/utils/prompts/monitor_prompts.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T13:11:23.226Z"
+      "first_read": "2026-05-20T23:40:44.469Z"
     },
-    "d:/Github Repositries/Connexio_Front2/src/api/socket.js": {
+    "f:/MasarX_A/src/utils/prompts/team_prompts.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T13:11:27.271Z"
+      "first_read": "2026-05-20T23:40:44.595Z"
     },
-    "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T13:11:48.722Z"
+    "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py": {
+      "count": 2,
+      "tokens": 1577,
+      "first_read": "2026-05-20T23:40:47.245Z"
     },
-    "d:/Github Repositries/connexio_back2/services/aiService.js": {
+    "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T13:12:11.067Z"
+      "tokens": 2256,
+      "first_read": "2026-05-20T23:41:15.844Z"
     },
-    "d:/Github Repositries/ConnexioRag/.wolf/memory.md": {
+    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T13:18:08.473Z"
+      "tokens": 2120,
+      "first_read": "2026-05-20T23:46:53.564Z"
     },
-    "d:/Github Repositries/ConnexioRag/.wolf/anatomy.md": {
+    "f:/MasarX_A/src/utils/prompts/pr_prompts.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T13:18:38.146Z"
+      "first_read": "2026-05-20T23:47:26.542Z"
+    },
+    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": {
+      "count": 1,
+      "tokens": 4289,
+      "first_read": "2026-05-20T23:51:02.870Z"
+    },
+    "f:/MasarX_A/src/models/db_schemas/live_models.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-21T00:09:06.391Z"
+    },
+    "f:/MasarX_A/src/helpers/config.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-05-21T00:09:09.016Z"
+    },
+    "f:/MasarX_A/src/Routes/webhook_routes.py": {
+      "count": 1,
+      "tokens": 11175,
+      "first_read": "2026-05-21T00:09:11.821Z"
     }
   },
   "files_written": [
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
-      "action": "create",
-      "tokens": 5500,
-      "at": "2026-05-20T13:14:10.601Z"
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+      "action": "edit",
+      "tokens": 762,
+      "at": "2026-05-20T23:42:25.003Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
       "action": "edit",
-      "tokens": 49,
-      "at": "2026-05-20T13:14:18.200Z"
+      "tokens": 187,
+      "at": "2026-05-20T23:42:34.261Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
       "action": "edit",
-      "tokens": 158,
-      "at": "2026-05-20T13:14:31.064Z"
+      "tokens": 1306,
+      "at": "2026-05-20T23:43:09.439Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/utils/prompts/audit_prompts.py",
       "action": "edit",
-      "tokens": 125,
-      "at": "2026-05-20T13:14:44.333Z"
+      "tokens": 371,
+      "at": "2026-05-20T23:43:23.782Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
       "action": "edit",
-      "tokens": 162,
-      "at": "2026-05-20T13:14:54.067Z"
+      "tokens": 57,
+      "at": "2026-05-20T23:43:29.373Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
       "action": "edit",
-      "tokens": 867,
-      "at": "2026-05-20T13:15:18.299Z"
+      "tokens": 642,
+      "at": "2026-05-20T23:43:52.210Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/context/AppContext.jsx",
+      "file": "f:/MasarX_A/src/utils/prompts/doc_prompts.py",
       "action": "edit",
-      "tokens": 818,
-      "at": "2026-05-20T13:15:40.577Z"
+      "tokens": 369,
+      "at": "2026-05-20T23:44:04.809Z"
     },
     {
-      "file": "d:/Github Repositries/connexio_back2/modules/ai/ai.routes.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
       "action": "edit",
-      "tokens": 228,
-      "at": "2026-05-20T13:15:49.937Z"
+      "tokens": 39,
+      "at": "2026-05-20T23:44:10.498Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
       "action": "edit",
-      "tokens": 290,
-      "at": "2026-05-20T13:16:20.536Z"
+      "tokens": 357,
+      "at": "2026-05-20T23:47:23.242Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
       "action": "edit",
-      "tokens": 119,
-      "at": "2026-05-20T13:16:51.270Z"
+      "tokens": 733,
+      "at": "2026-05-20T23:51:54.839Z"
     },
     {
-      "file": "d:/Github Repositries/Connexio_Front2/src/components/AIAgentPanel.jsx",
+      "file": "f:/MasarX_A/src/utils/prompts/doc_prompts.py",
       "action": "edit",
-      "tokens": 17,
-      "at": "2026-05-20T13:16:58.081Z"
+      "tokens": 302,
+      "at": "2026-05-20T23:52:06.185Z"
     }
   ],
   "edit_counts": {
-    "../Connexio_Front2/src/components/AIAgentPanel.jsx": 4,
-    "../Connexio_Front2/src/pages/ProjectDetail.jsx": 4,
-    "../Connexio_Front2/src/context/AppContext.jsx": 2,
-    "../connexio_back2/modules/ai/ai.routes.js": 1
+    "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py": 2,
+    "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py": 2,
+    "f:/MasarX_A/src/utils/prompts/audit_prompts.py": 1,
+    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": 2,
+    "f:/MasarX_A/src/utils/prompts/doc_prompts.py": 2,
+    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": 1,
+    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": 1
   },
-  "anatomy_hits": 0,
-  "anatomy_misses": 9,
-  "repeated_reads_warned": 0,
+  "anatomy_hits": 6,
+  "anatomy_misses": 7,
+  "repeated_reads_warned": 2,
   "cerebrum_warnings": 0,
-  "stop_count": 2
+  "stop_count": 3
 }

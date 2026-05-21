@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T13:16:58.078Z
-> Files: 4 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T23:52:06.168Z
+> Files: 19 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -256,6 +256,10 @@
 ## .venv/Lib/site-packages/asyncpg/protocol/record/
 
 
+## Connexio_Front2/src/components/
+
+- `AIAgentPanel.jsx` — AIAgentPanel: triggers all MasarX intents, renders structured results (match/risks/workload/audit/docs/scaffold/PR), owner-gated, timeout-tolerant (~2600 tok)
+
 ## F:/MasarX_A/
 
 
@@ -277,10 +281,6 @@
 ## docs/
 
 
-## Connexio_Front2/src/components/
-
-- `AIAgentPanel.jsx` — AIAgentPanel: triggers all MasarX intents, renders structured results (match/risks/workload/audit/docs/scaffold/PR), owner-gated, timeout-tolerant (~2600 tok)
-
 ## f:/Connexio_Frontend2/src/components/
 
 
@@ -292,18 +292,38 @@
 
 ## f:/MasarX_A/scratch/
 
+- `test_all_subgraphs.py` — get_state, dump, run_test, test_match_team (~2902 tok)
 
 ## f:/MasarX_A/src/
 
+- `main.py` — API: 1 endpoints (~1958 tok)
 
 ## f:/MasarX_A/src/Routes/
 
+- `webhook_routes.py` — API: 4 endpoints (~11175 tok)
+
+## f:/MasarX_A/src/controllers/
+
+- `WorkflowController.py` — _MemoryCache: get, set, get, set + 13 more (~4519 tok)
+
+## f:/MasarX_A/src/controllers/subgraphs/
+
+- `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report, save_audit_node (~2255 tok)
+- `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 5 more (~9592 tok)
+- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~2854 tok)
+- `pr_translator_subgraph.py` — Pydantic: PRBusinessSummary (~2209 tok)
+- `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~2322 tok)
+- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~4754 tok)
 
 ## f:/MasarX_A/src/helpers/
 
 
 ## f:/MasarX_A/src/models/db_schemas/
 
+
+## f:/MasarX_A/src/models/schemas/
+
+- `state.py` — MasarXState: add_results (~714 tok)
 
 ## f:/MasarX_A/src/stores/llm/
 
@@ -313,9 +333,15 @@
 
 ## f:/MasarX_A/src/tasks/
 
+- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan (~1099 tok)
 
 ## f:/MasarX_A/src/utils/
 
+
+## f:/MasarX_A/src/utils/prompts/
+
+- `audit_prompts.py` (~384 tok)
+- `doc_prompts.py` (~830 tok)
 
 ## f:/MasarX_A/src/utils/tools/
 
