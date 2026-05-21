@@ -42,6 +42,14 @@ class NLPController(BaseController):
         self.embedding_client = embedding_client
         self.template_parser = template_parser
         self.settings = settings
+
+        # ⚡ Bolt Optimization: tiktoken.get_encoding is slow (O(n) for vocabulary loading)
+        # We load it once at the class level instead of inside the method loop to significantly
+        # speed up token counting and context preparation for every request.
+        try:
+            self.encoding = tiktoken.get_encoding("cl100k_base")
+        except Exception:
+            self.encoding = None
         self.db_client = db_client
         self.reranker = reranker
         self.backend_client = backend_client  # May be None in Celery workers
@@ -344,18 +352,13 @@ class NLPController(BaseController):
             is_memory_query = True  # skip KB retrieval + CRAG — file content IS the source
 
         # --- Token budgeting ---
-        try:
-            encoding = tiktoken.get_encoding("cl100k_base")
-        except Exception:
-            encoding = None
-
         total_token_budget = getattr(self.settings, "TOTAL_CONTEXT_TOKEN_BUDGET", 4000)
 
         def count_tokens(text):
-            return len(encoding.encode(text)) if encoding else len(text) // 4
+            return len(self.encoding.encode(text)) if self.encoding else len(text) // 4
 
         truncated_history = self._get_truncated_history(
-            history, total_token_budget // 3, encoding
+            history, total_token_budget // 3, self.encoding
         )
         utility_history = [
             self.utility_client.construct_prompt(
@@ -563,7 +566,7 @@ class NLPController(BaseController):
 
         base_tokens = count_tokens(system_prompt) + count_tokens(context_string)
         history_budget = total_token_budget - base_tokens - 200
-        final_history = self._get_truncated_history(history, history_budget, encoding)
+        final_history = self._get_truncated_history(history, history_budget, self.encoding)
 
         if context_string.strip():
             footer_prompt = self.template_parser.get(
