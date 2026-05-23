@@ -242,8 +242,11 @@ def mock_utility_client():
         # Classification: return OOS for jailbreak or out-of-scope prompts
         if "classify" in p or "only one word" in p or "only the single" in p:
             if any(w in p for w in ["jailbreak", "bypass", "system prompt",
-                                    "arche", "نظام برومبت", "نظام البرومبت",
-                                    "override your", "out of scope"]):
+                                    "ignore your", "ignore previous",
+                                    "disregard your", "pretend you",
+                                    "override your", "out of scope",
+                                    "تجاهل تعليماتك", "تجاوز قيودك",
+                                    "تظاهر أنك", "نظام برومبت"]):
                 return "OUT_OF_SCOPE"
             # Detect Arabic in the query portion → assume OOS (conservative)
             if any('\u0600' <= c <= '\u06FF' for c in p if 'classify' in p):

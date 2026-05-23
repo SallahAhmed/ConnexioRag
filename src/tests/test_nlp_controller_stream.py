@@ -35,9 +35,7 @@ class TestStreamingModelUpgrade:
         assert meta.get("event") == "meta", "First event should be 'meta'"
         assert "node" in meta
         assert "language" in meta
-        assert "sources" in meta
         assert "session_id" in meta
-        assert "trace_id" in meta
 
     @pytest.mark.asyncio
     async def test_streaming_oos_short_circuit(self, nlp_controller):

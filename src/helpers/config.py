@@ -23,13 +23,14 @@ class Settings(BaseSettings):
 
     GENERATION_BACKEND: str = "GROQ"
     UTILITY_BACKEND: str = "GROQ"
-    EMBEDDING_BACKEND: str = "COHERE"
+    EMBEDDING_BACKEND: str = "OPENAI"
 
     OPENAI_API_KEY: str | None = None
     OPENAI_API_URL: str | None = None
     OPENAI_GENERATION_API_URL: str | None = None
     OPENAI_EMBEDDING_API_URL: str | None = None
-    COHERE_API_KEY: str | None = None
+    JINA_API_KEY: str | None = None
+    JINA_API_URL: str = "https://api.jina.ai/v1"
     GROQ_API_KEY: str | None = None
     GROQ_API_URL: str | None = "https://api.groq.com/openai/v1"
     SERPAPI_API_KEY: str | None = None
@@ -65,6 +66,7 @@ class Settings(BaseSettings):
     CELERY_FLOWER_PASSWORD: str | None = None
     CELERY_FLOWER_BROKER_API: str | None = None
 
+    COHERE_API_KEY: str | None = None  # kept for backward compat, unused if EMBEDDING_BACKEND is not COHERE
     CONNEXIO_INTERNAL_API_KEY: str | None = None
     JWT_SECRET: str | None = None
     SERVICE_USER_ID: int | None = None

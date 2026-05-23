@@ -383,30 +383,52 @@
 
 ## src/
 
+- `main.py` — FastAPI entrypoint: startup (DB pool, tool init, embedding client, reranker), SSE streaming via `/api/v1/nlp/agent/chat/{project_id}` (~1909 tok)
+- `celery_app.py` — Celery app config: Jina embedding client + reranker init in `on_after_finalize`
+- `Requirements.txt` — pinned deps incl `httpx`, no `cohere`
 
 ## src/Routes/
 
+- `agent.py` — POST `/api/v1/nlp/agent/chat/{project_id}` route: auth, session lookup, calls `answer_agent_chat`
+- `base.py` — GET `/api/v1/nlp/base` health check
+- `data.py` — POST `/api/v1/nlp/data/process` — chunk & embed documents
+- `nlp.py` — POST `/api/v1/nlp/generate` — answer generation
+- `projects.py` — GET project context, members, tasks from backend API
 
 ## src/Routes/schemas/
 
+- `agent.py` — `AgentChatRequest`/`AgentChatResponse` Pydantic models
 
 ## src/controllers/
 
+- `NLPController.py` — Core: node detection, CRAG tools dispatch, KB retriever, generation, stream/non-stream paths (~3725 tok)
+- `WorkflowController.py` — Node routing: jailbreak check (`JAILBREAK_KEYWORDS`, fixed), fuzzy matching, OOS detection, fast path, tiered utility→generation escalation
 
 ## src/controllers/helpers/
 
+- `ToolManager.py` — CRAG tool orchestration: Wikipedia, ArXiv, Google/SerpAPI, GitHub, StackOverflow. Collection name resolution, project context
+- `TraceManager.py` — Request tracing and logging
 
 ## src/helpers/
 
+- `config.py` — `Settings` class via `pydantic-settings`: `JINA_API_KEY`, `JINA_API_URL`, `COHERE_API_KEY`, `GROQ_API_KEY`, `CONNEXIO_INTERNAL_API_KEY`, etc.
 
-## src/models/db_schemas/connexio/
+## src/models/
 
+- `AssetModel.py`, `ChunkModel.py`, `ProjectModel.py`, `SessionModel.py`, `BaseDataModel.py` — SQLAlchemy models for PGVector-backed storage
 
-## src/models/db_schemas/connexio/alembic/versions/
+## src/stores/llm/providers/
 
+- `OpenAIProvider.py` — Active: used for Jina embeddings (OpenAI-compatible API) and Groq generation. `embed_text()` passes Jina `task` via `extra_body`
+- `GroqProvider.py` — Active: LLM generation via Groq API
+- `CoHereProvider.py` — Inactive: kept for backward compat, not imported by any code path
 
-## src/models/db_schemas/connexio/schemas/
+## src/stores/vectordb/providers/
 
+- `PGVectorProvider.py` — Active: default vector DB backend
+- `QdrantDBProvider.py` — Available: not default
+- `JinaReranker.py` — Active: httpx POST to `/v1/rerank`
+- `CoHereReranker.py` — Inactive: kept for backward compat
 
 ## src/stores/llm/templates/locales/ar/
 
@@ -415,4 +437,10 @@
 
 
 ## src/utils/
+
+- `backend_client.py` — REST calls to Node.js backend (5-min cache, X-API-Key auth)
+- `masarx_client.py` — REST calls to MasarX Agent
+- `security.py` — API key verification
+- `idempotency_manager.py` — Idempotency key handling
+- `metrics.py` — Usage metrics
 

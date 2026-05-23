@@ -37,9 +37,14 @@ async def get_setup_utils():
     utility_client = llm_provider_factory.create_utility_client()
 
     # embedding client
+    embedding_api_url = (
+        settings.JINA_API_URL
+        if settings.EMBEDDING_BACKEND == "OPENAI" and settings.JINA_API_KEY
+        else settings.OPENAI_EMBEDDING_API_URL
+    )
     embedding_client = llm_provider_factory.create(
         provider=settings.EMBEDDING_BACKEND,
-        api_url=settings.OPENAI_EMBEDDING_API_URL
+        api_url=embedding_api_url
     )
     embedding_client.set_embedding_model(model_id=settings.EMBEDDING_MODEL_ID,
                                              embedding_size=settings.EMBEDDING_MODEL_SIZE)

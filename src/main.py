@@ -114,9 +114,14 @@ async def lifespan(app: FastAPI):
     app.utility_client = llm_provider_factory.create_utility_client()
 
     # --- Embedding Client Setup ---
+    embedding_api_url = (
+        settings.JINA_API_URL
+        if settings.EMBEDDING_BACKEND == "OPENAI" and settings.JINA_API_KEY
+        else settings.OPENAI_EMBEDDING_API_URL
+    )
     app.embedding_client = llm_provider_factory.create(
         provider=settings.EMBEDDING_BACKEND,
-        api_url=settings.OPENAI_EMBEDDING_API_URL,
+        api_url=embedding_api_url,
     )
     app.embedding_client.set_embedding_model(
         model_id=settings.EMBEDDING_MODEL_ID,
@@ -135,18 +140,18 @@ async def lifespan(app: FastAPI):
         logger.error("Vector DB connection failed: %s", e)
         raise RuntimeError(f"Cannot start without Vector DB: {e}") from e
 
-    # --- Reranker Setup (Cohere Multilingual) ---
+    # --- Reranker Setup (Jina Multilingual) ---
     try:
-        from stores.vectordb.providers.CoHereReranker import CoHereReranker
-        if getattr(settings, "COHERE_API_KEY", None):
-            app.reranker = CoHereReranker(api_key=settings.COHERE_API_KEY)
-            logger.info("Cohere reranker (rerank-multilingual-v3.0) initialized.")
+        from stores.vectordb.providers.JinaReranker import JinaReranker
+        if getattr(settings, "JINA_API_KEY", None):
+            app.reranker = JinaReranker(api_key=settings.JINA_API_KEY)
+            logger.info("Jina reranker (jina-reranker-v2-base-multilingual) initialized.")
         else:
             app.reranker = None
-            logger.warning("COHERE_API_KEY not set — reranking disabled.")
+            logger.warning("JINA_API_KEY not set — reranking disabled.")
     except Exception as e:
         app.reranker = None
-        logger.error("Failed to initialize Cohere reranker: %s", e)
+        logger.error("Failed to initialize Jina reranker: %s", e)
 
     # --- Template Parser Setup ---
     app.template_parser = TemplateParser(

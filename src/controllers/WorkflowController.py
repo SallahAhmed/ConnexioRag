@@ -101,6 +101,8 @@ class WorkflowController(BaseController):
             "override your", "jailbreak", "developer mode", "dan mode",
             "أرني نظام برومبت", "تجاهل تعليماتك", "تجاوز قيودك", "تظاهر أنك لست",
         ]
+        if any(kw in query_lower for kw in JAILBREAK_KEYWORDS):
+            return WorkflowNodeEnum.OUT_OF_SCOPE
         # 0.5 CONVERSATIONAL FOLLOW-UPS: Instantly mark follow-up questions containing reference to AI as GENERAL
         CONVERSATIONAL_FOLLOW_UPS = [
             "you mean", "you meant", "you say", "you said", "did you", "you refer",

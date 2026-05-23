@@ -10,6 +10,16 @@
 
 ## Key Learnings
 
+- **Jina AI embeddings via OpenAIProvider:** `EMBEDDING_BACKEND="OPENAI"` reuses `OpenAIProvider` with Jina's OpenAI-compatible API at `JINA_API_URL`. The `embed_text()` method passes `"task": "retrieval.query"` or `"retrieval.passage"` via `extra_body` when model ID contains "jina". Model: `jina-embeddings-v3` (1024 dim).
+
+- **JinaReranker:** Calls `POST {JINA_API_URL}/v1/rerank` directly via `httpx`. Shares `JINA_API_KEY` with embeddings. No SDK needed — Jina's rerank API is OpenAI-compatible formatted as a standalone POST.
+
+- **JAILBREAK_KEYWORDS bug (fixed):** `JAILBREAK_KEYWORDS` list was defined at line 97-103 but `if any(kw in query_lower for kw in JAILBREAK_KEYWORDS): return OUT_OF_SCOPE` was missing. Queries matching jailbreak patterns were returning GENERAL instead of OUT_OF_SCOPE. Fixed by adding the check.
+
+- **.env secrets pattern:** All live secrets are commented with `# TODO: rotate` to prevent accidental commits while keeping the file as the single source of truth for required env vars.
+
+- **Cohere files disabled:** `CoHereProvider.py` and `CoHereReranker.py` are kept in the codebase but not imported. The imports in `providers/__init__.py`, `LLMEnums.py`, and `LLMProviderFactory.py` remain for backward compatibility but no code path activates them.
+
 - **Project:** connexios
 - **Description:** Connexio full-stack — Node.js backend (Hostinger), Connexios RAG (HF Spaces), MasarX Agent (HF Spaces), shared Neon.tech PostgreSQL.
 
@@ -73,6 +83,9 @@
 
 - **[2026-05-16] _SKIP_FAST_PATH must cover Arabic question words.**
   The 50-char fast path in `detect_node()` bypasses LLM classification. Arabic question starters like "ما هو", "ما هي", "كيف", "هل" were missing, allowing Arabic queries about folklore, philosophy, and personal topics to bypass OOS detection. Always keep `_SKIP_FAST_PATH` in sync with common Arabic question patterns.
+
+- **[2026-05-23] JAILBREAK_KEYWORDS list requires an explicit check.**
+  The `JAILBREAK_KEYWORDS` tuple was defined at class level but the loop to test `if any(kw in query_lower for kw in JAILBREAK_KEYWORDS): return OUT_OF_SCOPE` was never written. Static analysis won't catch this — a tuple declared and never iterated over is syntactically valid. Always verify that guard lists are actually consumed in the logic, not just declared.
 
 - **[2026-05-16] Streaming path needs explicit model upgrade logic.**
   Unlike the non-streaming path with auto-escalation (utility→generation on bad answer), the streaming path must pre-emptively upgrade to the generation model for projectless GENERAL queries. Streaming renders tokens visibly, so poor 8B answers are more noticeable.
