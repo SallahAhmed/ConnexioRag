@@ -3,6 +3,16 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+## Session: 2026-05-21
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:00 | Ran all 9 subgraph tests; raised quality 7.2→9.0/10 | MasarX_A/scratch/test_all_subgraphs.py | All pass | ~2000 |
+| 09:20 | Phase A: Webhook TTL cleanup + error propagation all 6 subgraphs | cron_jobs.py, celery_app.py, monitor/audit/doc/pr_translator/team/skill_endorsement/task subgraphs | cleanup_webhook_results + cleanup_pending_plans Celery Beat tasks; conditional edges on error | ~3500 |
+| 09:50 | Phase B: Sprint system | dbconnection.js, sprints.routes.js, bootstrap.js | sprints table + CRUD + start/close events → fireEvent → MasarX | ~1200 |
+| 10:10 | Phase C: GitHub PR webhook | github.webhook.js, bootstrap.js | HMAC-SHA256 verify, repo→project resolution, fires pullrequest.merged | ~800 |
+| 10:20 | Phase D: Project close endpoint | projects.controller.js, projects.routes.js, dbconnection.js | closeProject, status/closed_at columns, fires project.closed → generate_readme | ~600 |
+
 ## Session: 2026-05-20
 
 | Time | Action | File(s) | Outcome | ~Tokens |
@@ -383,3 +393,29 @@
 | 02:55 | Session end: 11 writes across 7 files (monitor_subgraph.py, audit_subgraph.py, audit_prompts.py, doc_subgraph.py, doc_prompts.py) | 10 reads | ~24615 tok |
 | 02:58 | Session end: 11 writes across 7 files (monitor_subgraph.py, audit_subgraph.py, audit_prompts.py, doc_subgraph.py, doc_prompts.py) | 10 reads | ~24615 tok |
 | 03:05 | Session end: 11 writes across 7 files (monitor_subgraph.py, audit_subgraph.py, audit_prompts.py, doc_subgraph.py, doc_prompts.py) | 10 reads | ~24615 tok |
+| 03:12 | Session end: 11 writes across 7 files (monitor_subgraph.py, audit_subgraph.py, audit_prompts.py, doc_subgraph.py, doc_prompts.py) | 19 reads | ~35790 tok |
+| 03:14 | Edited f:/MasarX_A/src/tasks/cron_jobs.py | added 1 import(s) | ~73 |
+| 03:14 | Edited f:/MasarX_A/src/tasks/cron_jobs.py | modified cleanup_webhook_results() | ~770 |
+| 03:15 | Edited f:/MasarX_A/src/celery_app.py | expanded (+9 lines) | ~187 |
+| 03:15 | Edited f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py | modified route_team_intent() | ~96 |
+| 03:16 | Edited f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py | modified route_monitor_intent() | ~80 |
+| 03:16 | Edited f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py | modified route_doc_intent() | ~116 |
+| 03:16 | Edited f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py | modified _route_after_context() | ~208 |
+| 03:16 | Edited f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py | modified _route_after_fetch() | ~229 |
+| 03:16 | Edited f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py | 3→7 lines | ~92 |
+| 03:17 | Edited f:/connexio_back2/database/dbconnection.js | expanded (+18 lines) | ~257 |
+| 03:18 | Created f:/connexio_back2/modules/sprints/sprints.routes.js | — | ~1470 |
+| 03:18 | Edited f:/connexio_back2/bootstrap.js | added 1 import(s) | ~33 |
+| 03:18 | Edited f:/connexio_back2/bootstrap.js | 1→2 lines | ~21 |
+| 03:18 | Created f:/connexio_back2/modules/webhooks/github.webhook.js | — | ~961 |
+| 03:18 | Edited f:/connexio_back2/bootstrap.js | added 1 import(s) | ~38 |
+| 03:18 | Edited f:/connexio_back2/bootstrap.js | 3→8 lines | ~87 |
+| 03:18 | Edited f:/connexio_back2/bootstrap.js | 1→2 lines | ~24 |
+| 03:19 | Edited f:/connexio_back2/database/dbconnection.js | added error handling | ~225 |
+| 03:19 | Edited f:/connexio_back2/modules/projects/projects.controller.js | added 4 condition(s) | ~558 |
+| 03:20 | Edited f:/connexio_back2/modules/projects/projects.routes.js | 2→3 lines | ~49 |
+
+## Session: 2026-05-21 03:22
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|

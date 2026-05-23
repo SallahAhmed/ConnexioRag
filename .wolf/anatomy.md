@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-20T23:52:06.168Z
-> Files: 19 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-05-21T00:20:03.670Z
+> Files: 27 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -296,6 +296,7 @@
 
 ## f:/MasarX_A/src/
 
+- `celery_app.py` (~701 tok)
 - `main.py` — API: 1 endpoints (~1958 tok)
 
 ## f:/MasarX_A/src/Routes/
@@ -308,12 +309,13 @@
 
 ## f:/MasarX_A/src/controllers/subgraphs/
 
-- `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report, save_audit_node (~2255 tok)
-- `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 5 more (~9592 tok)
-- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~2854 tok)
+- `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report, save_audit_node (~2322 tok)
+- `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 5 more (~9606 tok)
+- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~2867 tok)
 - `pr_translator_subgraph.py` — Pydantic: PRBusinessSummary (~2209 tok)
-- `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~2322 tok)
-- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~4754 tok)
+- `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~2384 tok)
+- `task_subgraph.py` — check_for_cycles, has_cycle, check_global_cycles, has_cycle (~11853 tok)
+- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~4767 tok)
 
 ## f:/MasarX_A/src/helpers/
 
@@ -333,7 +335,7 @@
 
 ## f:/MasarX_A/src/tasks/
 
-- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan (~1099 tok)
+- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan, cleanup_webhook_results, cleanup_pending_plans (~1824 tok)
 
 ## f:/MasarX_A/src/utils/
 
@@ -348,6 +350,11 @@
 
 ## f:/connexio_back2/
 
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1308 tok)
+
+## f:/connexio_back2/database/
+
+- `dbconnection.js` — database/dbconnection.js - MySQL Version (~3940 tok)
 
 ## f:/connexio_back2/models/
 
@@ -357,6 +364,19 @@
 
 ## f:/connexio_back2/modules/chats/
 
+
+## f:/connexio_back2/modules/projects/
+
+- `projects.controller.js` — API routes: POST (1 endpoints) (~9138 tok)
+- `projects.routes.js` — API routes: POST, GET, PUT, DELETE (16 endpoints) (~448 tok)
+
+## f:/connexio_back2/modules/sprints/
+
+- `sprints.routes.js` — Membership guard — only project members can manage sprints. (~1470 tok)
+
+## f:/connexio_back2/modules/webhooks/
+
+- `github.webhook.js` — Verify the GitHub HMAC-SHA256 signature on every incoming webhook. (~961 tok)
 
 ## f:/connexio_back2/services/
 

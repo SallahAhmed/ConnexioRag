@@ -1,152 +1,22 @@
 {
-  "session_id": "session-2026-05-20-0235",
-  "started": "2026-05-20T23:35:37.981Z",
+  "session_id": "session-2026-05-21-0322",
+  "started": "2026-05-21T00:22:17.145Z",
   "files_read": {
-    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": {
-      "count": 2,
-      "tokens": 9248,
-      "first_read": "2026-05-20T23:40:32.446Z"
+    "c:/Users/salla/Connexios/.wolf/memory.md": {
+      "count": 3,
+      "tokens": 0,
+      "first_read": "2026-05-21T00:22:21.792Z"
     },
-    "f:/MasarX_A/src/utils/prompts/doc_prompts.py": {
+    "c:/Users/salla/Connexios/.wolf/cerebrum.md": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-20T23:40:38.617Z"
-    },
-    "f:/MasarX_A/src/utils/prompts/audit_prompts.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T23:40:41.238Z"
-    },
-    "f:/MasarX_A/src/utils/prompts/monitor_prompts.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T23:40:44.469Z"
-    },
-    "f:/MasarX_A/src/utils/prompts/team_prompts.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T23:40:44.595Z"
-    },
-    "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py": {
-      "count": 2,
-      "tokens": 1577,
-      "first_read": "2026-05-20T23:40:47.245Z"
-    },
-    "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py": {
-      "count": 1,
-      "tokens": 2256,
-      "first_read": "2026-05-20T23:41:15.844Z"
-    },
-    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": {
-      "count": 1,
-      "tokens": 2120,
-      "first_read": "2026-05-20T23:46:53.564Z"
-    },
-    "f:/MasarX_A/src/utils/prompts/pr_prompts.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-20T23:47:26.542Z"
-    },
-    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": {
-      "count": 1,
-      "tokens": 4289,
-      "first_read": "2026-05-20T23:51:02.870Z"
-    },
-    "f:/MasarX_A/src/models/db_schemas/live_models.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-21T00:09:06.391Z"
-    },
-    "f:/MasarX_A/src/helpers/config.py": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-05-21T00:09:09.016Z"
-    },
-    "f:/MasarX_A/src/Routes/webhook_routes.py": {
-      "count": 1,
-      "tokens": 11175,
-      "first_read": "2026-05-21T00:09:11.821Z"
+      "first_read": "2026-05-21T00:22:22.084Z"
     }
   },
-  "files_written": [
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
-      "action": "edit",
-      "tokens": 762,
-      "at": "2026-05-20T23:42:25.003Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
-      "action": "edit",
-      "tokens": 187,
-      "at": "2026-05-20T23:42:34.261Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
-      "action": "edit",
-      "tokens": 1306,
-      "at": "2026-05-20T23:43:09.439Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/utils/prompts/audit_prompts.py",
-      "action": "edit",
-      "tokens": 371,
-      "at": "2026-05-20T23:43:23.782Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
-      "action": "edit",
-      "tokens": 57,
-      "at": "2026-05-20T23:43:29.373Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
-      "action": "edit",
-      "tokens": 642,
-      "at": "2026-05-20T23:43:52.210Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/utils/prompts/doc_prompts.py",
-      "action": "edit",
-      "tokens": 369,
-      "at": "2026-05-20T23:44:04.809Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
-      "action": "edit",
-      "tokens": 39,
-      "at": "2026-05-20T23:44:10.498Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
-      "action": "edit",
-      "tokens": 357,
-      "at": "2026-05-20T23:47:23.242Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
-      "action": "edit",
-      "tokens": 733,
-      "at": "2026-05-20T23:51:54.839Z"
-    },
-    {
-      "file": "f:/MasarX_A/src/utils/prompts/doc_prompts.py",
-      "action": "edit",
-      "tokens": 302,
-      "at": "2026-05-20T23:52:06.185Z"
-    }
-  ],
-  "edit_counts": {
-    "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py": 2,
-    "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py": 2,
-    "f:/MasarX_A/src/utils/prompts/audit_prompts.py": 1,
-    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": 2,
-    "f:/MasarX_A/src/utils/prompts/doc_prompts.py": 2,
-    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": 1,
-    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": 1
-  },
-  "anatomy_hits": 6,
-  "anatomy_misses": 7,
+  "files_written": [],
+  "edit_counts": {},
+  "anatomy_hits": 0,
+  "anatomy_misses": 2,
   "repeated_reads_warned": 2,
   "cerebrum_warnings": 0,
   "stop_count": 3
