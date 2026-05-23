@@ -40,6 +40,7 @@ python -m celery -A celery_app beat --loglevel=info       # Celery Beat
 - **Streaming SSE order:** meta event → token chunks → `[DONE]`
 - **No direct DB to Node.js backend** — all live data via `BackendApiClient` REST calls (5-min cache)
 - **Cohere provider files retained but inactive** — `CoHereProvider.py`/`CoHereReranker.py` present, not used
+- **`Requirements.txt` includes `cohere==5.21.1`** — required because `CoHereProvider` is imported unconditionally at module load time in `__init__.py` and `LLMProviderFactory.py`. Removing it crashes `celery_app.py` and `main.py` on startup (`ModuleNotFoundError: No module named 'cohere'`).
 
 ## WorkflowController Gotchas
 

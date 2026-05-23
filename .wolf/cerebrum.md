@@ -87,6 +87,9 @@
 - **[2026-05-23] JAILBREAK_KEYWORDS list requires an explicit check.**
   The `JAILBREAK_KEYWORDS` tuple was defined at class level but the loop to test `if any(kw in query_lower for kw in JAILBREAK_KEYWORDS): return OUT_OF_SCOPE` was never written. Static analysis won't catch this — a tuple declared and never iterated over is syntactically valid. Always verify that guard lists are actually consumed in the logic, not just declared.
 
+- **[2026-05-23] `cohere` package must stay in Requirements.txt despite being unused.**
+  `CoHereProvider` is imported unconditionally at module level in `providers/__init__.py:2` and `LLMProviderFactory.py:2`. Removing `cohere` from dependencies causes `ModuleNotFoundError` at startup — the import chain is triggered before any code path that could skip it. A lazy import (inside the `if provider == COHERE` branch) would fix this, but until then, the dependency must stay.
+
 - **[2026-05-16] Streaming path needs explicit model upgrade logic.**
   Unlike the non-streaming path with auto-escalation (utility→generation on bad answer), the streaming path must pre-emptively upgrade to the generation model for projectless GENERAL queries. Streaming renders tokens visibly, so poor 8B answers are more noticeable.
 
