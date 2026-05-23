@@ -152,10 +152,18 @@ class OpenAIProvider(LLMInterface):
         if not self.embedding_model_id:
             self.logger.error("Embedding model for OpenAI was not set")
             return None
-        
+
+        extra_body = {}
+        if self.embedding_model_id and "jina" in self.embedding_model_id.lower():
+            if document_type == "query":
+                extra_body["task"] = "retrieval.query"
+            elif document_type == "document":
+                extra_body["task"] = "retrieval.passage"
+
         response = await self.client.embeddings.create(
             model = self.embedding_model_id,
             input = text,
+            extra_body = extra_body or None,
         )
 
         if not response or not response.data or len(response.data) == 0 or not response.data[0].embedding:
