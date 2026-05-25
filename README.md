@@ -15,7 +15,7 @@ pinned: false
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
 [![Deployed on HF Spaces](https://img.shields.io/badge/Deployed-HuggingFace%20Spaces-blue.svg?style=for-the-badge)](https://huggingface.co/spaces)
 
-**Connexio** is a state-of-the-art Retrieval-Augmented Generation (RAG) system designed to serve as an intelligent backbone for educational and professional project management. It combines cutting-edge AI orchestration, hybrid search capabilities, and multi-persona interaction to provide accurate, context-aware, and multilingual (English & Arabic) assistance.
+**Connexio** is a state-of-the-art Agentic Retrieval-Augmented Generation (RAG) system deployed on Hugging Face Spaces, serving as the AI backbone for the Connexio educational/professional project management platform. It combines intent-driven LLM orchestration (Groq — `openai/gpt-oss-120b` + `meta-llama/llama-4-scout-17b-16e-instruct`), hybrid search via PGVector (Jina AI embeddings `jina-embeddings-v3` with HNSW + GIN trigram indexes, Reciprocal Rank Fusion), Jina multilingual reranking, and multi-persona interaction for accurate, context-aware, multilingual (English & Arabic) assistance.
 
 ---
 
@@ -58,31 +58,37 @@ graph TD
 
     subgraph "AI Services"
         Controller <--> LLM[LLM Provider Factory]
-        LLM --- Groq[Groq / Llama 3]
-        LLM --- OpenAI[OpenAI / GPT-4]
-        LLM --- Cohere[Cohere / Embeddings]
+        LLM --- Groq[Groq / GPT-OSS 120B + Llama 4 Scout 17B]
+        LLM --- OpenAI[OpenAI / Compatible API]
+        LLM --- Jina[Jina AI / Embeddings v3 + Reranker]
     end
 
     subgraph "Knowledge Sources"
         Tools --> SQL[PostgreSQL Database]
         Tools --> Vector[Vector Database (PGVector)]
         Tools --> Wiki[Wikipedia API]
-        Tools --> Google[Google Search]
+        Tools --> Google[Google Search / SerpAPI]
         Tools --> Github[GitHub API]
-        Tools --> Python[Python Interpreter]
+        Tools --> ArXiv[ArXiv API]
+        Tools --> StackOverflow[StackOverflow API]
+        Tools --> MasarX[MasarX Agent - Shared DB]
+        Tools --> Backend[Node.js Backend API]
     end
 
     subgraph "Asynchronous Processing"
-        API --> Broker[RabbitMQ]
-        Broker --> Worker[Celery Workers]
-        Worker <--> FS[Local Assets / PDF]
+        API --> Broker[RabbitMQ / Redis]
+        Broker --> Worker[Celery Workers - file_processing, data_indexing, default]
+        Worker <--> FS[Local Assets / PDF / DOCX / MD]
         Worker <--> PGVector[(PostgreSQL + pgvector)]
+        Worker --- Beat[Celery Beat - 24h cleanup]
     end
 
     subgraph "Observability"
-        API --- Prometheus[Prometheus]
+        API --- Prometheus[Prometheus - /metrics]
         Prometheus --- Grafana[Grafana]
         Worker --- Flower[Flower Dashboard]
+        API --- Sentry[Sentry Error Tracking]
+        API --- OpenTelemetry[OpenTelemetry]
     end
 ```
 
@@ -146,14 +152,17 @@ Connexio leverages a curated selection of premium technologies to ensure perform
 | **Message Broker**    | [RabbitMQ](https://www.rabbitmq.com/)                                                                                                   | Handling background task distributions.                             |
 | **Cache / Backend**   | [Redis](https://redis.io/)                                                                                                              | Celery result backend and in-memory caching.                        |
 | **Database Drivers**  | [SQLAlchemy](https://www.sqlalchemy.org/), [asyncpg](https://github.com/MagicStack/asyncpg), [alembic](https://alembic.sqlalchemy.org/) | ORM, async PostgreSQL driver, and migration tooling.                |
-| **LLM Providers**     | Groq (GPT-OSS 120B, Llama 4 Scout 17B), OpenAI, Cohere                                                                                  | Generation (120B), utility/classification (17B), embeddings.        |
-| **Embedding**         | Cohere `embed-multilingual-v3.0` (1024 dims)                                                                                            | Production embedding model for semantic search.                     |
-| **Document Processing**| [PyMuPDF](https://pymupdf.readthedocs.io/) (fitz)                                                                                      | PDF text extraction and parsing.                                    |
+| **LLM Providers**     | [Groq](https://groq.com/) (GPT-OSS 120B, Llama 4 Scout 17B), [OpenAI](https://openai.com/) (compatible), [Cohere](https://cohere.com/)                                                                          | Generation (120B), utility/classification (17B), fallback generation.        |
+| **Embedding**         | [Jina AI](https://jina.ai/) `jina-embeddings-v3` via OpenAI-compatible API (1024 dims)                                                                                                                     | Production embedding model for semantic search with `retrieval.query`/`retrieval.passage` task tagging.                     |
+| **Reranker**          | [Jina AI](https://jina.ai/) `jina-reranker-v2-base-multilingual`, CoHere `rerank-multilingual-v3.0`                                                                                                           | Multilingual reranking of retrieved documents.                    |
+| **Document Processing**| [PyMuPDF](https://pymupdf.readthedocs.io/) (fitz), [docx2txt](https://github.com/ankushshah89/python-docx2txt)                                                                                         | PDF and DOCX text extraction and parsing.                            |
 | **NLP**               | [NLTK](https://www.nltk.org/)                                                                                                           | Natural language processing utilities.                              |
-| **External APIs**     | Wikipedia API, [Google Search](https://serpapi.com/) (SerpApi), [GitHub API](https://docs.github.com/en/rest)                           | External knowledge sources for Corrective RAG.                      |
+| **External APIs**     | Wikipedia API, [Google Search](https://serpapi.com/) (SerpApi), [GitHub API](https://docs.github.com/en/rest), [ArXiv](https://arxiv.org/), [StackOverflow](https://stackexchange.com/)                  | External knowledge sources for Corrective RAG.                      |
+| **Rate Limiting**     | [slowapi](https://github.com/laurentS/slowapi)                                                                                          | Per-IP rate limiting (30 req/min chat, 10 req/min cache).            |
 | **Token Management**  | [tiktoken](https://github.com/openai/tiktoken)                                                                                          | Token counting and budget enforcement.                              |
-| **AI Guidance**       | [guidance](https://github.com/guidance-ai/guidance)                                                                                     | Structured generation and constrained decoding.                     |
-| **Monitoring**        | [Prometheus](https://prometheus.io/) & [Grafana](https://grafana.com/)                                                                  | Real-time performance metrics and dashboards.                       |
+| **Error Tracking**    | [Sentry](https://sentry.io/)                                                                                                            | Production error monitoring and tracing.                            |
+| **Observability**     | [OpenTelemetry](https://opentelemetry.io/)                                                                                               | Optional auto-instrumentation for FastAPI + logging.                |
+| **Monitoring**        | [Prometheus](https://prometheus.io/) & [Grafana](https://grafana.com/)                                                                  | Real-time HTTP metrics (request count, latency, rate limits).       |
 | **Worker Monitoring** | [Flower](https://github.com/mher/flower)                                                                                                | Celery worker monitoring and management.                            |
 | **Auth**              | [PyJWT](https://pyjwt.readthedocs.io/)                                                                                                  | Service JWT generation for backend auth.                            |
 | **Async I/O**         | [aiofiles](https://github.com/Tinche/aiofiles)                                                                                          | Async file operations for uploads and processing.                   |
@@ -208,10 +217,22 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
 - **Language Support**: Automatic detection and switching between English and Arabic prompts
 - **Persona Mapping**: Adjusts tone and depth based on user role (student, educator, company representative, early-career professional)
 - **Adaptive Conversational Memory**: Full token-budget window for project sessions; capped at 2 turns for projectless sessions to prevent accumulation across unrelated queries
-- **Rate Limiting & Security**: 30 requests/minute per IP, `max_length=5000` on query input, 429 retry with exponential backoff, cache invalidation endpoints, sanitized knowledge base (no internal infra details exposed), `CONNEXIO_INTERNAL_API_KEY` required for all endpoints (no dev bypass in production)
+- **Rate Limiting & Security**: 30 requests/minute per IP (agent chat), 10 req/min (cache invalidation), `max_length=5000` on query input, 429 retry with exponential backoff, cache invalidation endpoints, sanitized knowledge base (no internal infra details exposed), `CONNEXIO_INTERNAL_API_KEY` required for all endpoints (no dev bypass in production)
 - **Global Knowledge Base**: 52 curated files across 8 categories (134 chunks) — answers platform, agile, dev, design, career, business, soft skills, and industry trend questions
-- **Session TTL**: Stale chat sessions auto-cleaned after 30 days via Celery Beat
-- **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization
+- **Session TTL**: Stale chat sessions auto-cleaned after 30 days via Celery Beat; 24-hour cleanup of old task records
+- **Internal Tracing**: Every step is logged by the TraceManager for debugging and optimization; traces saved as JSON and rendered into HTML dashboards via `generate_report.py`
+- **Task Idempotency**: SHA-256 dedup of Celery tasks prevents duplicate processing; stuck task detection (time limit + 60s grace) allows safe re-execution
+- **Asset Management**: Full CRUD for uploaded files — list all assets per project, delete assets with cascade cleanup (vector rows, SQL chunks, physical file)
+- **Upload-and-Query**: Synchronous flow — upload file → ingest → embed → search → generate answer in a single request
+- **URL Content Ingestion**: Paste a URL; the system downloads the content, detects PDF/docx/text, and extracts up to 8000 characters for context
+- **MasarX Integration**: Direct PostgreSQL reads of MasarX agent task tables (`"TaskId"`, `"TaskName"`, `"PID"`, `"UID"` with quoted identifiers) for cross-agent intelligence
+- **Backend Caching**: 5-minute in-memory TTL for project details and user profiles (tasks are not cached — always live)
+- **Text-to-SQL Tool**: Natural language → SQL query with safety validation (SELECT-only enforced, all mutating operations blocked)
+- **Matching Intelligence**: 6-factor teammate matching algorithm (Skills 35%, Availability 25%, Rating 20%, Experience 12%, Goals 5%, Domain 3%) with team gap analysis
+- **Error Tracking**: Sentry integration with configurable sample rate; OpenTelemetry auto-instrumentation optional via start.sh
+- **Supported File Types**: PDF, TXT, DOCX, and Markdown — sliding window chunking (800 chars default, 150 overlap)
+- **Celery Beat Cleanup**: Two daily maintenance tasks — stale session cleanup (30 days) and task execution record cleanup (24 hours)
+- **Hidden Metrics Endpoint**: Prometheus metrics exposed at an obfuscated path (`/TrhBVe_m5gg2002_E5VVqS`) with custom 429 handler
 
 ---
 
@@ -263,6 +284,25 @@ If you prefer running locally:
 > [!NOTE]
 > For local development with Ollama models, uncomment the relevant sections in your `.env` file and ensure Ollama is running locally.
 
+### 🖥️ Dev Commands (from `src/`)
+
+```bash
+uvicorn main:app --reload --port 8080                    # API server
+python -m pytest tests/ -v --tb=short                    # Run all 42 tests
+python -m celery -A celery_app worker --loglevel=info     # Celery worker
+python -m celery -A celery_app beat --loglevel=info       # Celery Beat scheduler
+python flowerconfig.py                                    # Flower dashboard on :5556
+```
+
+### 🚀 Production Entrypoint
+
+The `start.sh` script boots Celery worker + beat and uvicorn with 4 workers, including optional OpenTelemetry auto-instrumentation:
+
+```bash
+# Set OTEL_EXPORTER_OTLP_ENDPOINT for OpenTelemetry tracing
+./start.sh
+```
+
 ---
 
 > [!TIP]
@@ -272,27 +312,31 @@ If you prefer running locally:
 
 ### 🔹 Agent Endpoints
 
-| Endpoint                                     | Method | Description                                                                                                                                                                                          |
-| :------------------------------------------- | :----- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `/api/v1/nlp/agent/chat/{project_id}`        | `POST` | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. |
-| `/api/v1/nlp/agent/chat/stream/{project_id}` | `GET`  | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Includes metadata about detected intent, language, sources used, and session information in the initial stream event.  |
-| `/api/v1/nlp/agent/cache/invalidate/{project_id}` | `POST` | Invalidate in-memory cache for a project's backend data (project, members, tasks). |
-| `/api/v1/nlp/agent/cache/invalidate/user/{user_id}` | `POST` | Invalidate cached user profile from the main backend. |
+| Endpoint                                     | Method | Rate Limit | Description                                                                                                                                                                                          |
+| :------------------------------------------- | :----- | :--------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `/api/v1/nlp/agent/chat/{project_id}`        | `POST` | 30/min     | Engage in a persona-based conversation with the AI agent using project context. Supports intent detection, workflow routing, and Corrective RAG (CRAG) for external knowledge retrieval when needed. Body: `query`, `user_id`, `persona`, `session_id`, `limit`, `model_tier`, `language`. |
+| `/api/v1/nlp/agent/chat/stream/{project_id}` | `GET`  | 30/min     | Stream AI responses using Server-Sent Events (SSE) for real-time interaction. Query params: `query`, `user_id`, `persona`, `session_id`, `limit`, `model_tier`, `language`. Returns meta event → token chunks → `[DONE]`. |
+| `/api/v1/nlp/agent/cache/invalidate/{project_id}` | `POST` | 10/min | Invalidate in-memory cache for a project's backend data (project, members, tasks). |
+| `/api/v1/nlp/agent/cache/invalidate/user/{user_id}` | `POST` | 10/min | Invalidate cached user profile from the main backend. |
 
 ### 🔹 Base Endpoints
 
-| Endpoint   | Method | Description                                                     |
-| :--------- | :----- | :-------------------------------------------------------------- |
-| `/api/v1/` | `GET`  | Retrieve basic application metadata including name and version. |
+| Endpoint           | Method | Auth   | Description                                                     |
+| :----------------- | :----- | :----- | :-------------------------------------------------------------- |
+| `/api/v1/`         | `GET`  | None   | Retrieve basic application metadata including name and version. |
+| `/api/v1/health`   | `GET`  | None   | Health check returning status, service name, and version.       |
 
 ### 🔹 Data Endpoints
 
-| Endpoint                                       | Method | Description                                                                                            |
-| :--------------------------------------------- | :----- | :----------------------------------------------------------------------------------------------------- |
-| `/api/v1/data/upload/{project_id}`             | `POST` | Upload a file (PDF or TXT) to the project assets directory and record it in the database.              |
-| `/api/v1/data/upload-and-process/{project_id}` | `POST` | Upload and immediately process + index a file (used by backend forwarding).                            |
-| `/api/v1/data/process/{project_id}`            | `POST` | Trigger the background processing task to chunk and clean uploaded files.                              |
-| `/api/v1/data/process-and-push/{project_id}`   | `POST` | Execute a chained workflow that processes files and immediately indexes them into the vector database. |
+| Endpoint                                         | Method | Description                                                                                              |
+| :----------------------------------------------- | :----- | :------------------------------------------------------------------------------------------------------- |
+| `/api/v1/data/upload/{project_id}`               | `POST` | Upload a file (PDF, TXT, DOCX, or MD) to the project assets directory and record it in the database.     |
+| `/api/v1/data/upload-and-process/{project_id}`   | `POST` | Upload and immediately process + index a file (used by backend forwarding, fire-and-forget).             |
+| `/api/v1/data/upload-and-query/{project_id}`     | `POST` | Upload file + index + answer a question about it synchronously in a single request.                      |
+| `/api/v1/data/process/{project_id}`              | `POST` | Trigger the background Celery processing task to chunk and clean uploaded files.                         |
+| `/api/v1/data/process-and-push/{project_id}`     | `POST` | Execute a chained Celery workflow that processes files and immediately indexes them into the vector DB.  |
+| `/api/v1/data/assets/{project_id}`               | `GET`  | List all uploaded assets for a project.                                                                  |
+| `/api/v1/data/assets/{asset_id}`                 | `DELETE`| Full asset deletion: PGVector rows, SQL chunks, physical file, and asset record cascade.               |
 
 ### 🔹 Project Sync Endpoints
 
@@ -304,9 +348,15 @@ If you prefer running locally:
 
 | Endpoint                                | Method | Description                                                                        |
 | :-------------------------------------- | :----- | :--------------------------------------------------------------------------------- |
-| `/api/v1/nlp/index/push/{project_id}`   | `POST` | Manually trigger the indexing of existing project chunks into the vector database. |
-| `/api/v1/nlp/index/info/{project_id}`   | `GET`  | Retrieve information about the vector database collection for a specific project.  |
+| `/api/v1/nlp/index/push/{project_id}`   | `POST` | Manually trigger Celery indexing of existing project chunks into the vector DB.     |
+| `/api/v1/nlp/index/info/{project_id}`   | `GET`  | Retrieve vector DB collection info (record count, table metadata) for a project.   |
 | `/api/v1/nlp/index/search/{project_id}` | `POST` | Perform a semantic search query against the project's indexed data.                |
+
+### 🔹 Internal Metrics
+
+| Endpoint                              | Method | Auth   | Description                                        |
+| :------------------------------------ | :----- | :----- | :------------------------------------------------- |
+| `/TrhBVe_m5gg2002_E5VVqS`            | `GET`  | None   | Prometheus metrics endpoint (obfuscated path).     |
 
 ---
 
@@ -316,21 +366,23 @@ Connexio doesn't just search; it understands and reasons through an advanced age
 
 ### 1. Document Ingestion & Hybrid Indexing
 
-When documents are uploaded:
+When documents are uploaded (PDF, TXT, DOCX, MD):
 
-- **Smart Chunking**: Text is split into manageable chunks using `RecursiveCharacterTextSplitter` with configurable overlap to preserve context.
-- **Multimodal Embedding**: Chunks are transformed into vectors using Cohere's `embed-multilingual-v3.0` (1024-dimensional).
-- **Hybrid Storage**: Chunks are stored in PGVector for semantic search and in PostgreSQL for metadata. This enables both semantic and keyword-based search capabilities.
+- **Smart Chunking**: Text is split into manageable chunks using sliding window chunking (default 800 chars, 150 overlap) via `RecursiveCharacterTextSplitter` to preserve context.
+- **Multimodal Embedding**: Chunks are transformed into vectors using Jina AI's `jina-embeddings-v3` (1024-dimensional) via OpenAI-compatible API, with task-specific tagging (`retrieval.query` / `retrieval.passage`).
+- **Hybrid Storage**: Chunks stored in per-project PGVector tables (`collection_{size}_{pid}`) with HNSW index on vectors (ANN search) AND GIN trigram index on text (Arabic-friendly keyword search). Raw chunks also stored in PostgreSQL `chunks` table for metadata queries.
 
-### 2. Intelligent Retrieval (Hybrid Search + RRF)
+### 2. Intelligent Retrieval (Hybrid Search + RRF + Reranking)
 
 Connexio uses **Reciprocal Rank Fusion (RRF)** to combine results from multiple sources:
 
-- **Vector Search**: Finds documents with similar meanings.
-- **Full-Text Search**: Finds exact term matches, especially useful for technical names.
+- **Vector Search (ANN)**: HNSW-indexed semantic search finds documents with similar meanings.
+- **Full-Text Search (Keyword)**: GIN trigram-indexed search finds exact term matches, especially useful for technical names and Arabic text.
 - **RRF Algorithm**:
   $$Score = \sum_{d \in R} \frac{1}{k + rank(d)}$$
   _Where $k=60$ balances the influence of different ranking sources._
+- **Relevance Grading**: Retrieved documents are batch-graded as `RELEVANT`/`AMBIGUOUS`/`IRRELEVANT` by the utility LLM (Llama 4 Scout 17B) to filter low-quality results.
+- **Multilingual Reranking** (optional, requires `JINA_API_KEY`): Jina's `jina-reranker-v2-base-multilingual` re-ranks results by relevance score for improved precision.
 
 ### 3. Agentic Workflow
 
@@ -367,16 +419,31 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
 
 | File                                     | Role                                                 |
 | :--------------------------------------- | :--------------------------------------------------- |
-| `src/main.py`                            | FastAPI entry — startup, DB, LLM/vector/RAG clients  |
-| `src/utils/backend_client.py`            | REST client to Node.js backend (with JWT auth)       |
-| `src/controllers/NLPController.py`       | Chat, search, context preparation, CRAG fallback     |
-| `src/controllers/helpers/ToolManager.py` | SQL tool, KB search, GitHub, ArXiv, StackOverflow, project context |
-| `src/controllers/DataController.py`      | File upload and processing control                   |
-| `src/controllers/ProjectController.py`   | Project sync between backend ↔ RAG                   |
-| `src/Routes/data.py`                     | `/upload-and-process`, `/sync`, `/process` endpoints |
-| `src/models/db_schemas/connexio/`        | `project_id_map.py`, `project.py` (PG schemas)       |
-| `Dockerfile`                             | Production dockerfile for HF Spaces                  |
-| `Requirements.txt`                       | All dependencies (includes `PyJWT>=2.8.0`)           |
+| `src/main.py`                            | FastAPI entry — startup, lifespan, middleware, health |
+| `src/celery_app.py`                      | Celery config, beat schedule, task routing           |
+| `src/flowerconfig.py`                    | Flower monitoring dashboard config                   |
+| `src/helpers/config.py`                  | `Settings` Pydantic model — all env vars             |
+| `src/controllers/NLPController.py`       | Chat, streaming, context prep, CRAG, model routing   |
+| `src/controllers/WorkflowController.py`  | Intent detection: jailbreak/OOS/project/fuzzy/LLM    |
+| `src/controllers/DataController.py`      | File upload validation and sanitization              |
+| `src/controllers/ProcessController.py`   | Document loading (PDF/DOCX/TXT/MD), chunking         |
+| `src/controllers/ProjectController.py`   | Project directory management on disk                 |
+| `src/controllers/helpers/ToolManager.py` | Wiki, Google, GitHub, ArXiv, StackOverflow, SQL, KB, MasarX |
+| `src/controllers/helpers/TraceManager.py`| Step tracer for RAG pipeline observability           |
+| `src/utils/backend_client.py`            | REST client to Node.js backend (JWT auth + 5min cache)|
+| `src/utils/masarx_client.py`             | Direct PostgreSQL reads of MasarX task tables        |
+| `src/utils/security.py`                  | `verify_api_key()` FastAPI dependency                |
+| `src/utils/metrics.py`                   | Prometheus middleware + obfuscated metrics endpoint  |
+| `src/utils/idempotency_manager.py`       | Celery task dedup (SHA-256) + stuck detection        |
+| `src/utils/generate_report.py`           | HTML report generator from trace JSON files          |
+| `src/stores/llm/providers/`              | OpenAIProvider, GroqProvider, CoHereProvider         |
+| `src/stores/vectordb/providers/`         | PGVectorProvider, QdrantDBProvider, JinaReranker     |
+| `src/tasks/`                             | Celery tasks: file_processing, data_indexing, process_workflow, maintenance |
+| `src/Routes/`                            | Endpoints: base, agent, data, nlp, projects          |
+| `src/models/db_schemas/connexio/schemas/`| ORM: project, data_chunk, asset, chat_session, celery_task_execution, project_id_map |
+| `start.sh`                               | Entrypoint: Celery worker+beat + uvicorn (+ optional OpenTelemetry) |
+| `Dockerfile`                             | Production dockerfile for HF Spaces (python:3.11-slim)|
+| `Requirements.txt`                       | All dependencies (63 packages)                       |
 
 ---
 
