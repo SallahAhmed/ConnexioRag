@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T10:41:49.926Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T11:55:01.075Z
 > Files: 65 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
@@ -419,7 +419,7 @@
 
 ## f:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) (~12138 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~11576 tok)
 - `projects.routes.js` — API routes: POST, GET, PUT, DELETE (16 endpoints) (~448 tok)
 
 ## f:/connexio_back2/modules/sprints/
@@ -461,11 +461,11 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~15595 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~15680 tok)
 
 ## src/controllers/helpers/
 
-- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 4 more (~9794 tok)
+- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 4 more (~9944 tok)
 
 ## src/helpers/
 

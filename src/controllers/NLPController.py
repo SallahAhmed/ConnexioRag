@@ -293,6 +293,10 @@ class NLPController(BaseController):
         # Injects recent exchanges into the retrieval context for project queries
         # so the LLM can reference what was just discussed without re-reading the
         # full chat history. Skipped for memory/file queries (they handle history separately).
+        self.logger.info(
+            f"[L3] pid={project_id} history_len={len(history)} "
+            f"is_memory={is_memory_query} is_file={is_file_query} db={'yes' if self.db_client else 'NO'}"
+        )
         if project_id and history and not is_memory_query and not is_file_query:
             recent_5 = history[-5:]
             if len(recent_5) >= 2:
@@ -304,6 +308,7 @@ class NLPController(BaseController):
                 retrieved_context.append(
                     "\n[Recent Conversation Summary]:\n" + "\n".join(summary_lines)
                 )
+                self.logger.info(f"[L3] Injected {len(recent_5)} messages into context")
 
         # --- Pasted URL Automatic Processing & Extraction ---
         # Detect if the query contains a URL anywhere inside it, download and extract its text

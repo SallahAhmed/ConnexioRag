@@ -272,8 +272,12 @@ class ToolManager:
 
             if self.reranker and sorted_doc_ids:
                 docs_to_rerank = [doc_map[did] for did in sorted_doc_ids]
-                reranked = await self.reranker.rerank(query=query, documents=docs_to_rerank, top_k=limit)
-                final = reranked
+                try:
+                    reranked = await self.reranker.rerank(query=query, documents=docs_to_rerank, top_k=limit)
+                    final = reranked
+                except Exception as rerank_err:
+                    self.logger.warning(f"Reranker failed (falling back to vector scores): {rerank_err}")
+                    final = [doc_map[did] for did in sorted_doc_ids]
             else:
                 final = [doc_map[did] for did in sorted_doc_ids]
 
@@ -340,8 +344,12 @@ class ToolManager:
 
             if self.reranker and sorted_doc_ids:
                 docs_to_rerank = [doc_map[did] for did in sorted_doc_ids]
-                reranked = await self.reranker.rerank(query=query, documents=docs_to_rerank, top_k=limit)
-                return reranked
+                try:
+                    reranked = await self.reranker.rerank(query=query, documents=docs_to_rerank, top_k=limit)
+                    return reranked
+                except Exception as rerank_err:
+                    self.logger.warning(f"Reranker failed in raw search (falling back to vector scores): {rerank_err}")
+                    return [doc_map[did] for did in sorted_doc_ids]
             else:
                 return [doc_map[did] for did in sorted_doc_ids]
 

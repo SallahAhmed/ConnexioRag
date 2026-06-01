@@ -18,7 +18,7 @@
       "first_read": "2026-06-01T10:28:02.756Z"
     },
     "c:/Users/salla/Connexios/.wolf/buglog.json": {
-      "count": 1,
+      "count": 2,
       "tokens": 0,
       "first_read": "2026-06-01T10:28:03.214Z"
     },
@@ -28,8 +28,8 @@
       "first_read": "2026-06-01T10:33:10.007Z"
     },
     "c:/Users/salla/Connexios/src/controllers/NLPController.py": {
-      "count": 1,
-      "tokens": 3725,
+      "count": 3,
+      "tokens": 15595,
       "first_read": "2026-06-01T10:33:15.543Z"
     },
     "f:/Connexio_Frontend2/src/App.jsx": {
@@ -91,6 +91,26 @@
       "count": 1,
       "tokens": 0,
       "first_read": "2026-06-01T10:42:33.928Z"
+    },
+    "f:/connexio_back2/modules/projects/projects.routes.js": {
+      "count": 1,
+      "tokens": 448,
+      "first_read": "2026-06-01T11:50:30.506Z"
+    },
+    "c:/Users/salla/Connexios/src/utils/backend_client.py": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-01T11:52:46.437Z"
+    },
+    "f:/connexio_back2/modules/tasks/tasks.routes.js": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-01T11:53:11.569Z"
+    },
+    "f:/connexio_back2/modules/projects/projects.controller.js": {
+      "count": 3,
+      "tokens": 12138,
+      "first_read": "2026-06-01T11:53:45.555Z"
     }
   },
   "files_written": [
@@ -225,6 +245,36 @@
       "action": "edit",
       "tokens": 176,
       "at": "2026-06-01T10:41:49.947Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "action": "edit",
+      "tokens": 193,
+      "at": "2026-06-01T11:54:07.828Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "action": "edit",
+      "tokens": 195,
+      "at": "2026-06-01T11:54:17.421Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+      "action": "edit",
+      "tokens": 171,
+      "at": "2026-06-01T11:54:26.332Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+      "action": "edit",
+      "tokens": 204,
+      "at": "2026-06-01T11:54:48.296Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "action": "edit",
+      "tokens": 345,
+      "at": "2026-06-01T11:55:01.088Z"
     }
   ],
   "edit_counts": {
@@ -240,13 +290,14 @@
     "f:/Connexio_Frontend2/src/components/shared/DataTable.jsx": 1,
     "f:/Connexio_Frontend2/src/App.jsx": 3,
     "f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx": 2,
-    "src/controllers/helpers/ToolManager.py": 1,
-    "src/controllers/NLPController.py": 1,
-    "f:/Connexio_Frontend2/src/pages/Projects.jsx": 4
+    "src/controllers/helpers/ToolManager.py": 3,
+    "src/controllers/NLPController.py": 2,
+    "f:/Connexio_Frontend2/src/pages/Projects.jsx": 4,
+    "f:/connexio_back2/modules/projects/projects.controller.js": 2
   },
-  "anatomy_hits": 3,
-  "anatomy_misses": 15,
-  "repeated_reads_warned": 5,
+  "anatomy_hits": 5,
+  "anatomy_misses": 17,
+  "repeated_reads_warned": 10,
   "cerebrum_warnings": 0,
-  "stop_count": 5
+  "stop_count": 8
 }

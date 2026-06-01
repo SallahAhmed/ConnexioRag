@@ -1343,6 +1343,42 @@
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-06-01T10:41:49.950Z"
+    },
+    {
+      "id": "bug-081",
+      "timestamp": "2026-06-01T14:00:00.000Z",
+      "error_message": "Main backend returned 403 for /api/projects/:id and /api/projects/:id/members — Access denied: you are not a member of this project.",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "X-API-Key bypass in protect middleware sets req.user = { UID: 0 }. getProjectById and getProjectMembers have an isMember guard that checks project_members for UID 0, which is never a member. Service actor blocked by its own membership check.",
+      "fix": "Wrapped membership checks in `if (req.user.UID !== 0)` in both getProjectById and getProjectMembers. UID=0 is the service actor sentinel — skips the check.",
+      "tags": ["403", "membership-guard", "x-api-key", "service-actor", "l1", "l2"],
+      "related_bugs": ["bug-075"],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T14:00:00.000Z"
+    },
+    {
+      "id": "bug-082",
+      "timestamp": "2026-06-01T14:00:00.000Z",
+      "error_message": "Knowledge Base Raw Tool Error: Cohere 429 — Trial key limited to 1000 API calls/month. Crashes entire KB search path, returns empty docs.",
+      "file": "src/controllers/helpers/ToolManager.py",
+      "root_cause": "Reranker call in search_knowledge_base() and search_knowledge_base_raw() was not wrapped in try/except. A 429 from Cohere propagated to the outer except block and returned [] instead of falling back to vector-score-sorted results.",
+      "fix": "Wrapped both reranker.rerank() calls in their own try/except. On failure, logs a warning and returns un-reranked vector results instead of crashing the KB path.",
+      "tags": ["429", "cohere", "reranker", "kb-search", "fallback"],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-01T14:00:00.000Z"
+    },
+    {
+      "id": "bug-083",
+      "timestamp": "2026-06-01T14:00:00.000Z",
+      "error_message": "L3 (recent chat summary) never injects — second message shows only 149 prompt tokens despite prior exchange existing.",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Unknown — history appears empty on second request. Added [L3] debug log to show history_len, is_memory, is_file, and db status on every request. Root cause to confirm after next test run.",
+      "fix": "Added debug logging. Will update after confirming root cause from next HF Spaces log.",
+      "tags": ["l3", "session-history", "debug", "streaming"],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T14:00:00.000Z"
     }
   ]
 }
