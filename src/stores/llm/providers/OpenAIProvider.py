@@ -3,7 +3,9 @@ from ..LLMEnums import OpenAIEnums
 # pyrefly: ignore [missing-import]
 from openai import AsyncOpenAI
 import logging
-from typing import List, Union
+import asyncio
+import re
+from typing import List, Union, Optional
 
 class OpenAIProvider(LLMInterface):
 
@@ -64,34 +66,60 @@ class OpenAIProvider(LLMInterface):
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
-        try:
-            response = await self.client.chat.completions.create(
-                model = self.generation_model_id,
-                messages = local_history,
-                max_tokens = max_output_tokens,
-                temperature = temperature
-            )
+        max_retries = 3
+        retry_delay = 1.0
 
-            if response and response.usage:
-                self.last_usage = {
-                    "prompt_tokens": response.usage.prompt_tokens,
-                    "completion_tokens": response.usage.completion_tokens,
-                    "total_tokens": response.usage.total_tokens
-                }
-                print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
-            else:
-                self.last_usage = None
-            
-            if not response or not response.choices:
-                print("DEBUG: Ollama returned an empty response object!")
-                return ""
+        for attempt in range(max_retries):
+            try:
+                response = await self.client.chat.completions.create(
+                    model = self.generation_model_id,
+                    messages = local_history,
+                    max_tokens = max_output_tokens,
+                    temperature = temperature
+                )
 
-            answer = response.choices[0].message.content
-            return answer if answer else ""
-            
-        except Exception as e:
-            print(f"DEBUG: OpenAIProvider Error: {str(e)}")
-            return f"Error during generation: {str(e)}"
+                if response and response.usage:
+                    self.last_usage = {
+                        "prompt_tokens": response.usage.prompt_tokens,
+                        "completion_tokens": response.usage.completion_tokens,
+                        "total_tokens": response.usage.total_tokens
+                    }
+                    print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {response.usage.prompt_tokens} | Completion: {response.usage.completion_tokens} | Total: {response.usage.total_tokens}")
+                else:
+                    self.last_usage = None
+                
+                if not response or not response.choices:
+                    print("DEBUG: Ollama returned an empty response object!")
+                    return ""
+
+                answer = response.choices[0].message.content
+                return answer if answer else ""
+                
+            except Exception as e:
+                error_str = str(e).lower()
+                is_rate_limit = "429" in error_str or "rate" in error_str or "too many" in error_str
+
+                if is_rate_limit and attempt < max_retries - 1:
+                    retry_after = self._parse_retry_after(e)
+                    wait = retry_after if retry_after else retry_delay
+                    self.logger.warning(f"Generation rate-limited (attempt {attempt + 1}/{max_retries}), retrying in {wait:.1f}s")
+                    await asyncio.sleep(wait)
+                    retry_delay = min(retry_delay * 2, 30.0)
+                else:
+                    print(f"DEBUG: OpenAIProvider Error: {str(e)}")
+                    return f"Error during generation: {str(e)}"
+
+    @staticmethod
+    def _parse_retry_after(error: Exception) -> Optional[float]:
+        """Try to extract Retry-After seconds from an HTTP error response."""
+        err_str = str(error)
+        match = re.search(r"[Rr]etry-?[Aa]fter[:\s]+(\d+)", err_str)
+        if match:
+            return float(match.group(1))
+        match = re.search(r"(?:try|wait|retry)\s+(?:again\s+)?(?:in\s+)?(\d+(?:\.\d+)?)\s*s", err_str, re.IGNORECASE)
+        if match:
+            return float(match.group(1))
+        return None
         
     async def generate_text_stream(self, prompt: str, chat_history: list=[], max_output_tokens: int=None,
                              temperature: float = None):
@@ -160,17 +188,38 @@ class OpenAIProvider(LLMInterface):
             elif document_type == "document":
                 extra_body["task"] = "retrieval.passage"
 
-        response = await self.client.embeddings.create(
-            model = self.embedding_model_id,
-            input = text,
-            extra_body = extra_body or None,
-        )
+        max_retries = 3
+        retry_delay = 1.0
 
-        if not response or not response.data or len(response.data) == 0 or not response.data[0].embedding:
-            self.logger.error("Error while embedding text with OpenAI")
-            return None
+        for attempt in range(max_retries):
+            try:
+                response = await self.client.embeddings.create(
+                    model = self.embedding_model_id,
+                    input = text,
+                    extra_body = extra_body or None,
+                )
 
-        return [ rec.embedding for rec in response.data ]
+                if not response or not response.data or len(response.data) == 0 or not response.data[0].embedding:
+                    self.logger.error("Error while embedding text with OpenAI")
+                    return None
+
+                return [ rec.embedding for rec in response.data ]
+
+            except Exception as e:
+                error_str = str(e).lower()
+                is_rate_limit = "429" in error_str or "rate" in error_str or "too many" in error_str
+
+                if is_rate_limit and attempt < max_retries - 1:
+                    retry_after = self._parse_retry_after(e)
+                    wait = retry_after if retry_after else retry_delay
+                    self.logger.warning(f"Embedding rate-limited (attempt {attempt + 1}/{max_retries}), retrying in {wait:.1f}s")
+                    await asyncio.sleep(wait)
+                    retry_delay = min(retry_delay * 2, 30.0)
+                else:
+                    self.logger.error(f"Error while embedding text: {str(e)}")
+                    return None
+
+        return None
 
     def construct_prompt(self, prompt: str, role: str):
         return {
