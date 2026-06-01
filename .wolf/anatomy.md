@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-05-21T00:20:03.670Z
-> Files: 27 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T09:17:21.581Z
+> Files: 51 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -21,6 +21,7 @@
 
 ## ./
 
+- `CLAUDE.md` — OpenWolf (~4770 tok)
 
 ## .claude/
 
@@ -284,6 +285,17 @@
 ## f:/Connexio_Frontend2/src/components/
 
 
+## f:/Connexio_Frontend2/src/components/shared/
+
+- `AccountTypeBadge.jsx` — Displays the user's current account tier (Normal / Pro / Org). (~302 tok)
+- `ContractSelector.jsx` — Step in the project-creation modal where the founder picks a contract type. (~840 tok)
+- `ContractSigning.jsx` — Modal for signing a project contract. (~2042 tok)
+- `UpgradePrompt.jsx` — Modal shown when a Normal user hits the 3-project/month limit. (~765 tok)
+
+## f:/Connexio_Frontend2/src/context/
+
+- `AppContext.jsx` — translations (~6947 tok)
+
 ## f:/Connexio_Frontend2/src/pages/
 
 
@@ -311,17 +323,18 @@
 
 - `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report, save_audit_node (~2322 tok)
 - `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 5 more (~9606 tok)
-- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~2867 tok)
+- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~3389 tok)
 - `pr_translator_subgraph.py` — Pydantic: PRBusinessSummary (~2209 tok)
 - `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~2384 tok)
 - `task_subgraph.py` — check_for_cycles, has_cycle, check_global_cycles, has_cycle (~11853 tok)
-- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~4767 tok)
+- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~6289 tok)
 
 ## f:/MasarX_A/src/helpers/
 
 
 ## f:/MasarX_A/src/models/db_schemas/
 
+- `seed_data.py` — seed_data, init_database (~1036 tok)
 
 ## f:/MasarX_A/src/models/schemas/
 
@@ -350,11 +363,17 @@
 
 ## f:/connexio_back2/
 
-- `bootstrap.js` — API routes: GET (5 endpoints) (~1308 tok)
+- `app.js` — app: startServer (~704 tok)
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1673 tok)
 
 ## f:/connexio_back2/database/
 
-- `dbconnection.js` — database/dbconnection.js - MySQL Version (~3940 tok)
+- `dbconnection.js` — database/dbconnection.js - MySQL Version (~5632 tok)
+
+## f:/connexio_back2/middleware/
+
+- `authMiddleware.js` — Declares JWT_SECRET (~498 tok)
+- `rateLimiter.js` — Applied to all auth endpoints (signup, signin, forgot-password, etc.) (~178 tok)
 
 ## f:/connexio_back2/models/
 
@@ -362,17 +381,40 @@
 ## f:/connexio_back2/modules/ai/
 
 
+## f:/connexio_back2/modules/auth/
+
+- `auth.controller.js` — modules/auth/auth.controller.js - MySQL Version (Production Ready) (~6118 tok)
+
 ## f:/connexio_back2/modules/chats/
 
 
+## f:/connexio_back2/modules/contracts/
+
+- `contracts.controller.js` — POST /api/contracts/projects/:projectId (~1870 tok)
+- `contracts.routes.js` — API routes: POST, GET (3 endpoints) (~118 tok)
+
+## f:/connexio_back2/modules/payments/
+
+- `payments.controller.js` — POST /api/payments/create-checkout (~512 tok)
+- `payments.routes.js` — API routes: POST, GET (3 endpoints) (~142 tok)
+
 ## f:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) (~9138 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~12142 tok)
 - `projects.routes.js` — API routes: POST, GET, PUT, DELETE (16 endpoints) (~448 tok)
 
 ## f:/connexio_back2/modules/sprints/
 
 - `sprints.routes.js` — Membership guard — only project members can manage sprints. (~1470 tok)
+
+## f:/connexio_back2/modules/tasks/
+
+- `tasks.controller.js` — modules/tasks/tasks.controller.js (~6424 tok)
+
+## f:/connexio_back2/modules/users/
+
+- `user.controller.js` — modules/users/user.controller.js (~8323 tok)
+- `user.routes.js` — modules/users/user.routes.js (~525 tok)
 
 ## f:/connexio_back2/modules/webhooks/
 
@@ -380,55 +422,39 @@
 
 ## f:/connexio_back2/services/
 
+- `contractService.js` — Contract enforcement service. (~1030 tok)
+- `eSignatureService.js` — In-app e-signature service. (~534 tok)
+- `stripeService.js` — Stripe integration for Pro account subscriptions ($20/month). (~1189 tok)
+
+## f:/connexio_back2/utils/
+
+- `responseHandler.js` — Unified response helpers — keeps all endpoints consistent (~118 tok)
 
 ## src/
 
 - `main.py` — FastAPI entrypoint: startup (DB pool, tool init, embedding client, reranker), SSE streaming via `/api/v1/nlp/agent/chat/{project_id}` (~1909 tok)
-- `celery_app.py` — Celery app config: Jina embedding client + reranker init in `on_after_finalize`
-- `Requirements.txt` — pinned deps incl `httpx`, no `cohere`
 
 ## src/Routes/
 
-- `agent.py` — POST `/api/v1/nlp/agent/chat/{project_id}` route: auth, session lookup, calls `answer_agent_chat`
-- `base.py` — GET `/api/v1/nlp/base` health check
-- `data.py` — POST `/api/v1/nlp/data/process` — chunk & embed documents
-- `nlp.py` — POST `/api/v1/nlp/generate` — answer generation
-- `projects.py` — GET project context, members, tasks from backend API
 
 ## src/Routes/schemas/
 
-- `agent.py` — `AgentChatRequest`/`AgentChatResponse` Pydantic models
 
 ## src/controllers/
 
 - `NLPController.py` — Core: node detection, CRAG tools dispatch, KB retriever, generation, stream/non-stream paths (~3725 tok)
-- `WorkflowController.py` — Node routing: jailbreak check (`JAILBREAK_KEYWORDS`, fixed), fuzzy matching, OOS detection, fast path, tiered utility→generation escalation
 
 ## src/controllers/helpers/
 
-- `ToolManager.py` — CRAG tool orchestration: Wikipedia, ArXiv, Google/SerpAPI, GitHub, StackOverflow. Collection name resolution, project context
-- `TraceManager.py` — Request tracing and logging
 
 ## src/helpers/
 
-- `config.py` — `Settings` class via `pydantic-settings`: `JINA_API_KEY`, `JINA_API_URL`, `COHERE_API_KEY`, `GROQ_API_KEY`, `CONNEXIO_INTERNAL_API_KEY`, etc.
 
 ## src/models/
 
-- `AssetModel.py`, `ChunkModel.py`, `ProjectModel.py`, `SessionModel.py`, `BaseDataModel.py` — SQLAlchemy models for PGVector-backed storage
 
 ## src/stores/llm/providers/
 
-- `OpenAIProvider.py` — Active: used for Jina embeddings (OpenAI-compatible API) and Groq generation. `embed_text()` passes Jina `task` via `extra_body`
-- `GroqProvider.py` — Active: LLM generation via Groq API
-- `CoHereProvider.py` — Inactive: kept for backward compat, not imported by any code path
-
-## src/stores/vectordb/providers/
-
-- `PGVectorProvider.py` — Active: default vector DB backend
-- `QdrantDBProvider.py` — Available: not default
-- `JinaReranker.py` — Active: httpx POST to `/v1/rerank`
-- `CoHereReranker.py` — Inactive: kept for backward compat
 
 ## src/stores/llm/templates/locales/ar/
 
@@ -436,11 +462,8 @@
 ## src/stores/llm/templates/locales/en/
 
 
-## src/utils/
+## src/stores/vectordb/providers/
 
-- `backend_client.py` — REST calls to Node.js backend (5-min cache, X-API-Key auth)
-- `masarx_client.py` — REST calls to MasarX Agent
-- `security.py` — API key verification
-- `idempotency_manager.py` — Idempotency key handling
-- `metrics.py` — Usage metrics
+
+## src/utils/
 

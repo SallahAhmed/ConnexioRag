@@ -1029,6 +1029,150 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-05-21T00:20:03.688Z"
+    },
+    {
+      "id": "bug-065",
+      "timestamp": "2026-06-01T08:41:42.131Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/connexio_back2/database/dbconnection.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:41:42.131Z"
+    },
+    {
+      "id": "bug-066",
+      "timestamp": "2026-06-01T08:41:56.546Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/connexio_back2/app.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:41:56.546Z"
+    },
+    {
+      "id": "bug-067",
+      "timestamp": "2026-06-01T08:43:14.967Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/bootstrap.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 17→39 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:43:14.967Z"
+    },
+    {
+      "id": "bug-068",
+      "timestamp": "2026-06-01T08:43:19.894Z",
+      "error_message": "Wrong reference: authRouter should be authLimiter",
+      "file": "f:/connexio_back2/bootstrap.js",
+      "root_cause": "Used \"authRouter\" instead of \"authLimiter\"",
+      "fix": "Changed authRouter → authLimiter",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:43:19.894Z"
+    },
+    {
+      "id": "bug-069",
+      "timestamp": "2026-06-01T08:43:58.067Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/connexio_back2/modules/tasks/tasks.controller.js",
+      "root_cause": "Had 'completed'",
+      "fix": "Changed to 'pending_verification'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:43:58.067Z"
+    },
+    {
+      "id": "bug-070",
+      "timestamp": "2026-06-01T08:47:21.434Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 29→58 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:47:21.434Z"
+    },
+    {
+      "id": "bug-071",
+      "timestamp": "2026-06-01T08:47:29.282Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/connexio_back2/middleware/authMiddleware.js",
+      "root_cause": "Had 'SELECT UID, FullName, email, photo, fieldexperien",
+      "fix": "Changed to 'SELECT UID, FullName, email, photo, fieldexperien",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:47:29.282Z"
+    },
+    {
+      "id": "bug-072",
+      "timestamp": "2026-06-01T08:51:32.133Z",
+      "error_message": "Significant refactor of ",
+      "file": "CLAUDE.md",
+      "root_cause": "20 lines replaced/restructured",
+      "fix": "Rewrote 21→22 lines (20 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T08:51:32.133Z"
+    },
+    {
+      "id": "bug-073",
+      "timestamp": "2026-06-01T09:07:16.460Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/services/stripeService.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 17→26 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T09:07:16.460Z"
     }
   ]
 }
