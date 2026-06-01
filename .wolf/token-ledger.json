@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 520195,
-    "total_reads": 656,
+    "total_tokens_estimated": 525443,
+    "total_reads": 673,
     "total_writes": 437,
-    "total_sessions": 18,
-    "anatomy_hits": 89,
-    "anatomy_misses": 543,
+    "total_sessions": 23,
+    "anatomy_hits": 91,
+    "anatomy_misses": 558,
     "repeated_reads_blocked": 126,
-    "estimated_savings_vs_bare_cli": 329248
+    "estimated_savings_vs_bare_cli": 329648
   },
   "sessions": [
     {
@@ -6962,6 +6962,140 @@
         "writes_count": 0,
         "repeated_reads_blocked": 2,
         "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-31-1628",
+      "started": "2026-05-31T13:28:22.587Z",
+      "ended": "2026-05-31T13:44:35.922Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/.opencode/plans/EXECUTION_ROADMAP.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_1_FOUNDATION.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_3_CONNEXIO.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_4_POLISH.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_5_MOBILE.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 5,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-05-31-1628",
+      "started": "2026-05-31T13:28:22.587Z",
+      "ended": "2026-05-31T14:43:42.799Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/.opencode/plans/EXECUTION_ROADMAP.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_1_FOUNDATION.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_3_CONNEXIO.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_4_POLISH.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_5_MOBILE.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_2_CORE.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/AGENTS.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PRE_EXECUTION_CHECKLIST.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/database/dbconnection.js",
+          "tokens_estimated": 3940,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/tasks/tasks.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/app.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1308,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 5248,
+        "output_tokens_estimated": 0,
+        "reads_count": 12,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 2
       }
     }
   ],

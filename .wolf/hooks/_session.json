@@ -1,23 +1,33 @@
 {
-  "session_id": "session-2026-05-21-0322",
-  "started": "2026-05-21T00:22:17.145Z",
+  "session_id": "session-2026-06-01-0912",
+  "started": "2026-06-01T06:12:40.084Z",
   "files_read": {
-    "c:/Users/salla/Connexios/.wolf/memory.md": {
-      "count": 3,
-      "tokens": 0,
-      "first_read": "2026-05-21T00:22:21.792Z"
-    },
-    "c:/Users/salla/Connexios/.wolf/cerebrum.md": {
+    "f:/MasarX_A/.opencode/plans/PLAN_A_CORE_PRODUCT.md": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-05-21T00:22:22.084Z"
+      "first_read": "2026-06-01T06:43:47.589Z"
+    },
+    "f:/MasarX_A/.opencode/plans/PLAN_C_ENHANCEMENTS.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-01T06:43:47.995Z"
+    },
+    "f:/MasarX_A/.opencode/plans/PLAN_D_GAPS_AND_OPTIMIZATION.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-01T06:43:56.392Z"
+    },
+    "f:/MasarX_A/.opencode/plans/PLAN_B_ECOSYSTEM_GROWTH.md": {
+      "count": 1,
+      "tokens": 0,
+      "first_read": "2026-06-01T06:43:57.323Z"
     }
   },
   "files_written": [],
   "edit_counts": {},
   "anatomy_hits": 0,
-  "anatomy_misses": 2,
-  "repeated_reads_warned": 2,
+  "anatomy_misses": 3,
+  "repeated_reads_warned": 0,
   "cerebrum_warnings": 0,
-  "stop_count": 3
+  "stop_count": 0
 }
