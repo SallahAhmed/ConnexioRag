@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T11:55:01.075Z
-> Files: 65 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T12:13:05.764Z
+> Files: 66 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -391,7 +391,7 @@
 
 ## f:/connexio_back2/middleware/
 
-- `authMiddleware.js` — Declares JWT_SECRET (~496 tok)
+- `authMiddleware.js` — Declares JWT_SECRET (~583 tok)
 - `rateLimiter.js` — Applied to all auth endpoints (signup, signin, forgot-password, etc.) (~192 tok)
 
 ## f:/connexio_back2/models/
@@ -419,7 +419,7 @@
 
 ## f:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) (~11576 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~11535 tok)
 - `projects.routes.js` — API routes: POST, GET, PUT, DELETE (16 endpoints) (~448 tok)
 
 ## f:/connexio_back2/modules/sprints/
@@ -487,3 +487,4 @@
 
 ## src/utils/
 
+- `backend_client.py` — BackendApiClient: close, get_user, get_project, get_project_members + 4 more (~2426 tok)

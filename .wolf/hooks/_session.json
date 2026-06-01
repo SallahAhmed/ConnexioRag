@@ -98,7 +98,7 @@
       "first_read": "2026-06-01T11:50:30.506Z"
     },
     "c:/Users/salla/Connexios/src/utils/backend_client.py": {
-      "count": 1,
+      "count": 3,
       "tokens": 0,
       "first_read": "2026-06-01T11:52:46.437Z"
     },
@@ -111,6 +111,16 @@
       "count": 3,
       "tokens": 12138,
       "first_read": "2026-06-01T11:53:45.555Z"
+    },
+    "f:/connexio_back2/middleware/authMiddleware.js": {
+      "count": 1,
+      "tokens": 496,
+      "first_read": "2026-06-01T12:10:42.200Z"
+    },
+    "c:/Users/salla/Connexios/src/main.py": {
+      "count": 1,
+      "tokens": 1909,
+      "first_read": "2026-06-01T12:11:23.497Z"
     }
   },
   "files_written": [
@@ -275,6 +285,30 @@
       "action": "edit",
       "tokens": 345,
       "at": "2026-06-01T11:55:01.088Z"
+    },
+    {
+      "file": "c:/Users/salla/Connexios/src/utils/backend_client.py",
+      "action": "edit",
+      "tokens": 96,
+      "at": "2026-06-01T12:12:40.129Z"
+    },
+    {
+      "file": "f:/connexio_back2/middleware/authMiddleware.js",
+      "action": "edit",
+      "tokens": 286,
+      "at": "2026-06-01T12:12:51.121Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "action": "edit",
+      "tokens": 116,
+      "at": "2026-06-01T12:12:59.297Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "action": "edit",
+      "tokens": 126,
+      "at": "2026-06-01T12:13:05.780Z"
     }
   ],
   "edit_counts": {
@@ -293,11 +327,13 @@
     "src/controllers/helpers/ToolManager.py": 3,
     "src/controllers/NLPController.py": 2,
     "f:/Connexio_Frontend2/src/pages/Projects.jsx": 4,
-    "f:/connexio_back2/modules/projects/projects.controller.js": 2
+    "f:/connexio_back2/modules/projects/projects.controller.js": 4,
+    "src/utils/backend_client.py": 1,
+    "f:/connexio_back2/middleware/authMiddleware.js": 1
   },
-  "anatomy_hits": 5,
+  "anatomy_hits": 7,
   "anatomy_misses": 17,
-  "repeated_reads_warned": 10,
+  "repeated_reads_warned": 12,
   "cerebrum_warnings": 0,
-  "stop_count": 10
+  "stop_count": 12
 }

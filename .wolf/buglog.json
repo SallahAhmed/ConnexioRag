@@ -1348,13 +1348,13 @@
       "id": "bug-081",
       "timestamp": "2026-06-01T14:00:00.000Z",
       "error_message": "Main backend returned 403 for /api/projects/:id and /api/projects/:id/members — Access denied: you are not a member of this project.",
-      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
-      "root_cause": "X-API-Key bypass in protect middleware sets req.user = { UID: 0 }. getProjectById and getProjectMembers have an isMember guard that checks project_members for UID 0, which is never a member. Service actor blocked by its own membership check.",
-      "fix": "Wrapped membership checks in `if (req.user.UID !== 0)` in both getProjectById and getProjectMembers. UID=0 is the service actor sentinel — skips the check.",
-      "tags": ["403", "membership-guard", "x-api-key", "service-actor", "l1", "l2"],
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js + middleware/authMiddleware.js + src/utils/backend_client.py",
+      "root_cause": "CONNEXIO_INTERNAL_API_KEY is commented out in RAG .env, so X-API-Key header is never sent. BackendApiClient sends only a service JWT with SERVICE_USER_ID=11. UID=11 is not a member of any test project, so membership check returns 403. First fix (UID !== 0) failed because UID is 11, not 0.",
+      "fix": "Added `service: True` claim to BackendApiClient service JWT. Added detection in protect middleware: if decoded.service===true, set req.user.isInternalService=true and skip DB user lookup. Changed membership guards in getProjectById and getProjectMembers to `if (!req.user.isInternalService)` instead of UID checks.",
+      "tags": ["403", "membership-guard", "service-jwt", "service-actor", "l1", "l2", "backend-client"],
       "related_bugs": ["bug-075"],
-      "occurrences": 1,
-      "last_seen": "2026-06-01T14:00:00.000Z"
+      "occurrences": 3,
+      "last_seen": "2026-06-01T14:30:00.000Z"
     },
     {
       "id": "bug-082",
