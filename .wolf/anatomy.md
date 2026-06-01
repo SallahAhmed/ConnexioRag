@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T09:17:21.581Z
-> Files: 51 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T10:41:49.926Z
+> Files: 65 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -21,7 +21,7 @@
 
 ## ./
 
-- `CLAUDE.md` — OpenWolf (~4770 tok)
+- `CLAUDE.md` — OpenWolf (~4791 tok)
 
 ## .claude/
 
@@ -266,6 +266,7 @@
 
 ## F:/MasarX_A/docs/documentation/
 
+- `documentation.md` — Connexio Platform — Release Documentation (~2578 tok)
 
 ## F:/MasarX_A/src/
 
@@ -282,14 +283,30 @@
 ## docs/
 
 
+## f:/Connexio_Frontend2/
+
+- `tailwind.config.js` (~64 tok)
+
+## f:/Connexio_Frontend2/src/
+
+- `App.jsx` — Shared (~1098 tok)
+- `index.css` — Styles: 51 rules, 52 vars (~17882 tok)
+
 ## f:/Connexio_Frontend2/src/components/
 
 
 ## f:/Connexio_Frontend2/src/components/shared/
 
 - `AccountTypeBadge.jsx` — Displays the user's current account tier (Normal / Pro / Org). (~302 tok)
+- `Avatar.jsx` — User avatar: image with hue-based colored-initials fallback. Props: src, name, size, className. (~120 tok)
+- `Badge.jsx` — Semantic badge with 5 variants: default, primary, success, warning, danger. (~90 tok)
+- `ConfirmDialog.jsx` — Modal confirmation dialog. Props: open, title, message, onConfirm, onCancel, danger. (~130 tok)
 - `ContractSelector.jsx` — Step in the project-creation modal where the founder picks a contract type. (~840 tok)
 - `ContractSigning.jsx` — Modal for signing a project contract. (~2042 tok)
+- `DataTable.jsx` — Table with Skeleton loading rows, EmptyState, and column.render() support. (~180 tok)
+- `EmptyState.jsx` — Centered empty-state with icon, title, description, optional action slot. (~80 tok)
+- `ErrorBoundary.jsx` — React class error boundary wrapping all routes. Shows retry UI on render crash. (~120 tok)
+- `Skeleton.jsx` — Shimmer loading placeholder (cx-skeleton keyframe). Props: width, height, className, style. (~50 tok)
 - `UpgradePrompt.jsx` — Modal shown when a Normal user hits the 3-project/month limit. (~765 tok)
 
 ## f:/Connexio_Frontend2/src/context/
@@ -298,6 +315,8 @@
 
 ## f:/Connexio_Frontend2/src/pages/
 
+- `ConnexioHub.jsx` — REACTIONS (~29301 tok)
+- `Projects.jsx` — ─── helpers ────────────────────────────────────────────────────────────────── (~10788 tok)
 
 ## f:/MasarX_A/
 
@@ -364,7 +383,7 @@
 ## f:/connexio_back2/
 
 - `app.js` — app: startServer (~704 tok)
-- `bootstrap.js` — API routes: GET (5 endpoints) (~1673 tok)
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1724 tok)
 
 ## f:/connexio_back2/database/
 
@@ -372,8 +391,8 @@
 
 ## f:/connexio_back2/middleware/
 
-- `authMiddleware.js` — Declares JWT_SECRET (~498 tok)
-- `rateLimiter.js` — Applied to all auth endpoints (signup, signin, forgot-password, etc.) (~178 tok)
+- `authMiddleware.js` — Declares JWT_SECRET (~496 tok)
+- `rateLimiter.js` — Applied to all auth endpoints (signup, signin, forgot-password, etc.) (~192 tok)
 
 ## f:/connexio_back2/models/
 
@@ -383,7 +402,7 @@
 
 ## f:/connexio_back2/modules/auth/
 
-- `auth.controller.js` — modules/auth/auth.controller.js - MySQL Version (Production Ready) (~6118 tok)
+- `auth.controller.js` — modules/auth/auth.controller.js - MySQL Version (Production Ready) (~6127 tok)
 
 ## f:/connexio_back2/modules/chats/
 
@@ -400,7 +419,7 @@
 
 ## f:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) (~12142 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~12138 tok)
 - `projects.routes.js` — API routes: POST, GET, PUT, DELETE (16 endpoints) (~448 tok)
 
 ## f:/connexio_back2/modules/sprints/
@@ -413,7 +432,7 @@
 
 ## f:/connexio_back2/modules/users/
 
-- `user.controller.js` — modules/users/user.controller.js (~8323 tok)
+- `user.controller.js` — modules/users/user.controller.js (~8348 tok)
 - `user.routes.js` — modules/users/user.routes.js (~525 tok)
 
 ## f:/connexio_back2/modules/webhooks/
@@ -442,10 +461,11 @@
 
 ## src/controllers/
 
-- `NLPController.py` — Core: node detection, CRAG tools dispatch, KB retriever, generation, stream/non-stream paths (~3725 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~15595 tok)
 
 ## src/controllers/helpers/
 
+- `ToolManager.py` — VECTOR: get_col_spec, execute_sql_query, search_wiki, search_google + 4 more (~9794 tok)
 
 ## src/helpers/
 

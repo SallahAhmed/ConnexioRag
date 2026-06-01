@@ -105,6 +105,18 @@
 - **[2026-05-17] Relevance grader prompts softened in both en and ar templates.**
   Changed from "strict and highly critical" to "generous — domain context is valuable even without a direct answer." AMBIGUOUS now covers partial relevance, not just near-misses.
 
+- **[2026-06-01] Pydantic v2 does NOT coerce int → str (breaking change from v1).**
+  In Pydantic v1, passing an integer for a `str` field was silently coerced. In v2 this raises `ValidationError: Input should be a valid string` → HTTP 422 in FastAPI. Always stringify integer IDs before sending them in webhook payloads: `user_id: String(user.UID)`, not `user_id: user.UID`.
+
+- **[2026-06-01] MySQL query() returns { rows } — affectedRows is on result.rows, not result.**
+  For UPDATE/DELETE queries, `query()` wraps the MySQL OkPacket in `{ rows: OkPacket }`. Reading `result.affectedRows` is always undefined. Must use `result.rows?.affectedRows ?? 0` to check whether rows were affected.
+
+- **[2026-06-01] express-rate-limit v8 renamed 'max' → 'limit'.**
+  v8 (installed as 8.5.2) silently ignores `max`. Must use `limit: N`. Also: `standardHeaders: true` changed to `standardHeaders: 'draft-7'`. Passing the old API causes the limiter to accept all requests with no error.
+
+- **[2026-06-01] X-Response-Time must override res.end, not listen on 'finish'.**
+  `res.on('finish', () => res.setHeader(...))` fires after headers are flushed — setHeader() is a no-op at that point. Correct pattern: save `originalEnd = res.end.bind(res)`, then `res.end = function(...args) { res.setHeader('X-Response-Time', ...); return originalEnd(...args); }`.
+
 ## Decision Log
 
 - **[2026-05-14] `ai_chatbot` rooms use `project_id=0` when calling the RAG.**

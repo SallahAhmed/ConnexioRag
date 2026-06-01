@@ -546,21 +546,35 @@ class ToolManager:
                     techs = [t.strip() for t in techs.split(",") if t.strip()]
                 lines.append(f"Technology stack: {', '.join(techs) if techs else 'N/A'}")
                 lines.append(f"Timeline: {project_data.get('startDate', '?')} → {project_data.get('endDate', '?')}")
+                # L1 additions: phase/status and GitHub URL
+                status = project_data.get("status") or project_data.get("phase")
+                if status:
+                    lines.append(f"Status/Phase: {status}")
+                github_url = project_data.get("github_repo_url") or project_data.get("GithubURL")
+                if github_url:
+                    lines.append(f"GitHub: {github_url}")
 
             if isinstance(members, list) and members:
                 lines.append(f"Team size: {len(members)} member(s)")
                 member_names = [m.get("FullName", "?") for m in members[:5] if isinstance(m, dict)]
                 lines.append(f"Members: {', '.join(member_names)}")
 
+            # L2: Active task list with title, status, and assignee
             if isinstance(tasks, list) and tasks:
                 total = len(tasks)
-                done = sum(1 for t in tasks if isinstance(t, dict) and t.get("status") in ("completed", "done"))
-                overdue = sum(
-                    1 for t in tasks
+                done_count = sum(1 for t in tasks if isinstance(t, dict) and t.get("status") in ("completed", "done"))
+                lines.append(f"Tasks: {total} total, {done_count} completed")
+                active_tasks = [
+                    t for t in tasks
                     if isinstance(t, dict) and t.get("status") not in ("completed", "done")
-                    and t.get("end_date")
-                )
-                lines.append(f"Tasks: {total} total, {done} completed, {overdue} potentially overdue")
+                ][:8]
+                if active_tasks:
+                    lines.append("Active tasks:")
+                    for t in active_tasks:
+                        title = t.get("TaskDesc") or t.get("title") or t.get("taskName") or "Untitled"
+                        status = t.get("status", "open")
+                        assignee = t.get("assignee") or t.get("FullName") or "unassigned"
+                        lines.append(f"  • [{status}] {title} — {assignee}")
 
             return "\n".join(lines) if lines else ""
 

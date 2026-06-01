@@ -8,7 +8,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 
 # CLAUDE.md — Connexio Platform Master Reference
 
-> **Last updated:** 2026-06-01 — Full rewrite. 5-phase execution plan underway.
+> **Last updated:** 2026-06-01 — Phase 0 complete. All 20 items done, all 9 integration tests passed, 6 bugs fixed and confirmed via HF Spaces logs. Starting Phase 1.
 > **Source of truth for ecosystem details:** `F:\MasarX_A\AGENTS.md`
 > **Execution plans:** `F:\MasarX_A\.opencode\plans\`
 >
@@ -130,7 +130,7 @@ The platform is executing a 5-phase enhancement plan (61 items). Source: `F:\Mas
 
 | Phase | Name | Days | Items | Status |
 |-------|------|------|-------|--------|
-| **0** | Hidden Fixes + Infrastructure | Day 0 | 20 | 🔄 In Progress |
+| **0** | Hidden Fixes + Infrastructure | Day 0 | 20 | ✅ Complete |
 | **1** | Foundation | Days 1-3 | 13 | ⏳ Pending |
 | **2** | Core Features | Days 4-7 | 17 | ⏳ Pending |
 | **3** | @connexio + Platform | Days 8-12 | 21 | ⏳ Pending |

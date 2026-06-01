@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 1018609,
-    "total_reads": 886,
-    "total_writes": 752,
-    "total_sessions": 25,
-    "anatomy_hits": 145,
-    "anatomy_misses": 717,
-    "repeated_reads_blocked": 252,
-    "estimated_savings_vs_bare_cli": 1085115
+    "total_tokens_estimated": 1309179,
+    "total_reads": 1032,
+    "total_writes": 851,
+    "total_sessions": 27,
+    "anatomy_hits": 214,
+    "anatomy_misses": 794,
+    "repeated_reads_blocked": 349,
+    "estimated_savings_vs_bare_cli": 1533011
   },
   "sessions": [
     {
@@ -10101,6 +10101,1594 @@
         "writes_count": 41,
         "repeated_reads_blocked": 23,
         "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-06-01-1025",
+      "started": "2026-06-01T07:25:56.991Z",
+      "ended": "2026-06-01T09:34:16.256Z",
+      "reads": [
+        {
+          "file": "f:/MasarX_A/.opencode/plans/EXECUTION_PROMPT.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/EXECUTION_ROADMAP.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PRE_EXECUTION_CHECKLIST.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_1_FOUNDATION.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_2_CORE.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_3_CONNEXIO.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/.opencode/plans/PHASE_4_POLISH.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.routes.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 522,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/database/dbconnection.js",
+          "tokens_estimated": 5632,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/tasks/tasks.controller.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/package.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/seed_data.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+          "tokens_estimated": 4767,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+          "tokens_estimated": 2867,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/index.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/context/AppContext.jsx",
+          "tokens_estimated": 6433,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1876,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/app.js",
+          "tokens_estimated": 704,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/stripeService.js",
+          "tokens_estimated": 1189,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 5298,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/database/dbconnection.js",
+          "tokens_estimated": 1275,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/app.js",
+          "tokens_estimated": 45,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/app.js",
+          "tokens_estimated": 157,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/utils/responseHandler.js",
+          "tokens_estimated": 118,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 398,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 397,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 19,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 37,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 61,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 84,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/tasks/tasks.controller.js",
+          "tokens_estimated": 33,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/services/eSignatureService.js",
+          "tokens_estimated": 534,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/services/contractService.js",
+          "tokens_estimated": 1030,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/services/stripeService.js",
+          "tokens_estimated": 1099,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/database/dbconnection.js",
+          "tokens_estimated": 197,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.routes.js",
+          "tokens_estimated": 142,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1876,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.routes.js",
+          "tokens_estimated": 118,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 289,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 737,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 153,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 334,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 606,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 59,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+          "tokens_estimated": 311,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+          "tokens_estimated": 501,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+          "tokens_estimated": 28,
+          "action": "edit"
+        },
+        {
+          "file": "f:/MasarX_A/src/models/db_schemas/seed_data.py",
+          "tokens_estimated": 83,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/AccountTypeBadge.jsx",
+          "tokens_estimated": 302,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/UpgradePrompt.jsx",
+          "tokens_estimated": 765,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/ContractSelector.jsx",
+          "tokens_estimated": 840,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/ContractSigning.jsx",
+          "tokens_estimated": 2042,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/context/AppContext.jsx",
+          "tokens_estimated": 578,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/context/AppContext.jsx",
+          "tokens_estimated": 550,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 503,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/services/stripeService.js",
+          "tokens_estimated": 270,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 446,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 19,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 44435,
+        "output_tokens_estimated": 23024,
+        "reads_count": 28,
+        "writes_count": 41,
+        "repeated_reads_blocked": 23,
+        "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T09:35:01.562Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 3,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T09:52:28.729Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 11374,
+        "output_tokens_estimated": 234,
+        "reads_count": 11,
+        "writes_count": 3,
+        "repeated_reads_blocked": 7,
+        "anatomy_lookups": 7
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T10:01:07.136Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 8323,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 136,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 31839,
+        "output_tokens_estimated": 370,
+        "reads_count": 13,
+        "writes_count": 4,
+        "repeated_reads_blocked": 8,
+        "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T10:02:58.392Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 8323,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 136,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 31839,
+        "output_tokens_estimated": 370,
+        "reads_count": 13,
+        "writes_count": 4,
+        "repeated_reads_blocked": 9,
+        "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T10:08:57.502Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 8323,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 136,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 2778,
+          "action": "create"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 31839,
+        "output_tokens_estimated": 3148,
+        "reads_count": 14,
+        "writes_count": 5,
+        "repeated_reads_blocked": 9,
+        "anatomy_lookups": 9
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T10:16:43.217Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 8323,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 11175,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.routes.js",
+          "tokens_estimated": 448,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 136,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 2778,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 66,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 15,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 227,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 43462,
+        "output_tokens_estimated": 3532,
+        "reads_count": 18,
+        "writes_count": 9,
+        "repeated_reads_blocked": 18,
+        "anatomy_lookups": 11
+      }
+    },
+    {
+      "id": "session-2026-06-01-1234",
+      "started": "2026-06-01T09:34:31.528Z",
+      "ended": "2026-06-01T10:20:00.382Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 1673,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 6118,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 178,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/contracts/contracts.controller.js",
+          "tokens_estimated": 1870,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/payments/payments.controller.js",
+          "tokens_estimated": 512,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.routes.js",
+          "tokens_estimated": 525,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 498,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 8323,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 12142,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+          "tokens_estimated": 11175,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/services/aiService.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/MasarX_A/src/utils/auth.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.routes.js",
+          "tokens_estimated": 448,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "f:/connexio_back2/bootstrap.js",
+          "tokens_estimated": 116,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/rateLimiter.js",
+          "tokens_estimated": 104,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/middleware/authMiddleware.js",
+          "tokens_estimated": 14,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/users/user.controller.js",
+          "tokens_estimated": 136,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 2778,
+          "action": "create"
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 66,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+          "tokens_estimated": 76,
+          "action": "edit"
+        },
+        {
+          "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+          "tokens_estimated": 15,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 227,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 43462,
+        "output_tokens_estimated": 3532,
+        "reads_count": 18,
+        "writes_count": 9,
+        "repeated_reads_blocked": 18,
+        "anatomy_lookups": 11
+      }
+    },
+    {
+      "id": "session-2026-06-01-1320",
+      "started": "2026-06-01T10:20:22.095Z",
+      "ended": "2026-06-01T10:20:48.927Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 2,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-06-01-1320",
+      "started": "2026-06-01T10:20:22.095Z",
+      "ended": "2026-06-01T10:24:49.992Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 2,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-06-01-1320",
+      "started": "2026-06-01T10:20:22.095Z",
+      "ended": "2026-06-01T10:26:14.220Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [],
+      "totals": {
+        "input_tokens_estimated": 0,
+        "output_tokens_estimated": 0,
+        "reads_count": 2,
+        "writes_count": 0,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 0
+      }
+    },
+    {
+      "id": "session-2026-06-01-1320",
+      "started": "2026-06-01T10:20:22.095Z",
+      "ended": "2026-06-01T10:28:47.936Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 4770,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 48,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 20,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 4770,
+        "output_tokens_estimated": 68,
+        "reads_count": 4,
+        "writes_count": 2,
+        "repeated_reads_blocked": 0,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-01-1320",
+      "started": "2026-06-01T10:20:22.095Z",
+      "ended": "2026-06-01T10:43:17.531Z",
+      "reads": [
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/cerebrum.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/anatomy.md",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 4770,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/buglog.json",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/tailwind.config.js",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 3725,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/App.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/models/SessionModel.py",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/AccountTypeBadge.jsx",
+          "tokens_estimated": 302,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/index.html",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/App.css",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/main.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/index.css",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Dashboard/Dashboard.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+          "tokens_estimated": 0,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        },
+        {
+          "file": "c:/Users/salla/Connexios/.wolf/memory.md",
+          "tokens_estimated": 0,
+          "was_repeated": false,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 48,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/CLAUDE.md",
+          "tokens_estimated": 20,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/tailwind.config.js",
+          "tokens_estimated": 64,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/index.css",
+          "tokens_estimated": 137,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/Skeleton.jsx",
+          "tokens_estimated": 64,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/ErrorBoundary.jsx",
+          "tokens_estimated": 379,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/EmptyState.jsx",
+          "tokens_estimated": 194,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/ConfirmDialog.jsx",
+          "tokens_estimated": 530,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/Avatar.jsx",
+          "tokens_estimated": 290,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/Badge.jsx",
+          "tokens_estimated": 311,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/components/shared/DataTable.jsx",
+          "tokens_estimated": 706,
+          "action": "create"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/App.jsx",
+          "tokens_estimated": 38,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/App.jsx",
+          "tokens_estimated": 13,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/App.jsx",
+          "tokens_estimated": 37,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx",
+          "tokens_estimated": 140,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/helpers/ToolManager.py",
+          "tokens_estimated": 674,
+          "action": "edit"
+        },
+        {
+          "file": "c:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 300,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+          "tokens_estimated": 26,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+          "tokens_estimated": 167,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+          "tokens_estimated": 140,
+          "action": "edit"
+        },
+        {
+          "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+          "tokens_estimated": 176,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 8797,
+        "output_tokens_estimated": 4475,
+        "reads_count": 18,
+        "writes_count": 22,
+        "repeated_reads_blocked": 5,
+        "anatomy_lookups": 3
       }
     }
   ],

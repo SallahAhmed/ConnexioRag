@@ -289,6 +289,22 @@ class NLPController(BaseController):
 
         tracer.end_trace(trace_id, step_id, {"session_id": session_id})
 
+        # --- L3: Recent conversation summary (last 5 messages) ---
+        # Injects recent exchanges into the retrieval context for project queries
+        # so the LLM can reference what was just discussed without re-reading the
+        # full chat history. Skipped for memory/file queries (they handle history separately).
+        if project_id and history and not is_memory_query and not is_file_query:
+            recent_5 = history[-5:]
+            if len(recent_5) >= 2:
+                summary_lines = []
+                for msg in recent_5:
+                    role = "User" if msg["role"] == "user" else "Assistant"
+                    snippet = msg.get("content", "")[:200].replace("\n", " ")
+                    summary_lines.append(f"{role}: {snippet}")
+                retrieved_context.append(
+                    "\n[Recent Conversation Summary]:\n" + "\n".join(summary_lines)
+                )
+
         # --- Pasted URL Automatic Processing & Extraction ---
         # Detect if the query contains a URL anywhere inside it, download and extract its text
         # content dynamically, and feed it into prompt context.

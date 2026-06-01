@@ -1173,6 +1173,176 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-01T09:07:16.460Z"
+    },
+    {
+      "id": "bug-074",
+      "timestamp": "2026-06-01T09:36:28.872Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/bootstrap.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 6→11 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T09:36:28.872Z"
+    },
+    {
+      "id": "bug-075",
+      "timestamp": "2026-06-01T09:50:43.943Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/connexio_back2/middleware/authMiddleware.js",
+      "root_cause": "Had `message: Auth failed: ${error.message}`",
+      "fix": "Changed to `Auth failed: ${error.message}`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T09:50:43.943Z"
+    },
+    {
+      "id": "bug-076",
+      "timestamp": "2026-06-01T09:57:00.000Z",
+      "error_message": "Rate limiter never fires — 21 rapid auth requests all return 401, never 429",
+      "file": "f:/connexio_back2/middleware/rateLimiter.js",
+      "root_cause": "express-rate-limit v8.5.2 removed the 'max' option silently. 'max: 20' is ignored, so every request passes through unlimited.",
+      "fix": "Changed max: 20 → limit: 20, and standardHeaders: true → standardHeaders: 'draft-7' to match v8 API.",
+      "tags": [
+        "rate-limit",
+        "express-rate-limit",
+        "v8-api-change",
+        "middleware",
+        "429"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T09:57:00.000Z"
+    },
+    {
+      "id": "bug-077",
+      "timestamp": "2026-06-01T10:15:31.682Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T10:15:31.682Z"
+    },
+    {
+      "id": "bug-078",
+      "timestamp": "2026-06-01T10:30:00.000Z",
+      "error_message": "POST /api/v1/masarx/webhook/event/user.joined_platform/0 → 422 Unprocessable Entity",
+      "file": "f:/connexio_back2/modules/auth/auth.controller.js",
+      "root_cause": "Pydantic v2 does NOT coerce int→str (breaking change from v1). Backend sent user_id as integer (user.UID). MasarX WebhookPayload.user_id is Optional[str] — Pydantic v2 rejects the int with a validation error. Also email/provider were top-level fields not in the schema (harmless but messy).",
+      "fix": "Changed user_id: user.UID → user_id: String(user.UID) in both fireEvent calls (signup + Google signin). Moved email/provider into payload: { email, provider } sub-object.",
+      "tags": [
+        "422",
+        "pydantic-v2",
+        "type-coercion",
+        "webhook",
+        "user.joined_platform"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-06-01T10:30:00.000Z",
+      "status": "confirmed_fixed",
+      "confirmed_at": "2026-06-01T12:00:00.000Z"
+    },
+    {
+      "id": "bug-079",
+      "timestamp": "2026-06-01T10:30:00.000Z",
+      "error_message": "PUT /api/projects/:id/sync-repo → 404 Project not found (even for existing projects)",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "syncRepoUrl read `result.rowCount ?? result.affectedRows ?? 0`. query() returns { rows }, so affectedRows is on result.rows (the MySQL OkPacket), not on result itself. Both result.rowCount and result.affectedRows are undefined, so affected always evaluated to 0.",
+      "fix": "Changed to `result.rows?.affectedRows ?? 0`.",
+      "tags": [
+        "404",
+        "sync-repo",
+        "mysql",
+        "affectedRows",
+        "query-result-shape"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-06-01T10:30:00.000Z",
+      "status": "confirmed_fixed",
+      "confirmed_at": "2026-06-01T12:00:00.000Z"
+    },
+    {
+      "id": "bug-080",
+      "timestamp": "2026-06-01T10:16:29.176Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/MasarX_A/docs/documentation/documentation.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T10:16:29.176Z"
+    },
+    {
+      "id": "bug-081",
+      "timestamp": "2026-06-01T10:39:19.019Z",
+      "error_message": "Wrong reference: Routes should be ErrorBoundary",
+      "file": "f:/Connexio_Frontend2/src/App.jsx",
+      "root_cause": "Used \"Routes\" instead of \"ErrorBoundary\"",
+      "fix": "Changed Routes → ErrorBoundary",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T10:39:19.019Z"
+    },
+    {
+      "id": "bug-082",
+      "timestamp": "2026-06-01T10:39:54.891Z",
+      "error_message": "Significant refactor of ",
+      "file": "src/controllers/helpers/ToolManager.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 23→37 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T10:39:54.891Z"
+    },
+    {
+      "id": "bug-083",
+      "timestamp": "2026-06-01T10:41:40.869Z",
+      "error_message": "CSS fix: display",
+      "file": "f:/Connexio_Frontend2/src/pages/Projects.jsx",
+      "root_cause": "display: 'flex', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--cx-border)' → 'flex', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--cx-border)', alignItems: 'center'",
+      "fix": "Changed display: 'flex', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--cx-border)' → 'flex', gap: 10, padding: '12px 0', borderBottom: '1px solid var(--cx-border)', alignItems: 'center'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-01T10:41:49.950Z"
     }
   ]
 }

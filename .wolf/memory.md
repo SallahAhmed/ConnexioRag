@@ -3,6 +3,16 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+## Session: 2026-06-01
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 09:55 | Fixed X-Response-Time: res.end override instead of res.on('finish') | bootstrap.js | bug-074 | ~200 |
+| 09:57 | Fixed rate limiter: max→limit for express-rate-limit v8; standardHeaders: 'draft-7' | rateLimiter.js | bug-076; live test confirmed 21 requests all returned 401 (limiter was silently disabled) | ~300 |
+| 09:58 | Fixed authMiddleware double "message:" prefix in error response | authMiddleware.js | bug-075 | ~100 |
+| 10:00 | Ran Tests 2-9 against connexio.icu — all passed | connexio.icu live | T2:429✅ T3+4:JWT✅ T5:columns✅ T6:403 upgrade_required✅ T7:SHA-256✅ T8:username✅ T9:payment_status✅ | ~800 |
+| 10:05 | Fixed getMyProfile missing account_type/username/projects_created_this_month | user.controller.js | All Phase 0 columns now returned from /profile/me; pushed + verified live | ~100 |
+
 ## Session: 2026-05-21
 
 | Time | Action | File(s) | Outcome | ~Tokens |
@@ -503,3 +513,62 @@
 | 12:18 | Session end: 41 writes across 27 files (CLAUDE.md, dbconnection.js, app.js, responseHandler.js, rateLimiter.js) | 28 reads | ~67459 tok |
 | 12:24 | Session end: 41 writes across 27 files (CLAUDE.md, dbconnection.js, app.js, responseHandler.js, rateLimiter.js) | 28 reads | ~67459 tok |
 | 12:27 | Session end: 41 writes across 27 files (CLAUDE.md, dbconnection.js, app.js, responseHandler.js, rateLimiter.js) | 28 reads | ~67459 tok |
+| 12:34 | Session end: 41 writes across 27 files (CLAUDE.md, dbconnection.js, app.js, responseHandler.js, rateLimiter.js) | 28 reads | ~67459 tok |
+
+## Session: 2026-06-01 12:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 12:36 | Edited f:/connexio_back2/bootstrap.js | modified function() | ~116 |
+| 12:49 | Edited f:/connexio_back2/middleware/rateLimiter.js | 8→8 lines | ~104 |
+| 12:50 | Edited f:/connexio_back2/middleware/authMiddleware.js | "message: Auth failed: ${e" → "Auth failed: ${error.mess" | ~14 |
+| 12:52 | Session end: 3 writes across 3 files (bootstrap.js, rateLimiter.js, authMiddleware.js) | 11 reads | ~11608 tok |
+| 12:58 | Edited f:/connexio_back2/modules/users/user.controller.js | 5→6 lines | ~136 |
+| 13:01 | Session end: 4 writes across 4 files (bootstrap.js, rateLimiter.js, authMiddleware.js, user.controller.js) | 13 reads | ~32209 tok |
+| 13:02 | Session end: 4 writes across 4 files (bootstrap.js, rateLimiter.js, authMiddleware.js, user.controller.js) | 13 reads | ~32209 tok |
+| 13:08 | Created F:/MasarX_A/docs/documentation/documentation.md | — | ~2592 |
+| 13:08 | Session end: 5 writes across 5 files (bootstrap.js, rateLimiter.js, authMiddleware.js, user.controller.js, documentation.md) | 14 reads | ~34987 tok |
+| 13:15 | Edited f:/connexio_back2/modules/auth/auth.controller.js | 4→4 lines | ~66 |
+| 13:15 | Edited f:/connexio_back2/modules/auth/auth.controller.js | 5→4 lines | ~76 |
+| 13:15 | Edited f:/connexio_back2/modules/projects/projects.controller.js | added optional chaining | ~15 |
+| 13:16 | Edited F:/MasarX_A/docs/documentation/documentation.md | added optional chaining | ~212 |
+| 13:16 | Session end: 9 writes across 7 files (bootstrap.js, rateLimiter.js, authMiddleware.js, user.controller.js, documentation.md) | 18 reads | ~46994 tok |
+| 13:20 | Session end: 9 writes across 7 files (bootstrap.js, rateLimiter.js, authMiddleware.js, user.controller.js, documentation.md) | 18 reads | ~46994 tok |
+
+## Session: 2026-06-01 13:20
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:28 | Edited CLAUDE.md | inline fix | ~45 |
+| 13:28 | Edited CLAUDE.md | inline fix | ~18 |
+| 13:28 | Session end: 2 writes across 1 files (CLAUDE.md) | 4 reads | ~4838 tok |
+| 13:38 | Created f:/Connexio_Frontend2/tailwind.config.js | — | ~64 |
+| 13:38 | Edited f:/Connexio_Frontend2/src/index.css | expanded (+17 lines) | ~137 |
+| 13:38 | Created f:/Connexio_Frontend2/src/components/shared/Skeleton.jsx | — | ~64 |
+| 13:38 | Created f:/Connexio_Frontend2/src/components/shared/ErrorBoundary.jsx | — | ~379 |
+| 13:38 | Created f:/Connexio_Frontend2/src/components/shared/EmptyState.jsx | — | ~194 |
+| 13:38 | Created f:/Connexio_Frontend2/src/components/shared/ConfirmDialog.jsx | — | ~530 |
+| 13:38 | Created f:/Connexio_Frontend2/src/components/shared/Avatar.jsx | — | ~290 |
+| 13:39 | Created f:/Connexio_Frontend2/src/components/shared/Badge.jsx | — | ~311 |
+| 13:39 | Created f:/Connexio_Frontend2/src/components/shared/DataTable.jsx | — | ~706 |
+| 13:39 | Edited f:/Connexio_Frontend2/src/App.jsx | 2→5 lines | ~38 |
+| 13:39 | Edited f:/Connexio_Frontend2/src/App.jsx | 1→2 lines | ~13 |
+| 13:39 | Edited f:/Connexio_Frontend2/src/App.jsx | 3→4 lines | ~37 |
+| 13:39 | Edited f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx | 5→1 lines | ~21 |
+| 13:39 | Edited f:/Connexio_Frontend2/src/pages/ConnexioHub.jsx | expanded (+6 lines) | ~140 |
+| 13:39 | Edited src/controllers/helpers/ToolManager.py | modified isinstance() | ~674 |
+| 13:40 | Edited src/controllers/NLPController.py | expanded (+16 lines) | ~300 |
+| 13:41 | Edited f:/Connexio_Frontend2/src/pages/Projects.jsx | added 1 import(s) | ~26 |
+| 13:41 | Edited f:/Connexio_Frontend2/src/pages/Projects.jsx | 10→10 lines | ~167 |
+| 13:41 | Edited f:/Connexio_Frontend2/src/pages/Projects.jsx | CSS: alignItems | ~140 |
+| 13:41 | Edited f:/Connexio_Frontend2/src/pages/Projects.jsx | CSS: alignItems | ~176 |
+| 13:45 | Phase 1 complete E18/E19/E20/E21/E22/E25/L1/L2/L3 | see rows below | success | ~8000 |
+| 13:45 | E21: tailwind.config.js expanded to src/**/*.{js,jsx,ts,tsx}, removed tw- prefix | tailwind.config.js | success | ~30 |
+| 13:45 | E21: index.css cx-skeleton shimmer keyframe added | src/index.css | success | ~50 |
+| 13:45 | E22/E25: 7 shared components created (Skeleton/ErrorBoundary/EmptyState/ConfirmDialog/Avatar/Badge/DataTable) | src/components/shared/ | success | ~700 |
+| 13:45 | E19: App.jsx Routes wrapped with ErrorBoundary | src/App.jsx | success | ~20 |
+| 13:45 | E20: ConnexioHub.jsx pdfjs-dist moved to dynamic import in useEffect | src/pages/ConnexioHub.jsx | success | ~40 |
+| 13:45 | E18: Projects.jsx 3 inline skeleton blocks replaced with Skeleton component | src/pages/Projects.jsx | success | ~60 |
+| 13:45 | L1/L2: ToolManager.py get_project_context_summary adds github_repo_url, phase, active task list | src/controllers/helpers/ToolManager.py | success | ~80 |
+| 13:45 | L3: NLPController.py injects last 5 chat messages into retrieved_context for project queries | src/controllers/NLPController.py | success | ~60 |
+| 13:43 | Session end: 22 writes across 15 files (CLAUDE.md, tailwind.config.js, index.css, Skeleton.jsx, ErrorBoundary.jsx) | 18 reads | ~13272 tok |
