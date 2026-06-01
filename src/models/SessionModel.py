@@ -70,7 +70,7 @@ class SessionModel(BaseDataModel):
         )
 
     async def append_message(self, session_id: int, role: str, content: str,
-                              workflow_node: str = None):
+                              workflow_node: str = None, source: str = None):
         """Appends a message to the chat history JSONB array in a single transaction."""
         message = {
             "role": role,
@@ -78,6 +78,8 @@ class SessionModel(BaseDataModel):
             "node": workflow_node,
             "timestamp": datetime.now(timezone.utc).isoformat()
         }
+        if source:
+            message["source"] = source
 
         async with self.db_client() as session:
             async with session.begin():

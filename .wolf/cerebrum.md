@@ -117,6 +117,18 @@
 - **[2026-06-01] X-Response-Time must override res.end, not listen on 'finish'.**
   `res.on('finish', () => res.setHeader(...))` fires after headers are flushed — setHeader() is a no-op at that point. Correct pattern: save `originalEnd = res.end.bind(res)`, then `res.end = function(...args) { res.setHeader('X-Response-Time', ...); return originalEnd(...args); }`.
 
+- **[2026-06-01] Phase 0 tables were not actually in dbconnection.js despite being checked off.**
+  `contribution_evidence`, `audit_log`, `active_sessions`, `project_contracts`, `contract_signatures`, and all Phase 0 column migrations were missing from `createTables()`. Added in Phase 2 session. Always verify DB table existence with a grep before writing code that INSERTs into them.
+
+- **[2026-06-01] Global `validator.escape()` on req.body corrupts stored data.**
+  HTML-escaping all string fields globally (e.g. `&` → `&amp;`) stores escaped HTML in MySQL and causes double-escaping when rendered. Correct approach: trim-only globally (`validator.trim`), escape at controller level for fields that accept freeform HTML. See `sanitize.js`.
+
+- **[2026-06-01] `generateToken` must be async after adding JTI + active_sessions insert.**
+  All call sites (`await generateToken(user)`) updated in auth.controller.js. Making it sync and fire-and-forget would leave the JTI unregistered before the token is returned to the client.
+
+- **[2026-06-01] `append_message` now accepts optional `source` param.**
+  Stored in the message dict alongside `role/content/node/timestamp`. Used to distinguish `chat_mention` (from socket @mention) vs page queries. The `source` param is threaded end-to-end: socket.js → agent.py → answer_agent_chat_stream → append_message.
+
 ## Decision Log
 
 - **[2026-05-14] `ai_chatbot` rooms use `project_id=0` when calling the RAG.**

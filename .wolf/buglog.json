@@ -1351,8 +1351,18 @@
       "file": "f:/connexio_back2/modules/projects/projects.controller.js + middleware/authMiddleware.js + src/utils/backend_client.py",
       "root_cause": "CONNEXIO_INTERNAL_API_KEY is commented out in RAG .env, so X-API-Key header is never sent. BackendApiClient sends only a service JWT with SERVICE_USER_ID=11. UID=11 is not a member of any test project, so membership check returns 403. First fix (UID !== 0) failed because UID is 11, not 0.",
       "fix": "Added `service: True` claim to BackendApiClient service JWT. Added detection in protect middleware: if decoded.service===true, set req.user.isInternalService=true and skip DB user lookup. Changed membership guards in getProjectById and getProjectMembers to `if (!req.user.isInternalService)` instead of UID checks.",
-      "tags": ["403", "membership-guard", "service-jwt", "service-actor", "l1", "l2", "backend-client"],
-      "related_bugs": ["bug-075"],
+      "tags": [
+        "403",
+        "membership-guard",
+        "service-jwt",
+        "service-actor",
+        "l1",
+        "l2",
+        "backend-client"
+      ],
+      "related_bugs": [
+        "bug-075"
+      ],
       "occurrences": 3,
       "last_seen": "2026-06-01T14:30:00.000Z"
     },
@@ -1363,7 +1373,13 @@
       "file": "src/controllers/helpers/ToolManager.py",
       "root_cause": "Reranker call in search_knowledge_base() and search_knowledge_base_raw() was not wrapped in try/except. A 429 from Cohere propagated to the outer except block and returned [] instead of falling back to vector-score-sorted results.",
       "fix": "Wrapped both reranker.rerank() calls in their own try/except. On failure, logs a warning and returns un-reranked vector results instead of crashing the KB path.",
-      "tags": ["429", "cohere", "reranker", "kb-search", "fallback"],
+      "tags": [
+        "429",
+        "cohere",
+        "reranker",
+        "kb-search",
+        "fallback"
+      ],
       "related_bugs": [],
       "occurrences": 2,
       "last_seen": "2026-06-01T14:00:00.000Z"
@@ -1375,10 +1391,159 @@
       "file": "src/controllers/NLPController.py",
       "root_cause": "Unknown — history appears empty on second request. Added [L3] debug log to show history_len, is_memory, is_file, and db status on every request. Root cause to confirm after next test run.",
       "fix": "Added debug logging. Will update after confirming root cause from next HF Spaces log.",
-      "tags": ["l3", "session-history", "debug", "streaming"],
+      "tags": [
+        "l3",
+        "session-history",
+        "debug",
+        "streaming"
+      ],
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-01T14:00:00.000Z"
+    },
+    {
+      "id": "bug-087",
+      "timestamp": "2026-06-01T13:21:41.063Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/tasks/tasks.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:21:41.063Z"
+    },
+    {
+      "id": "bug-088",
+      "timestamp": "2026-06-01T13:22:10.254Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:22:10.254Z"
+    },
+    {
+      "id": "bug-089",
+      "timestamp": "2026-06-01T13:23:29.709Z",
+      "error_message": "Significant refactor of ",
+      "file": "F:/connexio_back2/middleware/sanitize.js",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 21→24 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:23:29.709Z"
+    },
+    {
+      "id": "bug-090",
+      "timestamp": "2026-06-01T13:24:44.280Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/database/dbconnection.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:24:44.280Z"
+    },
+    {
+      "id": "bug-091",
+      "timestamp": "2026-06-01T13:25:15.128Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/auth/auth.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:25:15.128Z"
+    },
+    {
+      "id": "bug-092",
+      "timestamp": "2026-06-01T13:25:26.582Z",
+      "error_message": "Missing await",
+      "file": "F:/connexio_back2/modules/auth/auth.controller.js",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:25:26.582Z"
+    },
+    {
+      "id": "bug-093",
+      "timestamp": "2026-06-01T13:27:38.992Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/connexio_back2/bootstrap.js",
+      "root_cause": "Had './middleware/sanitize.js'",
+      "fix": "Changed to './modules/contracts/contracts.routes.js'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:27:38.992Z"
+    },
+    {
+      "id": "bug-094",
+      "timestamp": "2026-06-01T13:32:55.858Z",
+      "error_message": "CSS fix: background, borderBottom, boxShadow",
+      "file": "F:/Connexio_Frontend2/src/components/NotificationBell.jsx",
+      "root_cause": "background: 'var(--cx-primary-light)', flexShrink: 0, marginTop: 5, → isEscalation ? 'var(--cx-danger)' : 'var(--cx-primary-light)',; borderBottom: '1px solid var(--cx-border)', → isEscalation; boxShadow: '0 0 6px rgba(24,86,255,0.4)', → isEscalation ? '0 0 6px rgba(234,33,67,0.4)' : '0 0 6px rgba(24,86,255,0.4)',",
+      "fix": "Changed background: 'var(--cx-primary-light)', flexShrink: 0, marginTop: 5, → isEscalation ? 'var(--cx-danger)' : 'var(--cx-primary-light)',; borderBottom: '1px solid var(--cx-border)', → isEscalation; boxShadow: '0 0 6px rgba(24,86,255,0.4)', → isEscalation ? '0 0 6px rgba(234,33,67,0.4)' : '0 0 6px rgba(24,86,255,0.4)',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:32:55.858Z"
+    },
+    {
+      "id": "bug-095",
+      "timestamp": "2026-06-01T13:45:01.466Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/connexio_back2/modules/contracts/contracts.controller.js",
+      "root_cause": "Had 'SELECT role FROM project_members WHERE project_id",
+      "fix": "Changed to \"SELECT role FROM project_members WHERE project_id",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T13:45:01.466Z"
     }
   ]
 }

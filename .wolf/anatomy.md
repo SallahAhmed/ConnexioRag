@@ -1,7 +1,7 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T12:13:05.764Z
-> Files: 66 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T13:45:01.450Z
+> Files: 92 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../Connexio_Front2/src/components/
 
@@ -21,7 +21,7 @@
 
 ## ./
 
-- `CLAUDE.md` — OpenWolf (~4791 tok)
+- `CLAUDE.md` — OpenWolf (~4796 tok)
 
 ## .claude/
 
@@ -261,6 +261,26 @@
 
 - `AIAgentPanel.jsx` — AIAgentPanel: triggers all MasarX intents, renders structured results (match/risks/workload/audit/docs/scaffold/PR), owner-gated, timeout-tolerant (~2600 tok)
 
+## F:/Connexio_Frontend2/src/api/
+
+- `socket.js` — Exports getSocket, sendSocketMessage, trackSocketRoom, disconnectSocket (~642 tok)
+
+## F:/Connexio_Frontend2/src/components/
+
+- `EvidenceTab.jsx` — Shows per-member contribution breakdown (tasks, commits, reviews, verifications). Used as 5th tab in ProjectDetail. (~829 tok)
+- `KanbanBoard.jsx` — COLUMNS (~7934 tok)
+- `NotificationBell.jsx` — NOTIF_ICON (~2851 tok)
+- `ProfessorOverride.jsx` — Form to log a manual risk override (low/medium/high + reason). Posts to /api/projects/:id/risk-override. (~928 tok)
+- `ReassignmentModal.jsx` — Fetches GET /tasks/:id/suggestions and lets leader reassign to a least-loaded member. (~1045 tok)
+
+## F:/Connexio_Frontend2/src/context/
+
+- `AppContext.jsx` — translations (~7408 tok)
+
+## F:/Connexio_Frontend2/src/pages/
+
+- `ProjectDetail.jsx` — PHASES (~22228 tok)
+
 ## F:/MasarX_A/
 
 
@@ -276,9 +296,44 @@
 
 ## F:/connexio_back2/
 
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1404 tok)
+- `socket.js` — API routes: GET, POST (4 endpoints) (~8538 tok)
+
+## F:/connexio_back2/database/
+
+- `dbconnection.js` — database/dbconnection.js - MySQL Version (~5570 tok)
+
+## F:/connexio_back2/middleware/
+
+- `authMiddleware.js` — Declares JWT_SECRET (~728 tok)
+- `sanitize.js` — Globally trims whitespace from all string fields in req.body. (~243 tok)
+
+## F:/connexio_back2/modules/auth/
+
+- `auth.controller.js` — modules/auth/auth.controller.js - MySQL Version (Production Ready) (~6451 tok)
 
 ## F:/connexio_back2/modules/chats/
 
+
+## F:/connexio_back2/modules/contracts/
+
+- `contracts.controller.js` — POST /api/contracts/projects/:projectId — create a contract for a project (~1578 tok)
+- `contracts.routes.js` — API routes: POST, GET (3 endpoints) (~135 tok)
+
+## F:/connexio_back2/modules/projects/
+
+- `projects.controller.js` — API routes: POST (1 endpoints) (~12450 tok)
+- `projects.routes.js` — API routes: POST, GET, PUT, DELETE (18 endpoints) (~507 tok)
+
+## F:/connexio_back2/modules/tasks/
+
+- `tasks.controller.js` — modules/tasks/tasks.controller.js (~7384 tok)
+- `tasks.routes.js` — API routes: POST, DELETE, GET, PUT (12 endpoints) (~352 tok)
+
+## F:/connexio_back2/services/
+
+- `escalationService.js` — Finds overdue tasks and nudges/escalates based on days overdue. (~712 tok)
+- `eSignatureService.js` — Exports eSignatureService (~377 tok)
 
 ## docs/
 
@@ -391,8 +446,9 @@
 
 ## f:/connexio_back2/middleware/
 
-- `authMiddleware.js` — Declares JWT_SECRET (~583 tok)
+- `authMiddleware.js` — protect middleware: X-API-Key bypass, JTI validation against active_sessions, user DB lookup. (~583 tok)
 - `rateLimiter.js` — Applied to all auth endpoints (signup, signin, forgot-password, etc.) (~192 tok)
+- `sanitize.js` — Global req.body trimmer (trims whitespace + null bytes; no HTML escaping). (~80 tok)
 
 ## f:/connexio_back2/models/
 
@@ -409,8 +465,8 @@
 
 ## f:/connexio_back2/modules/contracts/
 
-- `contracts.controller.js` — POST /api/contracts/projects/:projectId (~1870 tok)
-- `contracts.routes.js` — API routes: POST, GET (3 endpoints) (~118 tok)
+- `contracts.controller.js` — createProjectContract, getContractStatus, signContract (in-app SHA-256 signing). (~250 tok)
+- `contracts.routes.js` — POST/GET /projects/:projectId + POST /projects/:projectId/sign. (~80 tok)
 
 ## f:/connexio_back2/modules/payments/
 
@@ -442,7 +498,8 @@
 ## f:/connexio_back2/services/
 
 - `contractService.js` — Contract enforcement service. (~1030 tok)
-- `eSignatureService.js` — In-app e-signature service. (~534 tok)
+- `escalationService.js` — Cron-ready overdue task escalation; logs to audit_log, escalates to owner at 5+ days. (~150 tok)
+- `eSignatureService.js` — In-app e-signature (SHA-256 hash); ESIGNATURE_PROVIDER=none default. (~200 tok)
 - `stripeService.js` — Stripe integration for Pro account subscriptions ($20/month). (~1189 tok)
 
 ## f:/connexio_back2/utils/
@@ -455,13 +512,14 @@
 
 ## src/Routes/
 
+- `agent.py` — get_nlp_controller, resolve_pid, agent_chat, agent_chat_stream (~1844 tok)
 
 ## src/Routes/schemas/
 
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~15680 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~16605 tok)
 
 ## src/controllers/helpers/
 
@@ -472,6 +530,7 @@
 
 ## src/models/
 
+- `SessionModel.py` — SessionModel: create_instance, create_session, get_session, get_or_create_session + 3 more (~1431 tok)
 
 ## src/stores/llm/providers/
 

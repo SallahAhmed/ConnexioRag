@@ -3,7 +3,25 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
-## Session: 2026-06-01
+## Session: 2026-06-01 (Phase 2)
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| — | B2/B5: verifyTask + getReassignmentSuggestions | tasks.controller.js, tasks.routes.js | PUT /:id/verify + GET /:id/suggestions | ~400 |
+| — | B3/B6: getProjectEvidence + overrideRiskLevel | projects.controller.js, projects.routes.js | GET /:id/evidence + POST /:id/risk-override | ~400 |
+| — | B4: escalationService.js | services/escalationService.js | Cron-ready overdue-task nudge/escalation with audit_log entries | ~200 |
+| — | B17: sanitizeInput middleware | middleware/sanitize.js, bootstrap.js | Trims whitespace + null bytes globally; HTML escaping left to controller-level sanitizeText | ~150 |
+| — | B18: JWT JTI + active_sessions | dbconnection.js, auth.controller.js, authMiddleware.js | generateToken async + active_sessions table; changePassword invalidates all sessions | ~600 |
+| — | Phase 0 tables backfill | dbconnection.js | Added project_contracts, contract_signatures, active_sessions, contribution_evidence, audit_log + column migrations | ~300 |
+| — | B19: SQL injection audit | dbconnection.js | All queries use parameterized ? — no user input interpolation found | ~100 |
+| — | B21-B24: WebSocket reliability | src/api/socket.js (frontend) | Exponential backoff+jitter, room re-join on reconnect, disconnect events, offline message queue | ~200 |
+| — | B35/B36: eSignatureService + contracts module | services/eSignatureService.js, modules/contracts/ | In-app signing (SHA-256 hash), contracts CRUD, sign endpoint | ~400 |
+| — | E1-E5: Contribution UI | EvidenceTab.jsx, ReassignmentModal.jsx, ProfessorOverride.jsx, NotificationBell.jsx, ProjectDetail.jsx, KanbanBoard.jsx | Evidence tab, verify button, reassign modal, escalation styles, professor override form | ~800 |
+| — | R4: L4 GitHub commits | NLPController.py | Fetches last 5 commits via GITHUB_TOKEN; injected as [Recent Commits] context | ~200 |
+| — | R5: L5 health snapshot | NLPController.py | Computes task %done, overdue count, risk level from live tasks | ~200 |
+| — | R7: chat_mention source | NLPController.py, SessionModel.py, agent.py, socket.js | source= param threaded end-to-end; socket.js passes source=chat_mention | ~200 |
+
+## Session: 2026-06-01 (Phase 0/1 verification)
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
@@ -599,3 +617,61 @@
 
 | Time | Action | File(s) | Outcome | ~Tokens |
 |------|--------|---------|---------|--------|
+
+## Session: 2026-06-01 16:20
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:21 | Edited F:/connexio_back2/modules/tasks/tasks.controller.js | added error handling | ~961 |
+| 16:21 | Edited F:/connexio_back2/modules/tasks/tasks.routes.js | 4→9 lines | ~105 |
+| 16:22 | Edited F:/connexio_back2/modules/projects/projects.controller.js | added error handling | ~916 |
+| 16:22 | Edited F:/connexio_back2/modules/projects/projects.routes.js | 3→8 lines | ~116 |
+| 16:22 | Created F:/connexio_back2/services/escalationService.js | — | ~712 |
+| 16:22 | Created F:/connexio_back2/middleware/sanitize.js | — | ~182 |
+| 16:23 | Edited F:/connexio_back2/middleware/sanitize.js | modified _trimObject() | ~243 |
+| 16:23 | Edited F:/connexio_back2/bootstrap.js | added 1 import(s) | ~34 |
+| 16:23 | Edited F:/connexio_back2/bootstrap.js | 3→4 lines | ~36 |
+| 16:24 | Edited F:/connexio_back2/database/dbconnection.js | added error handling | ~1326 |
+| 16:25 | Edited F:/connexio_back2/modules/auth/auth.controller.js | added error handling | ~351 |
+| 16:25 | Edited F:/connexio_back2/modules/auth/auth.controller.js | inline fix | ~13 |
+| 16:25 | Edited F:/connexio_back2/modules/auth/auth.controller.js | 10→13 lines | ~142 |
+| 16:25 | Edited F:/connexio_back2/middleware/authMiddleware.js | added 2 condition(s) | ~234 |
+| 16:26 | Created F:/Connexio_Frontend2/src/api/socket.js | — | ~642 |
+| 16:26 | Created F:/connexio_back2/services/eSignatureService.js | — | ~377 |
+| 16:27 | Created F:/connexio_back2/modules/contracts/contracts.controller.js | — | ~1578 |
+| 16:27 | Created F:/connexio_back2/modules/contracts/contracts.routes.js | — | ~135 |
+| 16:27 | Edited F:/connexio_back2/bootstrap.js | added 1 import(s) | ~56 |
+| 16:27 | Edited F:/connexio_back2/bootstrap.js | 1→2 lines | ~25 |
+| 16:28 | Edited F:/Connexio_Frontend2/src/context/AppContext.jsx | expanded (+21 lines) | ~235 |
+| 16:28 | Edited F:/Connexio_Frontend2/src/context/AppContext.jsx | expanded (+21 lines) | ~225 |
+| 16:28 | Created F:/Connexio_Frontend2/src/components/EvidenceTab.jsx | — | ~829 |
+| 16:29 | Created F:/Connexio_Frontend2/src/components/ReassignmentModal.jsx | — | ~1045 |
+| 16:29 | Created F:/Connexio_Frontend2/src/components/ProfessorOverride.jsx | — | ~928 |
+| 16:30 | Edited F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx | 9→10 lines | ~121 |
+| 16:30 | Edited F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx | 4→7 lines | ~82 |
+| 16:30 | Edited F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx | added 1 import(s) | ~31 |
+| 16:30 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | inline fix | ~39 |
+| 16:31 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | expanded (+17 lines) | ~221 |
+| 16:31 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | CSS: E2, status | ~306 |
+| 16:31 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | inline fix | ~52 |
+| 16:31 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | 5→6 lines | ~54 |
+| 16:31 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | 5→6 lines | ~51 |
+| 16:32 | Edited F:/Connexio_Frontend2/src/components/NotificationBell.jsx | CSS: escalation, escalation | ~219 |
+| 16:32 | Edited F:/Connexio_Frontend2/src/components/NotificationBell.jsx | CSS: borderLeft, Task | ~953 |
+| 16:35 | Edited src/controllers/NLPController.py | expanded (+47 lines) | ~1078 |
+| 16:35 | Edited src/models/SessionModel.py | modified append_message() | ~140 |
+| 16:35 | Edited src/controllers/NLPController.py | modified answer_agent_chat() | ~46 |
+| 16:36 | Edited src/controllers/NLPController.py | 5→5 lines | ~89 |
+| 16:36 | Edited src/controllers/NLPController.py | 6→6 lines | ~88 |
+| 16:36 | Edited src/controllers/NLPController.py | 15→16 lines | ~152 |
+| 16:36 | Edited src/controllers/NLPController.py | 6→6 lines | ~144 |
+| 16:36 | Edited src/controllers/NLPController.py | 5→5 lines | ~81 |
+| 16:37 | Edited F:/connexio_back2/socket.js | 8→9 lines | ~94 |
+| 16:37 | Edited src/Routes/agent.py | modified agent_chat_stream() | ~293 |
+| 16:40 | Edited CLAUDE.md | inline fix | ~50 |
+| 16:40 | Edited CLAUDE.md | 6→6 lines | ~92 |
+| 16:40 | Session end: 48 writes across 25 files (tasks.controller.js, tasks.routes.js, projects.controller.js, projects.routes.js, escalationService.js) | 24 reads | ~86076 tok |
+| 16:44 | Edited F:/Connexio_Frontend2/src/context/AppContext.jsx | modified useApp() | ~71 |
+| 16:44 | Edited F:/connexio_back2/modules/tasks/tasks.controller.js | 4→4 lines | ~44 |
+| 16:45 | Edited F:/connexio_back2/modules/contracts/contracts.controller.js | inline fix | ~28 |
+| 16:45 | Session end: 51 writes across 25 files (tasks.controller.js, tasks.routes.js, projects.controller.js, projects.routes.js, escalationService.js) | 24 reads | ~93599 tok |

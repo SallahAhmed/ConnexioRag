@@ -508,6 +508,53 @@ class NLPController(BaseController):
             except Exception as e:
                 self.logger.warning(f"Could not fetch MasarX tasks: {e}")
 
+        # --- L4: Recent GitHub commits ---
+        # Requires GITHUB_TOKEN to be set; silently skipped otherwise.
+        if project_id and self.backend_client and self.tool_manager.github_token and not is_file_query:
+            try:
+                project_raw = await self.backend_client.get_project(project_id)
+                project_data = (project_raw or {}).get("data") or project_raw or {}
+                github_url = project_data.get("github_repo_url") or project_data.get("GithubURL") or ""
+                if github_url and "github.com" in github_url:
+                    parts = github_url.rstrip("/").split("/")
+                    if len(parts) >= 2:
+                        repo_name = f"{parts[-2]}/{parts[-1]}"
+                        commits_text = await self.tool_manager.fetch_github_data(repo_name, mode="commits")
+                        if commits_text and "Error" not in commits_text and "not configured" not in commits_text:
+                            retrieved_context.append(f"\n[Recent Commits]:\n{commits_text}")
+                            sources.append("GitHub")
+                            self.logger.info(f"[L4] Injected GitHub commits for {repo_name}")
+            except Exception as e:
+                self.logger.warning(f"[L4] Could not fetch GitHub commits: {e}")
+
+        # --- L5: Project health snapshot ---
+        # Computes task completion %, overdue count, and risk level from live tasks.
+        if project_id and self.backend_client and not is_file_query:
+            try:
+                from datetime import datetime, timezone
+                tasks_raw = await self.backend_client.get_project_tasks(project_id)
+                tasks_list = (tasks_raw or {}).get("data") or (tasks_raw if isinstance(tasks_raw, list) else [])
+                if tasks_list:
+                    total = len(tasks_list)
+                    completed = sum(1 for t in tasks_list if str(t.get("status", "")).lower() in ("completed", "done"))
+                    now_iso = datetime.now(timezone.utc).isoformat()
+                    overdue = sum(
+                        1 for t in tasks_list
+                        if t.get("end_date") and str(t.get("status", "")).lower() not in ("completed", "done", "cancelled")
+                        and t["end_date"] < now_iso[:10]
+                    )
+                    pct = round(completed / total * 100) if total else 0
+                    risk = "🔴 High" if overdue > 3 else "🟡 Medium" if overdue > 0 else "🟢 Low"
+                    snapshot = (
+                        f"Task Completion: {completed}/{total} ({pct}%)\n"
+                        f"Overdue Tasks: {overdue}\n"
+                        f"Risk Level: {risk}"
+                    )
+                    retrieved_context.append(f"\n[Project Health Snapshot]:\n{snapshot}")
+                    self.logger.info(f"[L5] Injected health snapshot: {pct}% done, {overdue} overdue")
+            except Exception as e:
+                self.logger.warning(f"[L5] Could not compute health snapshot: {e}")
+
         # --- Step 4: Final Prompt Construction ---
         self.template_parser.set_language(query_language)
 
@@ -782,6 +829,7 @@ class NLPController(BaseController):
         user_id: int,
         project_id: Optional[int],
         query: str,
+        source: Optional[str] = None,
         persona: str = "student",
         session_id: Optional[int] = None,
         limit: int = 5,
@@ -867,8 +915,8 @@ class NLPController(BaseController):
                      "Can I help you with something related to your project?"
             )
             if self.db_client:
-                await self.session_model.append_message(session_id, "user", query, node.value)
-                await self.session_model.append_message(session_id, "assistant", answer, node.value)
+                await self.session_model.append_message(session_id, "user", query, node.value, source=source)
+                await self.session_model.append_message(session_id, "assistant", answer, node.value, source=source)
             return {
                 "answer": answer,
                 "node": node.value,
@@ -951,8 +999,8 @@ class NLPController(BaseController):
             answer = fallback_msg
 
         if self.db_client:
-            await self.session_model.append_message(session_id, "user", query, node.value)
-            await self.session_model.append_message(session_id, "assistant", answer, node.value)
+            await self.session_model.append_message(session_id, "user", query, node.value, source=source)
+            await self.session_model.append_message(session_id, "assistant", answer, node.value, source=source)
 
         try:
             os.makedirs("traces", exist_ok=True)
@@ -983,6 +1031,7 @@ class NLPController(BaseController):
         model_tier: str = "auto",
         language: Optional[str] = None,
         extra_context: Optional[str] = None,
+        source: Optional[str] = None,
     ):
         # Fast path — history clear
         clear_commands = [
@@ -1058,8 +1107,8 @@ class NLPController(BaseController):
                      "Can I help you with something related to your project?"
             )
             if self.db_client:
-                await self.session_model.append_message(session_id, "user", query, node.value)
-                await self.session_model.append_message(session_id, "assistant", answer, node.value)
+                await self.session_model.append_message(session_id, "user", query, node.value, source=source)
+                await self.session_model.append_message(session_id, "assistant", answer, node.value, source=source)
             import json as _json
             yield f"data: {_json.dumps({'node': node.value, 'language': language, 'sources': sources, 'session_id': session_id, 'event': 'meta'})}\n\n"
             yield f"data: {_json.dumps({'text': answer})}\n\n"
@@ -1122,8 +1171,8 @@ class NLPController(BaseController):
             self.logger.error(f"Failed to save trace: {e}")
 
         if self.db_client:
-            await self.session_model.append_message(session_id, "user", query, node.value)
-            await self.session_model.append_message(session_id, "assistant", full_answer, node.value)
+            await self.session_model.append_message(session_id, "user", query, node.value, source=source)
+            await self.session_model.append_message(session_id, "assistant", full_answer, node.value, source=source)
 
         yield "data: [DONE]\n\n"
 
