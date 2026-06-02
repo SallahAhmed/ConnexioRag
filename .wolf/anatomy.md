@@ -1,7 +1,12 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-01T13:45:01.450Z
-> Files: 92 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-02T13:13:41.053Z
+> Files: 109 tracked | Anatomy hits: 0 | Misses: 0
+
+## ../.claude/projects/c--Users-salla-Connexios/memory/
+
+- `MEMORY.md` — Memory Index (~44 tok)
+- `project_azure_migration.md` (~310 tok)
 
 ## ../Connexio_Front2/src/components/
 
@@ -21,7 +26,7 @@
 
 ## ./
 
-- `CLAUDE.md` — OpenWolf (~4796 tok)
+- `CLAUDE.md` — OpenWolf (~4815 tok)
 
 ## .claude/
 
@@ -268,7 +273,7 @@
 ## F:/Connexio_Frontend2/src/components/
 
 - `EvidenceTab.jsx` — Shows per-member contribution breakdown (tasks, commits, reviews, verifications). Used as 5th tab in ProjectDetail. (~829 tok)
-- `KanbanBoard.jsx` — COLUMNS (~7934 tok)
+- `KanbanBoard.jsx` — COLUMNS (~8014 tok)
 - `NotificationBell.jsx` — NOTIF_ICON (~2851 tok)
 - `ProfessorOverride.jsx` — Form to log a manual risk override (low/medium/high + reason). Posts to /api/projects/:id/risk-override. (~928 tok)
 - `ReassignmentModal.jsx` — Fetches GET /tasks/:id/suggestions and lets leader reassign to a least-loaded member. (~1045 tok)
@@ -279,33 +284,57 @@
 
 ## F:/Connexio_Frontend2/src/pages/
 
-- `ProjectDetail.jsx` — PHASES (~22228 tok)
+- `ProjectDetail.jsx` — PHASES (~22746 tok)
 
 ## F:/MasarX_A/
 
+- `.gitignore` — Git ignore rules (~367 tok)
+- `AGENTS.md` — AGENTS.md — Connexio Ecosystem Knowledge Base (~26303 tok)
+- `DEPLOY.md` — MasarX — Deployment Reference (~408 tok)
+- `docker-compose.yml` — Docker Compose services (~140 tok)
+- `Dockerfile` — Docker container definition (~237 tok)
+- `README.md` — Project documentation (~10613 tok)
+- `start.sh` — Tell Python to look in the src directory (~163 tok)
+
+## F:/MasarX_A/.wolf/
+
+- `buglog.json` (~2577 tok)
 
 ## F:/MasarX_A/docs/documentation/
 
-- `documentation.md` — Connexio Platform — Release Documentation (~2578 tok)
+- `documentation.md` — Connexio Platform — Release Documentation (~6923 tok)
+
+## F:/MasarX_A/nginx/
+
+- `masarx.conf` — MasarX Agent — nginx reverse proxy (~411 tok)
+
+## F:/MasarX_A/scripts/
+
+- `deploy.sh` — Re-deploy MasarX — pull latest image and restart (~236 tok)
+- `restart_space.py` — main (~1324 tok)
+- `setup-vm.sh` — One-shot VM bootstrap — run once after SSH into the Azure VM (~585 tok)
 
 ## F:/MasarX_A/src/
 
+- `main.py` — API: 1 endpoints (~2231 tok)
 
 ## F:/MasarX_A/src/stores/vectordb/
 
 
 ## F:/connexio_back2/
 
-- `bootstrap.js` — API routes: GET (5 endpoints) (~1404 tok)
+- `app.js` — app: startServer (~561 tok)
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1560 tok)
 - `socket.js` — API routes: GET, POST (4 endpoints) (~8538 tok)
 
 ## F:/connexio_back2/database/
 
-- `dbconnection.js` — database/dbconnection.js - MySQL Version (~5570 tok)
+- `dbconnection.js` — database/dbconnection.js - MySQL Version (~6106 tok)
 
 ## F:/connexio_back2/middleware/
 
 - `authMiddleware.js` — Declares JWT_SECRET (~728 tok)
+- `rateLimiter.js` — Exports authLimiter, apiLimiter (~142 tok)
 - `sanitize.js` — Globally trims whitespace from all string fields in req.body. (~243 tok)
 
 ## F:/connexio_back2/modules/auth/
@@ -327,7 +356,7 @@
 
 ## F:/connexio_back2/modules/tasks/
 
-- `tasks.controller.js` — modules/tasks/tasks.controller.js (~7384 tok)
+- `tasks.controller.js` — modules/tasks/tasks.controller.js (~7391 tok)
 - `tasks.routes.js` — API routes: POST, DELETE, GET, PUT (12 endpoints) (~352 tok)
 
 ## F:/connexio_back2/services/
@@ -519,7 +548,7 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~16605 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~16597 tok)
 
 ## src/controllers/helpers/
 

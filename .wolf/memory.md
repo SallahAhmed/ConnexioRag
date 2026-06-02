@@ -3,6 +3,12 @@
 > Chronological action log. Hooks and AI append to this file automatically.
 > Old sessions are consolidated by the daemon weekly.
 
+## Session: 2026-06-02
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:15 | Fixed NameError crash in streaming chat — lambda closing over `datetime` | src/controllers/NLPController.py | Inlined datetime call, removed lambda, bug-113 logged | ~150 |
+
 ## Session: 2026-06-01 (Phase 2)
 
 | Time | Action | File(s) | Outcome | ~Tokens |
@@ -675,3 +681,141 @@
 | 16:44 | Edited F:/connexio_back2/modules/tasks/tasks.controller.js | 4→4 lines | ~44 |
 | 16:45 | Edited F:/connexio_back2/modules/contracts/contracts.controller.js | inline fix | ~28 |
 | 16:45 | Session end: 51 writes across 25 files (tasks.controller.js, tasks.routes.js, projects.controller.js, projects.routes.js, escalationService.js) | 24 reads | ~93599 tok |
+
+## Session: 2026-06-01 18:34
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 18:50 | Edited F:/MasarX_A/.wolf/buglog.json | expanded (+33 lines) | ~909 |
+| 18:50 | Session end: 1 writes across 1 files (buglog.json) | 14 reads | ~2818 tok |
+| 18:57 | Session end: 1 writes across 1 files (buglog.json) | 14 reads | ~2818 tok |
+| 19:01 | Created F:/MasarX_A/scripts/restart_space.py | — | ~1324 |
+| 19:04 | Edited F:/MasarX_A/src/main.py | modified error() | ~474 |
+| 19:07 | Edited F:/MasarX_A/.wolf/buglog.json | 3→3 lines | ~449 |
+| 19:07 | Session end: 4 writes across 3 files (buglog.json, restart_space.py, main.py) | 16 reads | ~5065 tok |
+| 19:14 | Edited F:/MasarX_A/.wolf/buglog.json | 3→3 lines | ~363 |
+| 19:15 | Session end: 5 writes across 3 files (buglog.json, restart_space.py, main.py) | 16 reads | ~5428 tok |
+| 19:18 | Session end: 5 writes across 3 files (buglog.json, restart_space.py, main.py) | 16 reads | ~5428 tok |
+
+## Session: 2026-06-02 11:40
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-02 11:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+
+## Session: 2026-06-02 11:41
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 11:44 | Edited F:/MasarX_A/.gitignore | 1→6 lines | ~34 |
+| 11:45 | Session end: 1 writes across 1 files (.gitignore) | 1 reads | ~37 tok |
+
+## Session: 2026-06-02 11:47
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 13:54 | Edited F:/MasarX_A/Dockerfile | 7860 → 8080 | ~3 |
+| 13:54 | Edited F:/MasarX_A/start.sh | 3→3 lines | ~35 |
+| 13:55 | Created F:/MasarX_A/docker-compose.yml | — | ~140 |
+| 13:55 | Created F:/MasarX_A/nginx/masarx.conf | — | ~377 |
+| 13:55 | Created F:/MasarX_A/scripts/setup-vm.sh | — | ~585 |
+| 13:55 | Created F:/MasarX_A/scripts/deploy.sh | — | ~236 |
+| 13:56 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:02 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:06 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:10 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:10 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:13 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:21 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:22 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:24 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:27 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:36 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:43 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:45 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:48 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:51 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:53 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 14:54 | Session end: 6 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3697 tok |
+| 15:02 | Edited F:/MasarX_A/nginx/masarx.conf | 21→21 lines | ~164 |
+| 15:02 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:04 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:06 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:09 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:10 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:11 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:12 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:13 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:14 | Session end: 7 writes across 6 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 6 reads | ~3873 tok |
+| 15:15 | Edited F:/MasarX_A/AGENTS.md | "https://sallahahmed-conne" → "https://connexio-agent.ce" | ~20 |
+| 15:16 | Edited CLAUDE.md | inline fix | ~57 |
+| 15:16 | Session end: 9 writes across 8 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 8 reads | ~8752 tok |
+| 15:18 | Edited F:/connexio_back2/bootstrap.js | "${AGENT_URL}/health" → "${AGENT_URL}/api/v1/masar" | ~21 |
+| 15:18 | Session end: 10 writes across 9 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 10 reads | ~10177 tok |
+| 15:20 | Session end: 10 writes across 9 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 10 reads | ~10177 tok |
+| 15:24 | Created F:/MasarX_A/DEPLOY.md | — | ~435 |
+| 15:24 | Session end: 11 writes across 10 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 10 reads | ~10643 tok |
+| 15:25 | Session end: 11 writes across 10 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 10 reads | ~10643 tok |
+| 15:27 | Created ../.claude/projects/c--Users-salla-Connexios/memory/project_azure_migration.md | — | ~310 |
+| 15:27 | Created ../.claude/projects/c--Users-salla-Connexios/memory/MEMORY.md | — | ~47 |
+| 15:27 | Session end: 13 writes across 12 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 11 reads | ~11026 tok |
+| 15:34 | Edited F:/MasarX_A/README.md | reduced (-9 lines) | ~191 |
+| 15:34 | Edited F:/MasarX_A/README.md | 4→4 lines | ~63 |
+| 15:34 | Edited F:/MasarX_A/README.md | 12→15 lines | ~106 |
+| 15:34 | Edited F:/MasarX_A/README.md | 5→5 lines | ~27 |
+| 15:34 | Edited F:/MasarX_A/README.md | 2→4 lines | ~76 |
+| 15:34 | Edited F:/MasarX_A/README.md | expanded (+7 lines) | ~211 |
+| 15:35 | Edited F:/MasarX_A/README.md | 2→2 lines | ~24 |
+| 15:35 | Session end: 20 writes across 13 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 12 reads | ~11774 tok |
+| 15:38 | Session end: 20 writes across 13 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 12 reads | ~11774 tok |
+| 15:39 | Session end: 20 writes across 13 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 12 reads | ~11774 tok |
+| 15:41 | Session end: 20 writes across 13 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 12 reads | ~11774 tok |
+| 15:42 | Session end: 20 writes across 13 files (Dockerfile, start.sh, docker-compose.yml, masarx.conf, setup-vm.sh) | 12 reads | ~11774 tok |
+
+## Session: 2026-06-02 15:42
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| — | Phase 1/2 audit + fix: ALLOWED_STATUS, rateLimiter.js, Helmet, X-Response-Time, trust proxy, SIGTERM | bootstrap.js, app.js, rateLimiter.js, tasks.controller.js, dbconnection.js | All fixed + pushed to git | ~800 |
+| — | Phase 2 frontend: wired onVerify to KanbanBoard, added pending_verification column | ProjectDetail.jsx, KanbanBoard.jsx | Verify button now visible for leaders on in_review/pending_verification tasks | ~300 |
+| — | Verified: Helmet/X-Response-Time already live on connexio.icu; rate limiter needs Hostinger pull+restart | connexio.icu | Live headers confirmed | ~100 |
+| — | Verified: L4/L5 RAG, EvidenceTab, ReassignmentModal, ProfessorOverride, NotificationBell, socket.js all ✅ | — | 27/30 Phase 1/2 items confirmed; 3 items fixed this session | ~200 |
+| 15:51 | Edited F:/connexio_back2/bootstrap.js | modified function() | ~295 |
+| 15:51 | Edited F:/connexio_back2/bootstrap.js | 3→3 lines | ~47 |
+| 15:51 | Edited F:/connexio_back2/bootstrap.js | 2→2 lines | ~19 |
+| 15:52 | Edited F:/connexio_back2/database/dbconnection.js | modified catch() | ~129 |
+| 15:52 | Edited F:/connexio_back2/app.js | 5→6 lines | ~42 |
+| 15:52 | Edited F:/connexio_back2/app.js | 1→6 lines | ~44 |
+| 15:56 | Edited F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx | added optional chaining | ~207 |
+| 15:56 | Edited F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx | CSS: handleVerifyTask | ~142 |
+| 15:56 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | added 1 condition(s) | ~208 |
+| 15:57 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | 2→2 lines | ~53 |
+| 15:57 | Edited F:/Connexio_Frontend2/src/components/KanbanBoard.jsx | inline fix | ~28 |
+| 16:04 | Edited CLAUDE.md | inline fix | ~62 |
+| 16:05 | Session end: 15 writes across 8 files (tasks.controller.js, rateLimiter.js, bootstrap.js, dbconnection.js, app.js) | 30 reads | ~102402 tok |
+| 16:08 | Edited F:/MasarX_A/docs/documentation/documentation.md | added error handling | ~4873 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → Backend() | ~111 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | 6→7 lines | ~87 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | 2→3 lines | ~32 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | 6→7 lines | ~56 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → Frontend() | ~29 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → RAG() | ~24 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | 18→22 lines | ~118 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | inline fix | ~10 |
+| 16:11 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → Backend() | ~122 |
+| 16:12 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → RAG() | ~24 |
+| 16:12 | Edited F:/MasarX_A/docs/documentation/documentation.md | 8→10 lines | ~89 |
+
+## Session: 2026-06-02 16:12
+
+| Time | Action | File(s) | Outcome | ~Tokens |
+|------|--------|---------|---------|--------|
+| 16:12 | Edited F:/MasarX_A/docs/documentation/documentation.md | 7→8 lines | ~41 |
+| 16:12 | Edited F:/MasarX_A/docs/documentation/documentation.md | Changes() → Frontend() | ~20 |
+| 16:12 | Session end: 2 writes across 1 files (documentation.md) | 1 reads | ~16670 tok |
+| 16:13 | Edited src/controllers/NLPController.py | 2→1 lines | ~31 |
+| 16:14 | Session end: 3 writes across 2 files (documentation.md, NLPController.py) | 1 reads | ~16701 tok |

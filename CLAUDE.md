@@ -8,7 +8,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 
 # CLAUDE.md — Connexio Platform Master Reference
 
-> **Last updated:** 2026-06-01 — Phase 2 complete. All 17 items done (Contribution Truth Engine, WebSocket reliability, Security hardening, E-Signature, RAG L4/L5/R7). Starting Phase 3.
+> **Last updated:** 2026-06-02 — Phase 1+2 audit complete. All bugs fixed. 4 items restored to git (rate limiter, trust proxy, pending_verification ENUM, verify button). Hostinger needs `git pull` + restart. Phase 3 ready to start.
 > **Source of truth for ecosystem details:** `F:\MasarX_A\AGENTS.md`
 > **Execution plans:** `F:\MasarX_A\.opencode\plans\`
 >
@@ -25,7 +25,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 | **Frontend** | `F:\Connexio_Frontend2` | TBD (dev: `localhost:5173`) | ✅ Active — React 19 + Vite + Tailwind | SPA: auth, projects, tasks, chat, AI chat, profiles |
 | **Node.js Backend** | `F:\connexio_back2` | Hostinger (`connexio.icu:3000`) | ✅ Deployed | Core API: auth, users, projects, tasks, chat, file upload, Socket.IO |
 | **Connexios RAG** | `C:\Users\salla\Connexios` | HF Spaces (`ConnexioRag`) | ✅ Deployed — DB confirmed on port 5432 | Knowledge engine: document indexing, hybrid search, intent-aware chat |
-| **MasarX Agent** | `F:\MasarX_A` | HF Spaces (`ConnexioAgent`) | ✅ Fully operational | Autonomous PM: task planning (HITL), team matching, audit, HITL workflows, GitHub scaffolding |
+| **MasarX Agent** | `F:\MasarX_A` | Azure VM (`connexio-agent.centralus.cloudapp.azure.com`) | ✅ Fully operational | Autonomous PM: task planning (HITL), team matching, audit, HITL workflows, GitHub scaffolding |
 | **Admin Panel** | `F:\connexio-adminPanel` | Standalone (Electron) | ✅ Built by teammate | System-admin tool — **NO changes from this execution plan** |
 
 ---

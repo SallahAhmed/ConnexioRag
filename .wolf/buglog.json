@@ -1544,6 +1544,305 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-01T13:45:01.466Z"
+    },
+    {
+      "id": "bug-096",
+      "timestamp": "2026-06-01T16:04:36.437Z",
+      "error_message": "Significant refactor of ",
+      "file": "F:/MasarX_A/src/main.py",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 18→39 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T16:04:36.437Z"
+    },
+    {
+      "id": "bug-097",
+      "timestamp": "2026-06-01T16:07:43.130Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/MasarX_A/.wolf/buglog.json",
+      "root_cause": "Had \"not-a-code-bug\"",
+      "fix": "Changed to \"startup-hardening\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T16:07:43.130Z"
+    },
+    {
+      "id": "bug-098",
+      "timestamp": "2026-06-01T16:14:51.291Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/MasarX_A/.wolf/buglog.json",
+      "root_cause": "Had \"diagnosed\"",
+      "fix": "Changed to \"root-cause-confirmed\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "json"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-01T16:14:51.291Z"
+    },
+    {
+      "id": "bug-099",
+      "timestamp": "2026-06-02T10:54:21.609Z",
+      "error_message": "Wrong reference: 7860 should be 8080",
+      "file": "F:/MasarX_A/Dockerfile",
+      "root_cause": "Used \"7860\" instead of \"8080\"",
+      "fix": "Changed 7860 → 8080",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "unknown"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T10:54:21.609Z"
+    },
+    {
+      "id": "bug-100",
+      "timestamp": "2026-06-02T12:15:41.537Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/MasarX_A/AGENTS.md",
+      "root_cause": "Had `https://sallahahmed-connexioagent.hf.space`",
+      "fix": "Changed to `https://connexio-agent.centralus.cloudapp.azure.c",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:15:41.537Z"
+    },
+    {
+      "id": "bug-101",
+      "timestamp": "2026-06-02T12:16:07.429Z",
+      "error_message": "Incorrect value in code",
+      "file": "CLAUDE.md",
+      "root_cause": "Had `ConnexioAgent`",
+      "fix": "Changed to `connexio-agent.centralus.cloudapp.azure.com`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:16:07.429Z"
+    },
+    {
+      "id": "bug-102",
+      "timestamp": "2026-06-02T12:18:05.676Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/connexio_back2/bootstrap.js",
+      "root_cause": "Had `${AGENT_URL}/health`",
+      "fix": "Changed to `${AGENT_URL}/api/v1/masarx/health`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:18:05.677Z"
+    },
+    {
+      "id": "bug-103",
+      "timestamp": "2026-06-02T12:34:39.809Z",
+      "error_message": "Significant refactor of ",
+      "file": "F:/MasarX_A/README.md",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 12→15 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:34:39.809Z"
+    },
+    {
+      "id": "bug-104",
+      "timestamp": "2026-06-02T12:51:02.562Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/connexio_back2/modules/tasks/tasks.controller.js",
+      "root_cause": "Had 'completed'",
+      "fix": "Changed to 'pending_verification'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:51:02.562Z"
+    },
+    {
+      "id": "bug-105",
+      "timestamp": "2026-06-02T12:51:39.002Z",
+      "error_message": "Wrong reference: req should be _req",
+      "file": "F:/connexio_back2/bootstrap.js",
+      "root_cause": "Used \"req\" instead of \"_req\"",
+      "fix": "Changed req → _req",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-02T12:51:43.606Z"
+    },
+    {
+      "id": "bug-106",
+      "timestamp": "2026-06-02T12:56:19.081Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:56:19.081Z"
+    },
+    {
+      "id": "bug-107",
+      "timestamp": "2026-06-02T12:56:59.575Z",
+      "error_message": "CSS fix: id",
+      "file": "F:/Connexio_Frontend2/src/components/KanbanBoard.jsx",
+      "root_cause": "id: 'completed',   label: 'Done' → 'completed',            label: 'Done'",
+      "fix": "Changed id: 'completed',   label: 'Done' → 'completed',            label: 'Done'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:56:59.575Z"
+    },
+    {
+      "id": "bug-108",
+      "timestamp": "2026-06-02T12:57:14.240Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/Connexio_Frontend2/src/components/KanbanBoard.jsx",
+      "root_cause": "Had 'completed'",
+      "fix": "Changed to 'pending_verification'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T12:57:14.240Z"
+    },
+    {
+      "id": "bug-109",
+      "timestamp": "2026-06-02T00:00:00.000Z",
+      "error_message": "ALLOWED_STATUS missing 'pending_verification' + tasks.status ENUM not updated — task verification workflow broken",
+      "file": "F:/connexio_back2/modules/tasks/tasks.controller.js + database/dbconnection.js",
+      "root_cause": "pending_verification added to execution plan but never committed to git. MySQL tasks.status ENUM also needed MODIFY COLUMN to accept the new value.",
+      "fix": "Added pending_verification to ALLOWED_STATUS. Added ALTER TABLE tasks MODIFY COLUMN status ENUM(...,pending_verification,...) in dbconnection.js createTables().",
+      "tags": [
+        "pending_verification",
+        "ALLOWED_STATUS",
+        "ENUM",
+        "task-status"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T00:00:00.000Z"
+    },
+    {
+      "id": "bug-110",
+      "timestamp": "2026-06-02T00:00:00.000Z",
+      "error_message": "Security middleware (Helmet, rateLimiter, X-Response-Time) deployed to Hostinger but never committed to git — lost on next pull",
+      "file": "F:/connexio_back2/bootstrap.js + middleware/rateLimiter.js + app.js",
+      "root_cause": "June 1 session created rateLimiter.js and updated bootstrap.js, deployed to Hostinger via direct file transfer, but never git add/commit. Subsequent git operations left the repo without these files.",
+      "fix": "Re-created rateLimiter.js (limit:20, standardHeaders draft-7), re-added Helmet/X-Response-Time/authLimiter to bootstrap.js, added trust proxy + SIGTERM to app.js. Committed and pushed.",
+      "tags": [
+        "helmet",
+        "rate-limit",
+        "x-response-time",
+        "git-drift",
+        "bootstrap"
+      ],
+      "related_bugs": [
+        "bug-076"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T00:00:00.000Z"
+    },
+    {
+      "id": "bug-111",
+      "timestamp": "2026-06-02T00:00:00.000Z",
+      "error_message": "KanbanBoard verify button never shown — onVerify prop not passed from ProjectDetail.jsx",
+      "file": "F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "TaskCard renders verify button only when onVerify prop is truthy. handleVerifyTask existed but was never passed to <KanbanBoard>.",
+      "fix": "Added handleVerifyTask (PUT /api/tasks/:id/verify, updates status to completed). Passed as onVerify={isProjectOwner ? handleVerifyTask : undefined}.",
+      "tags": [
+        "verify-button",
+        "kanban",
+        "onVerify",
+        "phase-2",
+        "E2"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T00:00:00.000Z"
+    },
+    {
+      "id": "bug-112",
+      "timestamp": "2026-06-02T13:08:39.927Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/MasarX_A/docs/documentation/documentation.md",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T13:08:39.927Z"
+    },
+    {
+      "id": "bug-113",
+      "timestamp": "2026-06-02T13:13:41.073Z",
+      "error_message": "NameError: cannot access free variable 'datetime' where it is not associated with a value in enclosing scope — streaming chat crashes on every message",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "A lambda `now = lambda: datetime.now().strftime(...)` inside `_prepare_chat_context` (an async method) caused Python's bytecode compiler to classify `datetime` as a free variable from the enclosing scope rather than a global. When the lambda is invoked, Python cannot resolve the cell reference, raising NameError. The 200 OK response is already sent by the time the stream generator raises, so the client sees no error — the stream just terminates silently.",
+      "fix": "Removed the lambda. Inlined the call: `print(f\"\\n[AGENT] [{datetime.now().strftime('%H:%M:%S')}] ...\")`. No closure involved, `datetime` is now resolved as a plain global.",
+      "tags": [
+        "NameError",
+        "closure",
+        "lambda",
+        "async",
+        "streaming",
+        "NLPController",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T13:13:41.073Z"
     }
   ]
 }

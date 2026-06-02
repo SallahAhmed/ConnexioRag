@@ -175,8 +175,7 @@ class NLPController(BaseController):
         builds the final prompt components ready for generation.
         """
         trace_id = str(uuid.uuid4())
-        now = lambda: datetime.now().strftime("%H:%M:%S")
-        print(f"\n[AGENT] [{now()}] Query: {query[:50]}...", file=sys.stderr)
+        print(f"\n[AGENT] [{datetime.now().strftime('%H:%M:%S')}] Query: {query[:50]}...", file=sys.stderr)
 
         # --- Step 1: Intent & Language ---
         explicit_language = language is not None

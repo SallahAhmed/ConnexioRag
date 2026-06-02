@@ -21,7 +21,11 @@
 - **Cohere files disabled:** `CoHereProvider.py` and `CoHereReranker.py` are kept in the codebase but not imported. The imports in `providers/__init__.py`, `LLMEnums.py`, and `LLMProviderFactory.py` remain for backward compatibility but no code path activates them.
 
 - **Project:** connexios
-- **Description:** Connexio full-stack — Node.js backend (Hostinger), Connexios RAG (HF Spaces), MasarX Agent (HF Spaces), shared Neon.tech PostgreSQL.
+- **Description:** Connexio full-stack — Node.js backend (Hostinger), Connexios RAG (HF Spaces), MasarX Agent (Azure VM, centralus), shared Neon.tech PostgreSQL.
+
+- **MasarX Azure deployment:** Agent runs on Azure VM D4as_v7 (4 vCPU, 16 GB) at `connexio-agent.centralus.cloudapp.azure.com`. Docker image stored in ACR (`connexioregistry.azurecr.io`). nginx + Let's Encrypt handles HTTPS. Health endpoint: `/api/v1/masarx/health`. Deploy workflow in `F:\MasarX_A\DEPLOY.md`.
+
+- **MasarX health route prefix:** The health endpoint is at `/api/v1/masarx/health` (NOT `/health`). The `base.py` router has `prefix="/api/v1/masarx"`. Backend `bootstrap.js` must use the full path.
 
 - **Chat system:** The Node.js backend uses MongoDB (Mongoose) for chat rooms and messages, and PostgreSQL for users/projects/tasks. `ChatRoom.metadata` is a Mongoose `Map` type — use `.get()` / `.set()` to read/write.
 
@@ -128,6 +132,15 @@
 
 - **[2026-06-01] `append_message` now accepts optional `source` param.**
   Stored in the message dict alongside `role/content/node/timestamp`. Used to distinguish `chat_mention` (from socket @mention) vs page queries. The `source` param is threaded end-to-end: socket.js → agent.py → answer_agent_chat_stream → append_message.
+
+- **[2026-06-02] Security middleware (Helmet, rateLimiter, X-Response-Time) was deployed to Hostinger but never committed to git.**
+  connexio.icu already had Helmet headers and X-Response-Time live, but the local git repo had none of it. This causes a silent drift: live server has features the repo doesn't. Always commit + push BEFORE deploying to Hostinger to keep git as the source of truth.
+
+- **[2026-06-02] `pending_verification` was added to ALLOWED_STATUS in tasks.controller.js but the MySQL tasks.status ENUM was never updated.**
+  Without the ENUM update, `UPDATE tasks SET status='pending_verification'` silently stores an empty string or fails. The ENUM migration must be in dbconnection.js's createTables() alongside the ALLOWED_STATUS change in the controller.
+
+- **[2026-06-02] KanbanBoard's `onVerify` prop was never passed from ProjectDetail.jsx.**
+  The verify button in TaskCard only renders when `onVerify && canAssign` are both truthy. Even though the handler was defined in ProjectDetail, it wasn't passed as a prop. Always search for the prop usage in the parent component when a child feature appears missing.
 
 ## Decision Log
 
