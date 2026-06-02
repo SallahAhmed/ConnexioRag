@@ -18,6 +18,15 @@ import os
 import tiktoken
 
 
+SHORTCUT_COMMANDS = {
+    '/summary': 'Provide a concise project status summary including: tasks completed vs total, any overdue tasks, current blockers, and overall progress percentage.',
+    '/tasks':   'List all open tasks assigned to the current user with their deadlines and current status. Format as a clean numbered list.',
+    '/blame':   'Identify all blocked tasks, who blocked them, and for how long. Also list overdue tasks and their assignees.',
+    '/docs':    'List recently generated documents (README, retro, audit reports) with timestamps and brief descriptions.',
+    '/audit':   'Provide the latest comprehensive audit results including: health score, workload distribution, risk assessment, and key recommendations.',
+}
+
+
 class NLPController(BaseController):
 
     def __init__(
@@ -838,6 +847,12 @@ class NLPController(BaseController):
     ):
         self.logger.info(f"answer_agent_chat called with model_tier={model_tier}, language={language}")
 
+        # Shortcut commands: override query with command prompt and force generation model
+        cmd_key = query.strip().lower()
+        if cmd_key in SHORTCUT_COMMANDS:
+            query = SHORTCUT_COMMANDS[cmd_key]
+            model_tier = "generation"  # commands always need full project context
+
         # Fast path — greetings (skip ALL LLM calls, RAG, KB, etc.)
         GREETINGS_EN = {"hello", "hi", "hey", "hi there", "hello there",
                         "good morning", "good afternoon", "good evening",
@@ -1032,6 +1047,12 @@ class NLPController(BaseController):
         extra_context: Optional[str] = None,
         source: Optional[str] = None,
     ):
+        # Shortcut commands: override query with command prompt and force generation model
+        cmd_key = query.strip().lower()
+        if cmd_key in SHORTCUT_COMMANDS:
+            query = SHORTCUT_COMMANDS[cmd_key]
+            model_tier = "generation"
+
         # Fast path — history clear
         clear_commands = [
             "clear history", "forget everything", "new topic",

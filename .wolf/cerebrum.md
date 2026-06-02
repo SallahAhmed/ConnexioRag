@@ -142,6 +142,14 @@
 - **[2026-06-02] KanbanBoard's `onVerify` prop was never passed from ProjectDetail.jsx.**
   The verify button in TaskCard only renders when `onVerify && canAssign` are both truthy. Even though the handler was defined in ProjectDetail, it wasn't passed as a prop. Always search for the prop usage in the parent component when a child feature appears missing.
 
+- **Phase 3 tables:** `courses`, `course_members`, `course_projects`, `project_ideas`, `idea_members`, `mentor_applications` — all in `dbconnection.js` createTables(). Phase 3 APIs: `/api/courses`, `/api/professor`, `/api/ideas`, `/api/skills`.
+
+- **ai_trigger column was BOOLEAN, now VARCHAR(50):** The Phase 0 migration added it as BOOLEAN but Phase 3 needs it as a keyword string (e.g. `@connexio`). A `MODIFY COLUMN` alter is in dbconnection.js to fix existing columns.
+
+- **socket.js isAIMentioned is now async:** It queries MySQL for the project's `ai_trigger` per call. The group/direct chat handler now uses streaming RAG (same as ai_chatbot) with shortcut command detection. `parseCommand()` and `checkAIRateLimit()` are module-level helpers.
+
+- **SHORTCUT_COMMANDS dict in NLPController.py:** Defined at module level above the class. Both `answer_agent_chat` and `answer_agent_chat_stream` check this dict before the greeting fast path. Matching commands override `query` and set `model_tier = 'generation'`.
+
 ## Decision Log
 
 - **[2026-05-14] `ai_chatbot` rooms use `project_id=0` when calling the RAG.**

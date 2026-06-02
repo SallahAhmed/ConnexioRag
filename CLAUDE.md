@@ -8,7 +8,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 
 # CLAUDE.md — Connexio Platform Master Reference
 
-> **Last updated:** 2026-06-02 — Phase 1+2 audit complete. All bugs fixed. 4 items restored to git (rate limiter, trust proxy, pending_verification ENUM, verify button). Hostinger needs `git pull` + restart. Phase 3 ready to start.
+> **Last updated:** 2026-06-02 — Phase 3 implementation complete (all 21 items). Hostinger needs `git pull` + restart. RAG needs `git pull` + restart (NLPController shortcut handlers). Phase 4 ready to start.
 > **Source of truth for ecosystem details:** `F:\MasarX_A\AGENTS.md`
 > **Execution plans:** `F:\MasarX_A\.opencode\plans\`
 >
@@ -79,7 +79,9 @@ Connection pool: 20 connections. `query()` helper in `dbconnection.js` converts 
 
 **New tables (added Phase 0):** `project_contracts`, `contract_signatures`, `active_sessions`
 
-**Planned tables (added in phases):** `contribution_evidence`, `audit_log`, `courses`, `course_members`, `course_projects`, `project_ideas`, `idea_members`, `analytics_daily`, `push_subscriptions` (mobile Phase 5)
+**Phase 3 tables (added):** `courses`, `course_members`, `course_projects`, `project_ideas`, `idea_members`, `mentor_applications`
+
+**Planned tables:** `analytics_daily`, `push_subscriptions` (mobile Phase 5)
 
 ### MongoDB (Backend — Chat/Rooms)
 Mongoose models: `ChatRoom`, `Message`, `CallRoom`, `CallHistory`, `ChatbotSession`, `Post`, `Comment`, `Notification`
@@ -133,7 +135,7 @@ The platform is executing a 5-phase enhancement plan (61 items). Source: `F:\Mas
 | **0** | Hidden Fixes + Infrastructure | Day 0 | 20 | ✅ Complete |
 | **1** | Foundation | Days 1-3 | 13 | ✅ Complete |
 | **2** | Core Features | Days 4-7 | 17 | ✅ Complete |
-| **3** | @connexio + Platform | Days 8-12 | 21 | ⏳ Pending |
+| **3** | @connexio + Platform | Days 8-12 | 21 | ✅ Complete |
 | **4** | Polish | Days 13-16 | 8 | ⏳ Pending |
 | **5** | Mobile (Flutter) | Days 17-23 | 4 | ⏳ Pending |
 

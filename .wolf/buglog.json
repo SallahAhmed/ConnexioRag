@@ -1858,6 +1858,118 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-02T13:19:05.663Z"
+    },
+    {
+      "id": "bug-115",
+      "timestamp": "2026-06-02T14:01:35.543Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/socket.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block | Also: } else {; // Group / direct chat: slash commands or @mention → stream ",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-02T14:02:23.741Z"
+    },
+    {
+      "id": "bug-116",
+      "timestamp": "2026-06-02T14:01:59.198Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/docker-compose.yml",
+      "root_cause": "Had \"http://localhost:8080/health\"",
+      "fix": "Changed to \"http://localhost:8080/api/v1/masarx/health\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "yml"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:01:59.198Z"
+    },
+    {
+      "id": "bug-117",
+      "timestamp": "2026-06-02T14:04:17.594Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:04:17.594Z"
+    },
+    {
+      "id": "bug-118",
+      "timestamp": "2026-06-02T14:10:07.594Z",
+      "error_message": "CSS fix: id",
+      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "id: 'activity', label: 'Activity' → 'settings', label: 'Settings'",
+      "fix": "Changed id: 'activity', label: 'Activity' → 'settings', label: 'Settings'",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:10:07.594Z"
+    },
+    {
+      "id": "bug-119",
+      "timestamp": "2026-06-02T14:10:46.841Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:10:46.841Z"
+    },
+    {
+      "id": "bug-120",
+      "timestamp": "2026-06-02T14:16:28.605Z",
+      "error_message": "Wrong reference: Pending should be Complete",
+      "file": "CLAUDE.md",
+      "root_cause": "Used \"Pending\" instead of \"Complete\"",
+      "fix": "Changed Pending → Complete",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:16:28.605Z"
+    },
+    {
+      "id": "bug-121",
+      "timestamp": "2026-06-02T14:16:35.481Z",
+      "error_message": "Incorrect value in code",
+      "file": "CLAUDE.md",
+      "root_cause": "Had `contribution_evidence`",
+      "fix": "Changed to `courses`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:16:35.481Z"
     }
   ]
 }
