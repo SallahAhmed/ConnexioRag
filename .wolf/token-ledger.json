@@ -2,14 +2,14 @@
   "version": 1,
   "created_at": "2026-05-12T01:01:06.417Z",
   "lifetime": {
-    "total_tokens_estimated": 2133651,
-    "total_reads": 1683,
-    "total_writes": 1530,
+    "total_tokens_estimated": 2183764,
+    "total_reads": 1686,
+    "total_writes": 1541,
     "total_sessions": 37,
-    "anatomy_hits": 351,
+    "anatomy_hits": 354,
     "anatomy_misses": 1308,
-    "repeated_reads_blocked": 580,
-    "estimated_savings_vs_bare_cli": 2683346
+    "repeated_reads_blocked": 588,
+    "estimated_savings_vs_bare_cli": 2816738
   },
   "sessions": [
     {
@@ -20085,6 +20085,130 @@
         "reads_count": 1,
         "writes_count": 3,
         "repeated_reads_blocked": 2,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-02-1612",
+      "started": "2026-06-02T13:12:11.336Z",
+      "ended": "2026-06-02T13:16:04.710Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 16605,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 44,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 31,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 16605,
+        "output_tokens_estimated": 96,
+        "reads_count": 1,
+        "writes_count": 3,
+        "repeated_reads_blocked": 2,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-02-1612",
+      "started": "2026-06-02T13:12:11.336Z",
+      "ended": "2026-06-02T13:19:36.251Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 16597,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 44,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 31,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 13,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 16597,
+        "output_tokens_estimated": 109,
+        "reads_count": 1,
+        "writes_count": 4,
+        "repeated_reads_blocked": 3,
+        "anatomy_lookups": 1
+      }
+    },
+    {
+      "id": "session-2026-06-02-1612",
+      "started": "2026-06-02T13:12:11.336Z",
+      "ended": "2026-06-02T13:21:25.349Z",
+      "reads": [
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 16597,
+          "was_repeated": true,
+          "anatomy_had_description": false
+        }
+      ],
+      "writes": [
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 44,
+          "action": "edit"
+        },
+        {
+          "file": "F:/MasarX_A/docs/documentation/documentation.md",
+          "tokens_estimated": 21,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 31,
+          "action": "edit"
+        },
+        {
+          "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+          "tokens_estimated": 13,
+          "action": "edit"
+        }
+      ],
+      "totals": {
+        "input_tokens_estimated": 16597,
+        "output_tokens_estimated": 109,
+        "reads_count": 1,
+        "writes_count": 4,
+        "repeated_reads_blocked": 3,
         "anatomy_lookups": 1
       }
     }

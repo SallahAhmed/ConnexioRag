@@ -1827,15 +1827,14 @@
     {
       "id": "bug-113",
       "timestamp": "2026-06-02T13:13:41.073Z",
-      "error_message": "NameError: cannot access free variable 'datetime' where it is not associated with a value in enclosing scope — streaming chat crashes on every message",
+      "error_message": "UnboundLocalError: cannot access local variable 'datetime' where it is not associated with a value — streaming chat crashes on every message",
       "file": "src/controllers/NLPController.py",
-      "root_cause": "A lambda `now = lambda: datetime.now().strftime(...)` inside `_prepare_chat_context` (an async method) caused Python's bytecode compiler to classify `datetime` as a free variable from the enclosing scope rather than a global. When the lambda is invoked, Python cannot resolve the cell reference, raising NameError. The 200 OK response is already sent by the time the stream generator raises, so the client sees no error — the stream just terminates silently.",
-      "fix": "Removed the lambda. Inlined the call: `print(f\"\\n[AGENT] [{datetime.now().strftime('%H:%M:%S')}] ...\")`. No closure involved, `datetime` is now resolved as a plain global.",
+      "root_cause": "Line 533 had `from datetime import datetime, timezone` inside `_prepare_chat_context`. Python's scoping rules mark any name assigned anywhere in a function (including via `import`) as a local variable for the entire function. So `datetime` was a local at line 178 — before the import on 533 runs — causing UnboundLocalError. The 200 OK is already sent before the stream generator raises, so the client sees a silent stream termination.",
+      "fix": "Changed `from datetime import datetime, timezone` → `from datetime import timezone` on line 533. `datetime` is already imported at module level (line 13); only `timezone` needed the local import.",
       "tags": [
-        "NameError",
-        "closure",
-        "lambda",
-        "async",
+        "UnboundLocalError",
+        "local-import",
+        "scoping",
         "streaming",
         "NLPController",
         "py"
@@ -1843,6 +1842,22 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-02T13:13:41.073Z"
+    },
+    {
+      "id": "bug-114",
+      "timestamp": "2026-06-02T13:19:05.663Z",
+      "error_message": "Wrong reference: datetime should be timezone",
+      "file": "src/controllers/NLPController.py",
+      "root_cause": "Used \"datetime\" instead of \"timezone\"",
+      "fix": "Changed datetime → timezone",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T13:19:05.663Z"
     }
   ]
 }

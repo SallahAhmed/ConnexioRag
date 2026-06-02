@@ -1,6 +1,6 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-02T13:13:41.053Z
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-02T13:19:05.645Z
 > Files: 109 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/projects/c--Users-salla-Connexios/memory/
@@ -548,7 +548,7 @@
 
 ## src/controllers/
 
-- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~16597 tok)
+- `NLPController.py` — NLPController: create_collection_name, reset_vector_db_collection, get_vector_db_collection_info, in (~16594 tok)
 
 ## src/controllers/helpers/
 

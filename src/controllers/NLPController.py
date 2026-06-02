@@ -530,7 +530,7 @@ class NLPController(BaseController):
         # Computes task completion %, overdue count, and risk level from live tasks.
         if project_id and self.backend_client and not is_file_query:
             try:
-                from datetime import datetime, timezone
+                from datetime import timezone
                 tasks_raw = await self.backend_client.get_project_tasks(project_id)
                 tasks_list = (tasks_raw or {}).get("data") or (tasks_raw if isinstance(tasks_raw, list) else [])
                 if tasks_list:
