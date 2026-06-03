@@ -2,7 +2,7 @@
 
 > OpenWolf's learning memory. Updated automatically as the AI learns from interactions.
 > Do not edit manually unless correcting an error.
-> Last updated: 2026-05-12
+> Last updated: 2026-06-02
 
 ## User Preferences
 
@@ -58,6 +58,90 @@
 - **socket.js resolveProjectId:** AI chatbot rooms resolve project ID in this priority: (1) room metadata.projectId, (2) DB query for user's most recent project, (3) 0 (projectless). The db query joins `projects` with `project_members` on `pm.user_id`.
 
 - **RAG chunk_size for production:** Default `chunk_size=100` is too small for document retrieval. Use `chunk_size=500+` for meaningful context per chunk. The `limit` parameter (default 5) should be at least 20 for full document coverage.
+
+- **[2026-06-02] Phase 3 integration testing — items found missing after implementation:**
+  (1) `DirectMessages.jsx` had no `ai_chunk`/`ai_typing` socket handlers — group/direct chat AI messages appeared all at once with no streaming animation. Fixed by adding handlers + streaming bubble component.
+  (2) `SkillGapWidget` was created but never imported/used in `Profile.jsx`. Fixed by adding import and rendering after `SkillsPreviewCard`.
+  (3) Sidebar had no navigation links for `/ideas`, `/courses`, `/mentors`. Fixed by adding `communityItems` entries with `Lightbulb`, `BookOpen`, `UserCheck` lucide icons + translation keys in `AppContext.jsx`.
+  (4) AI responses in DirectMessages had no source pills display. Fixed in `MsgContent` default renderer.
+
+- **[2026-06-02] DirectMessages.jsx streaming pattern:** AI streaming state is `aiStreamingText` + `aiTypingRoomId` (both cleared on room switch and on `ai_typing: false`). The `onAiChunk` / `onAiTyping` handlers use `activeRoomRef.current` for safe stale-closure access.
+
+- **[2026-06-02] socket.accountType:** Stored at socket auth time from `decoded.account_type` (the JWT already carries it — no extra DB query). Use `socket.accountType === 'pro'` to decide `model_tier` for RAG calls.
+
+- **[2026-06-02] Supervisor Hub concept:** The `/supervisors` page is professor/TA-only and is professor-initiated — professors browse student projects and click "Offer to Supervise". Students are notified via `Notification` (type=`system`). The backend table is `mentor_applications` (naming kept as-is). Route was `/mentors` — renamed to `/supervisors` in sidebar, App.jsx, and translations only. Do NOT confuse with professor dashboard (`/admin/dashboard`): supervisors page = request management; dashboard = analytics.
+
+- **[2026-06-02] `user_type` for supervisor role:** `'professor'` and `'ta'` are the supervisor types. Neither `'mentor'` nor `'supervisor'` is the right value — those are other roles. Professor dashboard, supervisors page, and `professorOnly` middleware all gate on `user_type IN ('professor','ta')`.
+
+- **[2026-06-02] @mention autocomplete pattern in DirectMessages:** Detect `/@(\w*)$/` at end of text. Store matched text after `@` in `mentionQuery` state. Filter `activeRoom.participants` by that string. On click, replace the trailing `@partial` in `text` state using `text.replace(/(?:^|\s)@\w*$/, ...)` and refocus input. Clear `mentionQuery` on send, Escape, and room switch.
+
+- **[2026-06-02] AI trigger conflict validation:** In ProjectDetail Settings tab, after validating `@` prefix, strip `@` and compare lowercase against `members.map(m => m.FullName.toLowerCase().replace(/\s+/g,''))` and `m.username.toLowerCase()`. Block save (not just warn) if a match is found — prevents AI firing every time a teammate is @mentioned.
+
+- **[2026-06-02] SkillGapWidget visibility:** The widget must always render (remove the `if (!gaps.length) return null` guard). Show a green success message when gaps are empty. Hiding it silently when there are no gaps made it look broken to the user.
+
+- **[2026-06-02] Project group chat member auto-sync:** After `INSERT INTO project_members`, call `ChatRoom.findOneAndUpdate({ 'metadata.projectId': String(id), type: 'group' }, { $addToSet: { participants: Number(userId) } })`. This is non-fatal (wrapped in try/catch). Without it, new members miss group chat messages until they manually join.
+
+- **[2026-06-02] Slash command menu in DirectMessages:** Show dropdown when `text === '/'` or text starts with `/` and has no space and length ≤ 8. Each entry has `{ cmd, desc }`. Filter entries by `c.cmd.startsWith(text)`. On click, set text to the command string and focus input. Close on Escape, send, and room switch.
+
+- **[2026-06-03] MasarX VALID_INTENTS must be kept in sync with INTENT_TO_SUBGRAPH_MAP.** `validate_idea` and `preview_team` were in `conditions.py` and working in the graph but silently returning HTTP 400 because they were missing from `VALID_INTENTS` in `webhook_routes.py`. Always update both when adding a new intent.
+
+- **[2026-06-03] State-level errors in LangGraph nodes don't auto-surface as HTTP errors.** When a node returns `{"error": "...", "draft_status": "error"}` and routes to END cleanly, `invoke_masarx` still returns HTTP 200 — only exceptions become proper error signals. Added a post-graph check in `invoke_masarx` that converts `error + draft_status=="error"` into `signal: masarx_agent_error` so `manual_trigger` can return HTTP 500.
+
+- **[2026-06-03] Groq rejects Pydantic schemas that contain numeric range validators (`ge`, `le`).** `ge=0, le=100` on an `int` field generates `"minimum": 0, "maximum": 100` in the JSON schema. Groq's tool-calling layer throws before the LLM even runs, causing a silent fallback. **Never use `ge`/`le` on Pydantic fields passed to `create_structured_client`.**
+
+- **[2026-06-03] All Pydantic models for `create_structured_client` must have `ConfigDict(populate_by_name=True)`, `alias=`, and `Optional` + `default`/`default_factory` on every field.** Required fields with no defaults cause `ValidationError` when the LLM returns partial JSON — the `except` block silently swallows it and the fallback fires. The working reference pattern is `EndorsedSkillsResult` in `skill_endorsement_subgraph.py`. Follow it exactly.
+
+- **[2026-06-03] Groq `response_format: json_object` requires the word "json" in the prompt.** `create_structured_client` passes `response_format: {"type": "json_object"}` to Groq. If the prompt/system message contains no variant of the word "json", Groq throws `invalid_request_error: 'messages' must contain the word 'json'`. This was the root cause of ALL `ideas_subgraph` failures — the system prompts said "return a structured assessment" with no "json" mention. **Fix: always include "JSON" in any prompt that will be sent with `response_format: json_object`. Alternatively, use `generate_text` with explicit JSON instructions in the prompt — avoids the constraint entirely.**
+
+- **[2026-06-03] Small Groq models (utility, ~8B) skip fields under complex multi-field Pydantic schemas.** They return valid JSON but with empty strings and empty lists for fields beyond the first 2-3. Pydantic fills the rest with defaults — no exception thrown, no fallback, just silent empty output. Fix: use `create_generation_client()` + `GENERATION_MODEL_ID` for any structured output call that has ≥4 fields or nested lists. `endorse_skills` (2 fields, simple schema) stays on utility. `recommend_skills`, `validate_idea`, `preview_team` all moved to generation model.
+
+- **[2026-06-03] Use `create_structured_client(PydanticModel)` for all LLM calls that need JSON.** `generate_text` + regex/`_safe_json` JSON parsing fails 20-40% of the time with Groq models. Pydantic structured output is reliable. Pattern: define a `BaseModel`, pass to `create_structured_client()`, call `.ainvoke([system, user])`, then `.model_dump()`.
+
+- **[2026-06-03] `detect_risks` cross-scan memory pattern:** `fetch_monitor_context` fetches the most recent `risk_report` doc via `db_tool.get_documents(project_id, doc_type="risk_report")` and extracts the `## AI Risk Assessment` section. This is injected into `RISK_DETECTION_PROMPT` as `previous_analysis` + `previous_scan_date`. The LLM prompt explicitly asks to compare against the previous scan.
+
+- **[2026-06-03] Wolfram tool in audit_subgraph is permanently mocked.** `wolfram_tool.calculate()` always returns `"Mock calculation for: ..."` in production (no real API key). Removed the entire Wolfram call path. Health score is now pure Python: `(completed/total)*100 − overdue*10 + min(in_progress,5)*2`, clamped 0–100.
+
+- **[2026-06-03] `marketplace_ideas` vs `project_ideas` are two separate tables.** `marketplace_ideas` = commercial buy/sell idea marketplace (price, cart, orders, Stripe). `project_ideas` = Phase 3 collaborative idea marketplace (tech_stack, looking_for, team formation). The AI intents `validate_idea` and `preview_team` target `marketplace_ideas` since `IdeaDetail.jsx` (/ideas/:id) renders from that table. Do NOT confuse the two.
+
+- **[2026-06-03] `ideas.routes.js` did not register `POST /:id/validate` or `POST /:id/preview-team`.** The controller functions `validateIdea` and `previewTeam` existed in `ideas.controller.js` but were never imported or registered. Both are now wired. Always verify routes file when NOTES.md marks a backend endpoint "✅ Fixed" — it may just mean the controller function was written.
+
+- **[2026-06-03] Celery beat runs in-process on the Azure VM.** `start.sh` uses `celery -A celery_app worker -B --loglevel=info &`. The `-B` flag runs Beat in-process alongside the worker — no separate beat process needed. Risk/workload crons ARE firing automatically.
+
+- **[2026-06-03] No Redis in the Azure VM Docker Compose.** The `docker-compose.yml` defines only the `masarx` service. Redis-backed circuit breaker persistence would require adding a Redis service. For now, the REDIS_URL setting (from Upstash?) may provide cloud Redis, but it is not in the compose file.
+
+- **[2026-06-03] Gap 1.5 sprint-scoped task generation (implemented).** Sprints now emit only the next capacity-sized batch from a persisted "canonical" plan instead of regenerating the whole project every sprint. Mechanism: (1) backend `project.sprint_started` sends `sprint_id` (top-level string) + `payload:{sprint_name,sprint_goal,sprint_seq}`; (2) `task_planner` detects sprint mode, stores the first plan in PG `project_intelligence` key `canonical_phase_plan`, and on every sprint calls `_emit_sprint_batch` which reads `current_phase_index`, advances past fully-done phases (completion-driven, NOT 1-sprint-per-phase), and emits one phase's not-yet-created tasks capped at `max(4, team_size*2)`; (3) tasks sync to MySQL with `sprint_id`; (4) sprint-close retro counts `WHERE sprint_id=?`. Skip statuses `phase_in_progress`/`skipped_complete` route straight to END via a conditional edge.
+
+- **[2026-06-03] `fireEvent`/`triggerIntent` POST the data object AS the raw webhook body, parsed by `WebhookPayload`.** Only its declared fields survive (`project_id,user_id,sprint_id,member_ids,payload,requirements`). Any extra top-level key (e.g. `sprint_name`) is silently dropped by Pydantic. To get custom data into a subgraph's `state["output"]`, nest it under `payload:{...}`. `sprint_id` must be a STRING (Pydantic v2 won't coerce int→str).
+
+- **[2026-06-03] MasarX `project_intelligence` table (PG, MasarX-owned).** Generic cross-intent KV store `{project_id, key, value JSONB, updated_at, PK(project_id,key)}`, created idempotently in `db_tool._run_migrations()`. Access via `db_tool.get_intelligence(pid, key)` / `set_intelligence(pid, key, value)` (best-effort, never raise; value stored via `CAST(:v AS JSONB)` with `json.dumps`). Gap 1.5 keys: `canonical_phase_plan`, `current_phase_index`.
+
+- **[2026-06-03] `db_tool.get_pending_plan(token)` takes an approval TOKEN; use `get_pending_plan_by_project(pid)` to look up by project.** Both return SQLAlchemy ORM objects (read attributes like `.plan_data`, `.approval_token` — they have NO `.get()` method). The task_planner idempotency guard had been calling `get_pending_plan(project_id)` + `.get()`, so it was dead code (see bug-188).
+
+- **[2026-06-03] `project_intelligence` is now wired (Gap 9.1).** Producers: `detect_risks`→`last_risk_level`, `comprehensive_audit`→`last_health_score`, `task_planner`→`canonical_phase_plan`/`current_phase_index`. Read via `db_tool.get_intelligence(pid,key)`, write via `set_intelligence(pid,key,value)`.
+
+- **[2026-06-03] AI risk level write path:** `detect_risks` derives `low|medium|high` and calls `backend_client.set_project_risk` → `PUT /api/projects/:id/ai-risk` (service-JWT, sets `projects.ai_risk_level`+`ai_risk_updated_at`). New controller `setAiRiskLevel`.
+
+- **[2026-06-03] `Document.doc_metadata` maps to DB column `metadata`** (SQLAlchemy reserves `.metadata`). `save_document` accepts `doc_data["metadata"]`. Used by risk_report (overall_risk summary) and audit (health_score history for diffing).
+
+- **[2026-06-03] Idea AI scores live on `marketplace_ideas` (NOT project_ideas), and `validateIdea` already persists them.** The score columns + the `UPDATE marketplace_ideas SET feasibility_score...` were already present in uncommitted backend work. Only the React badges remain.
+
+- **[2026-06-03] Token usage (Gap 9.2)** is logged fire-and-forget from `OpenAIProvider.generate_text` via `db_tool.log_usage` → `masarx_usage`. intent/project_id are null (provider has no request context). Direct `client.chat.completions.create` calls (e.g. task_subgraph rotation) are NOT logged.
+
+- **[2026-06-03] Audit cache (Gap 7.2) only applies to automated runs.** `triggered_by=="celery_beat"` audits skip regeneration if the last audit is <6h old; manual/webhook triggers always run fresh. Cache hit sets `_audit_cached` and routes to END.
+
+- **[2026-06-03] Pre-merge PR review (Gap 5.1):** events `pullrequest.opened/updated` → `review_pr`, gated in `handle_event` by MySQL `projects.ai_review_on_open_prs` (default OFF, read via `backend_client.get_project`). `pullrequest.merged` always runs. Reviews post back via new `github_tool.post_pr_comment` (issues-comments endpoint; needs `pull_requests:write`). Large diffs truncated per-file (`_truncate_diff`, ~24k chars).
+
+- **[2026-06-03] Onboarding tasks are MySQL-first (Gap 2.2).** `onboarding_task_creator` syncs to MySQL first; only mirrors to PG on success; MySQL failure → `draft_status: error` (no PG write). Same rule should apply to any source-of-truth task write.
+
+- **[2026-06-03] Invite dedup (Gap 2.4) uses `masarx_invitations`.** `db_tool.get_recently_invited(pid, days=30)` filters candidates in `team_matching_node`; `record_invitations` writes after queuing. The owner-approval flow itself (Gap 2.1) was already implemented via the backend pending-invitations table — don't rebuild it.
+
+- **[2026-06-03] Endorse dedup (Gap 6.1)** stores per-skill timestamps in `project_intelligence` key `endorse_ts_user_<uid>` ({skill_lower: iso}); skills endorsed <14d ago are dropped from `skills` in `performance_analysis_node` (empty list → downstream no-ops). Proficiency text→int map (Advanced=5/Intermediate=3/Beginner=1) is sent as `skill_levels` to `updateMyProfile`, which upserts `user_skills.proficiency_level` (Gap 6.3). user_skills has no unique key — upsert = UPDATE then INSERT-if-0-rows.
+
+- **[2026-06-03] `precomputed_match_scores`** is written to `project_intelligence` by `recommender_refiner`; the weekly cron `masarx.tasks.run_match_precompute` (Mon 04:00 UTC) fans out `refine_recommender` per project. Consumer: `preview_team` (read best-effort).
+
+- **[2026-06-03] Gap 2.3 proficiency in matching:** `GET /api/users/proficiency-map` (route placed BEFORE `/:id` in user.routes; `/skills/:type` already exists so don't use `/skills/...`) returns `{uid: {skill_lower: level}}`, optional `?user_ids=`. `backend_client.get_users_proficiency` → `team_matching_node` adds `skill_level_bonus = avg(level)/5 * 0.1` (cap 0.1).
+
+- **[2026-06-03] ALL backend/MasarX plan work is complete.** Only React remains (`F:\MasarX_A\FRONTEND_TASKS.md`). Full per-graph/intent logic is documented in `F:\MasarX_A\MASARX_GRAPHS_AND_INTENTS.md`. Testing in `IMPLEMENTATION_TESTING.md`.
 
 ## Do-Not-Repeat
 
@@ -123,6 +207,13 @@
 
 - **[2026-06-01] Phase 0 tables were not actually in dbconnection.js despite being checked off.**
   `contribution_evidence`, `audit_log`, `active_sessions`, `project_contracts`, `contract_signatures`, and all Phase 0 column migrations were missing from `createTables()`. Added in Phase 2 session. Always verify DB table existence with a grep before writing code that INSERTs into them.
+
+- **[2026-06-02] Do NOT build a "browse mentors" page for students — that concept is wrong for Connexio.**
+  The supervisor feature is professor-initiated: professors browse student projects and offer supervision. There is no student-facing mentor browser. The page at `/supervisors` is professor/TA only and hidden from students. Building it as a student-facing browse-and-invite page was incorrect and had to be rewritten.
+  **Why:** In the academic context of Connexio, "supervisor" = a DR or TA assigned to a student capstone project. Supervision flows from professor to student, not the other way around.
+
+- **[2026-06-02] `GET /api/users` is adminOnly — never call it from a regular user-facing page.**
+  The endpoint is gated by `adminOnly` middleware (X-Admin-Key check). Using it from the frontend for browsing professors/mentors returns 403. Add a dedicated `GET /api/users/mentors` (or `/supervisors`) route with only `protect` middleware. Lesson: always check the route middleware before wiring a frontend page to it.
 
 - **[2026-06-01] Global `validator.escape()` on req.body corrupts stored data.**
   HTML-escaping all string fields globally (e.g. `&` → `&amp;`) stores escaped HTML in MySQL and causes double-escaping when rendered. Correct approach: trim-only globally (`validator.trim`), escape at controller level for fields that accept freeform HTML. See `sanitize.js`.

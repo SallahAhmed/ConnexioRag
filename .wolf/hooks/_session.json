@@ -1,415 +1,289 @@
 {
-  "session_id": "session-2026-06-02-1658",
-  "started": "2026-06-02T13:58:01.379Z",
+  "session_id": "session-2026-06-03-2242",
+  "started": "2026-06-03T19:42:37.981Z",
   "files_read": {
-    "F:/MasarX_A/.opencode/plans/PHASE_3_CONNEXIO.md": {
+    "f:/MasarX_A/src/Routes/webhook_routes.py": {
+      "count": 2,
+      "tokens": 12560,
+      "first_read": "2026-06-03T19:50:47.170Z"
+    },
+    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": {
+      "count": 1,
+      "tokens": 3025,
+      "first_read": "2026-06-03T19:50:47.561Z"
+    },
+    "f:/MasarX_A/src/utils/tools/github_tool.py": {
       "count": 1,
       "tokens": 0,
-      "first_read": "2026-06-02T13:58:07.273Z"
+      "first_read": "2026-06-03T19:51:19.040Z"
     },
-    "c:/Users/salla/Connexios/.wolf/cerebrum.md": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T13:58:07.770Z"
-    },
-    "c:/Users/salla/Connexios/.wolf/anatomy.md": {
-      "count": 4,
-      "tokens": 0,
-      "first_read": "2026-06-02T13:58:19.444Z"
-    },
-    "F:/connexio_back2/socket.js": {
-      "count": 5,
-      "tokens": 9046,
-      "first_read": "2026-06-02T13:58:30.420Z"
-    },
-    "F:/connexio_back2/bootstrap.js": {
-      "count": 1,
-      "tokens": 1593,
-      "first_read": "2026-06-02T13:58:48.116Z"
-    },
-    "F:/connexio_back2/modules/projects/projects.controller.js": {
-      "count": 5,
-      "tokens": 18956,
-      "first_read": "2026-06-02T13:59:23.728Z"
-    },
-    "F:/connexio_back2/database/dbconnection.js": {
-      "count": 1,
-      "tokens": 6209,
-      "first_read": "2026-06-02T13:59:43.365Z"
-    },
-    "f:/MasarX_A/nginx/masarx.conf": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T14:01:29.088Z"
-    },
-    "f:/MasarX_A/docker-compose.yml": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T14:01:55.218Z"
-    },
-    "F:/connexio_back2/modules/projects/projects.routes.js": {
-      "count": 1,
-      "tokens": 507,
-      "first_read": "2026-06-02T14:03:31.422Z"
-    },
-    "f:/MasarX_A/DEPLOY.md": {
-      "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T14:04:27.858Z"
-    },
-    "C:/Users/salla/Connexios/src/controllers/NLPController.py": {
+    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": {
       "count": 3,
-      "tokens": 16893,
-      "first_read": "2026-06-02T14:07:26.359Z"
+      "tokens": 11447,
+      "first_read": "2026-06-03T19:54:37.169Z"
     },
-    "f:/Connexio_Frontend2/src/App.jsx": {
+    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": {
       "count": 1,
-      "tokens": 1098,
-      "first_read": "2026-06-02T14:08:15.349Z"
+      "tokens": 6289,
+      "first_read": "2026-06-03T19:56:04.053Z"
     },
-    "f:/Connexio_Frontend2/src/components/shared/Badge.jsx": {
+    "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py": {
+      "count": 2,
+      "tokens": 3818,
+      "first_read": "2026-06-03T20:03:49.482Z"
+    },
+    "f:/MasarX_A/src/utils/backend_client.py": {
       "count": 1,
-      "tokens": 90,
-      "first_read": "2026-06-02T14:08:26.448Z"
+      "tokens": 4285,
+      "first_read": "2026-06-03T20:05:05.459Z"
     },
-    "f:/Connexio_Frontend2/src/api/axiosInstance.js": {
+    "f:/connexio_back2/modules/users/user.controller.js": {
+      "count": 2,
+      "tokens": 9123,
+      "first_read": "2026-06-03T20:05:34.334Z"
+    },
+    "f:/connexio_back2/modules/ideas/ideas.controller.js": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T14:08:29.464Z"
+      "tokens": 6539,
+      "first_read": "2026-06-03T20:07:44.581Z"
     },
-    "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx": {
-      "count": 5,
-      "tokens": 22802,
-      "first_read": "2026-06-02T14:09:42.772Z"
-    },
-    "c:/Users/salla/Connexios/CLAUDE.md": {
+    "f:/MasarX_A/src/tasks/cron_jobs.py": {
       "count": 1,
-      "tokens": 4815,
-      "first_read": "2026-06-02T14:16:19.042Z"
+      "tokens": 1824,
+      "first_read": "2026-06-03T20:08:09.391Z"
     },
-    "c:/Users/salla/Connexios/.wolf/memory.md": {
+    "f:/MasarX_A/src/celery_app.py": {
       "count": 1,
-      "tokens": 0,
-      "first_read": "2026-06-02T14:16:39.610Z"
+      "tokens": 701,
+      "first_read": "2026-06-03T20:08:58.475Z"
+    },
+    "f:/connexio_back2/modules/users/user.routes.js": {
+      "count": 1,
+      "tokens": 550,
+      "first_read": "2026-06-03T20:19:21.740Z"
+    },
+    "f:/Connexio_Frontend2/src/pages/Projects.jsx": {
+      "count": 3,
+      "tokens": 10788,
+      "first_read": "2026-06-03T20:56:01.735Z"
     }
   },
   "files_written": [
     {
-      "file": "F:/connexio_back2/database/dbconnection.js",
+      "file": "f:/MasarX_A/src/utils/tools/github_tool.py",
       "action": "edit",
-      "tokens": 1034,
-      "at": "2026-06-02T14:00:45.146Z"
+      "tokens": 429,
+      "at": "2026-06-03T19:51:32.452Z"
     },
     {
-      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
       "action": "edit",
-      "tokens": 42,
-      "at": "2026-06-02T14:01:00.141Z"
+      "tokens": 162,
+      "at": "2026-06-03T19:51:46.754Z"
     },
     {
-      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
       "action": "edit",
-      "tokens": 144,
-      "at": "2026-06-02T14:01:06.931Z"
+      "tokens": 276,
+      "at": "2026-06-03T19:51:59.465Z"
     },
     {
-      "file": "F:/connexio_back2/socket.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
       "action": "edit",
-      "tokens": 576,
-      "at": "2026-06-02T14:01:35.540Z"
+      "tokens": 296,
+      "at": "2026-06-03T19:52:22.294Z"
     },
     {
-      "file": "f:/MasarX_A/docker-compose.yml",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
       "action": "edit",
-      "tokens": 23,
-      "at": "2026-06-02T14:01:59.193Z"
+      "tokens": 430,
+      "at": "2026-06-03T19:52:34.150Z"
     },
     {
-      "file": "F:/connexio_back2/socket.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
       "action": "edit",
-      "tokens": 1186,
-      "at": "2026-06-02T14:02:23.736Z"
+      "tokens": 420,
+      "at": "2026-06-03T19:52:45.332Z"
     },
     {
-      "file": "F:/connexio_back2/modules/courses/courses.controller.js",
-      "action": "create",
-      "tokens": 1612,
-      "at": "2026-06-02T14:03:01.182Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/courses/courses.routes.js",
-      "action": "create",
-      "tokens": 144,
-      "at": "2026-06-02T14:03:08.953Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
       "action": "edit",
-      "tokens": 1013,
-      "at": "2026-06-02T14:04:17.588Z"
+      "tokens": 328,
+      "at": "2026-06-03T19:55:03.284Z"
     },
     {
-      "file": "F:/connexio_back2/modules/projects/projects.routes.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
       "action": "edit",
-      "tokens": 152,
-      "at": "2026-06-02T14:04:25.269Z"
+      "tokens": 99,
+      "at": "2026-06-03T19:55:10.089Z"
     },
     {
-      "file": "F:/connexio_back2/middleware/professorMiddleware.js",
-      "action": "create",
-      "tokens": 68,
-      "at": "2026-06-02T14:04:39.855Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/professor/professor.controller.js",
-      "action": "create",
-      "tokens": 1576,
-      "at": "2026-06-02T14:05:03.653Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/professor/professor.routes.js",
-      "action": "create",
-      "tokens": 150,
-      "at": "2026-06-02T14:05:09.700Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/ideas/ideas.controller.js",
-      "action": "create",
-      "tokens": 1900,
-      "at": "2026-06-02T14:05:55.548Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/ideas/ideas.routes.js",
-      "action": "create",
-      "tokens": 142,
-      "at": "2026-06-02T14:06:02.510Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/skills/skills.controller.js",
-      "action": "create",
-      "tokens": 1196,
-      "at": "2026-06-02T14:06:42.081Z"
-    },
-    {
-      "file": "F:/connexio_back2/modules/skills/skills.routes.js",
-      "action": "create",
-      "tokens": 95,
-      "at": "2026-06-02T14:06:47.268Z"
-    },
-    {
-      "file": "F:/connexio_back2/bootstrap.js",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
       "action": "edit",
-      "tokens": 116,
-      "at": "2026-06-02T14:07:06.891Z"
+      "tokens": 87,
+      "at": "2026-06-03T19:55:17.405Z"
     },
     {
-      "file": "F:/connexio_back2/bootstrap.js",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
       "action": "edit",
-      "tokens": 73,
-      "at": "2026-06-02T14:07:12.519Z"
+      "tokens": 648,
+      "at": "2026-06-03T19:56:55.146Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
       "action": "edit",
-      "tokens": 223,
-      "at": "2026-06-02T14:07:46.932Z"
+      "tokens": 494,
+      "at": "2026-06-03T19:57:25.923Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
       "action": "edit",
-      "tokens": 136,
-      "at": "2026-06-02T14:07:53.884Z"
+      "tokens": 162,
+      "at": "2026-06-03T19:57:33.646Z"
     },
     {
-      "file": "C:/Users/salla/Connexios/src/controllers/NLPController.py",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
       "action": "edit",
-      "tokens": 105,
-      "at": "2026-06-02T14:08:03.102Z"
+      "tokens": 146,
+      "at": "2026-06-03T19:57:41.485Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/components/AIMessageBubble.jsx",
-      "action": "create",
-      "tokens": 584,
-      "at": "2026-06-02T14:09:04.789Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/TaskCreationConfirm.jsx",
-      "action": "create",
-      "tokens": 861,
-      "at": "2026-06-02T14:09:28.025Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
       "action": "edit",
-      "tokens": 43,
-      "at": "2026-06-02T14:10:07.589Z"
+      "tokens": 546,
+      "at": "2026-06-03T20:04:46.363Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
       "action": "edit",
-      "tokens": 73,
-      "at": "2026-06-02T14:10:22.883Z"
+      "tokens": 377,
+      "at": "2026-06-03T20:04:59.005Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "file": "f:/connexio_back2/modules/users/user.controller.js",
       "action": "edit",
-      "tokens": 46,
-      "at": "2026-06-02T14:10:30.930Z"
+      "tokens": 58,
+      "at": "2026-06-03T20:05:57.667Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "file": "f:/connexio_back2/modules/users/user.controller.js",
       "action": "edit",
-      "tokens": 916,
-      "at": "2026-06-02T14:10:46.836Z"
+      "tokens": 338,
+      "at": "2026-06-03T20:06:08.013Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/components/ProjectDrillDown.jsx",
-      "action": "create",
-      "tokens": 1372,
-      "at": "2026-06-02T14:11:18.183Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/StudentProgressModal.jsx",
-      "action": "create",
-      "tokens": 1230,
-      "at": "2026-06-02T14:11:35.619Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/ProfessorDashboard.jsx",
-      "action": "create",
-      "tokens": 1864,
-      "at": "2026-06-02T14:12:00.316Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/ProfessorCourses.jsx",
-      "action": "create",
-      "tokens": 1538,
-      "at": "2026-06-02T14:12:20.797Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/IdeaCard.jsx",
-      "action": "create",
-      "tokens": 971,
-      "at": "2026-06-02T14:12:46.833Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/SubmitIdeaModal.jsx",
-      "action": "create",
-      "tokens": 1616,
-      "at": "2026-06-02T14:13:08.090Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/IdeaMarketplace.jsx",
-      "action": "create",
-      "tokens": 994,
-      "at": "2026-06-02T14:13:24.525Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/IdeaDetail.jsx",
-      "action": "create",
-      "tokens": 1884,
-      "at": "2026-06-02T14:13:52.089Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/RecommendationCard.jsx",
-      "action": "create",
-      "tokens": 627,
-      "at": "2026-06-02T14:14:17.808Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/components/SkillGapWidget.jsx",
-      "action": "create",
-      "tokens": 468,
-      "at": "2026-06-02T14:14:28.118Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/SkillAnalysis.jsx",
-      "action": "create",
-      "tokens": 1208,
-      "at": "2026-06-02T14:14:46.780Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/Courses.jsx",
-      "action": "create",
-      "tokens": 1543,
-      "at": "2026-06-02T14:15:18.118Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/pages/MentorBrowser.jsx",
-      "action": "create",
-      "tokens": 1521,
-      "at": "2026-06-02T14:15:41.232Z"
-    },
-    {
-      "file": "f:/Connexio_Frontend2/src/App.jsx",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
       "action": "edit",
-      "tokens": 126,
-      "at": "2026-06-02T14:15:56.114Z"
+      "tokens": 250,
+      "at": "2026-06-03T20:06:16.996Z"
     },
     {
-      "file": "f:/Connexio_Frontend2/src/App.jsx",
+      "file": "f:/connexio_back2/modules/ideas/ideas.controller.js",
       "action": "edit",
-      "tokens": 188,
-      "at": "2026-06-02T14:16:02.291Z"
+      "tokens": 228,
+      "at": "2026-06-03T20:07:58.303Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/CLAUDE.md",
+      "file": "f:/MasarX_A/src/celery_app.py",
       "action": "edit",
-      "tokens": 60,
-      "at": "2026-06-02T14:16:23.762Z"
+      "tokens": 114,
+      "at": "2026-06-03T20:09:04.208Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/CLAUDE.md",
+      "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
       "action": "edit",
-      "tokens": 18,
-      "at": "2026-06-02T14:16:28.602Z"
+      "tokens": 596,
+      "at": "2026-06-03T20:09:15.632Z"
     },
     {
-      "file": "c:/Users/salla/Connexios/CLAUDE.md",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
       "action": "edit",
-      "tokens": 60,
-      "at": "2026-06-02T14:16:35.475Z"
+      "tokens": 376,
+      "at": "2026-06-03T20:09:25.642Z"
+    },
+    {
+      "file": "f:/MasarX_A/IMPLEMENTATION_TESTING.md",
+      "action": "edit",
+      "tokens": 983,
+      "at": "2026-06-03T20:13:31.162Z"
+    },
+    {
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "action": "edit",
+      "tokens": 242,
+      "at": "2026-06-03T20:13:45.326Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/users/user.routes.js",
+      "action": "edit",
+      "tokens": 91,
+      "at": "2026-06-03T20:19:33.978Z"
+    },
+    {
+      "file": "f:/connexio_back2/modules/users/user.controller.js",
+      "action": "edit",
+      "tokens": 352,
+      "at": "2026-06-03T20:19:48.171Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/utils/backend_client.py",
+      "action": "edit",
+      "tokens": 335,
+      "at": "2026-06-03T20:19:57.692Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "action": "edit",
+      "tokens": 186,
+      "at": "2026-06-03T20:20:06.557Z"
+    },
+    {
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "action": "edit",
+      "tokens": 304,
+      "at": "2026-06-03T20:20:30.655Z"
+    },
+    {
+      "file": "f:/MasarX_A/MASARX_GRAPHS_AND_INTENTS.md",
+      "action": "create",
+      "tokens": 5012,
+      "at": "2026-06-03T20:22:59.258Z"
+    },
+    {
+      "file": "f:/MasarX_A/FRONTEND_TASKS.md",
+      "action": "create",
+      "tokens": 1714,
+      "at": "2026-06-03T20:24:13.406Z"
+    },
+    {
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "action": "edit",
+      "tokens": 182,
+      "at": "2026-06-03T20:24:28.042Z"
     }
   ],
   "edit_counts": {
-    "F:/connexio_back2/database/dbconnection.js": 1,
-    "F:/connexio_back2/modules/projects/projects.controller.js": 3,
-    "F:/connexio_back2/socket.js": 2,
-    "f:/MasarX_A/docker-compose.yml": 1,
-    "F:/connexio_back2/modules/courses/courses.controller.js": 1,
-    "F:/connexio_back2/modules/courses/courses.routes.js": 1,
-    "F:/connexio_back2/modules/projects/projects.routes.js": 1,
-    "F:/connexio_back2/middleware/professorMiddleware.js": 1,
-    "F:/connexio_back2/modules/professor/professor.controller.js": 1,
-    "F:/connexio_back2/modules/professor/professor.routes.js": 1,
-    "F:/connexio_back2/modules/ideas/ideas.controller.js": 1,
-    "F:/connexio_back2/modules/ideas/ideas.routes.js": 1,
-    "F:/connexio_back2/modules/skills/skills.controller.js": 1,
-    "F:/connexio_back2/modules/skills/skills.routes.js": 1,
-    "F:/connexio_back2/bootstrap.js": 2,
-    "src/controllers/NLPController.py": 3,
-    "f:/Connexio_Frontend2/src/components/AIMessageBubble.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/TaskCreationConfirm.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx": 4,
-    "f:/Connexio_Frontend2/src/components/ProjectDrillDown.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/StudentProgressModal.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/ProfessorDashboard.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/ProfessorCourses.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/IdeaCard.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/SubmitIdeaModal.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/IdeaMarketplace.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/IdeaDetail.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/RecommendationCard.jsx": 1,
-    "f:/Connexio_Frontend2/src/components/SkillGapWidget.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/SkillAnalysis.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/Courses.jsx": 1,
-    "f:/Connexio_Frontend2/src/pages/MentorBrowser.jsx": 1,
-    "f:/Connexio_Frontend2/src/App.jsx": 2,
-    "CLAUDE.md": 3
+    "f:/MasarX_A/src/utils/tools/github_tool.py": 1,
+    "f:/MasarX_A/src/Routes/webhook_routes.py": 2,
+    "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py": 3,
+    "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py": 3,
+    "f:/MasarX_A/src/utils/tools/db_tool.py": 1,
+    "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py": 6,
+    "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py": 3,
+    "f:/connexio_back2/modules/users/user.controller.js": 3,
+    "f:/connexio_back2/modules/ideas/ideas.controller.js": 1,
+    "f:/MasarX_A/src/celery_app.py": 1,
+    "f:/MasarX_A/src/tasks/cron_jobs.py": 1,
+    "f:/MasarX_A/IMPLEMENTATION_TESTING.md": 1,
+    "f:/MasarX_A/IMPLEMENTATION_PLAN.md": 2,
+    "f:/connexio_back2/modules/users/user.routes.js": 1,
+    "f:/MasarX_A/src/utils/backend_client.py": 1,
+    "f:/MasarX_A/MASARX_GRAPHS_AND_INTENTS.md": 1,
+    "f:/MasarX_A/FRONTEND_TASKS.md": 1
   },
-  "anatomy_hits": 9,
-  "anatomy_misses": 9,
-  "repeated_reads_warned": 17,
+  "anatomy_hits": 12,
+  "anatomy_misses": 1,
+  "repeated_reads_warned": 7,
   "cerebrum_warnings": 0,
-  "stop_count": 6
+  "stop_count": 3
 }

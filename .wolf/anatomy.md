@@ -1,12 +1,14 @@
 # anatomy.md
 
-> Auto-maintained by OpenWolf. Last scanned: 2026-06-02T14:16:35.453Z
-> Files: 142 tracked | Anatomy hits: 0 | Misses: 0
+> Auto-maintained by OpenWolf. Last scanned: 2026-06-03T20:24:28.027Z
+> Files: 197 tracked | Anatomy hits: 0 | Misses: 0
 
 ## ../.claude/projects/c--Users-salla-Connexios/memory/
 
-- `MEMORY.md` — Memory Index (~44 tok)
+- `MEMORY.md` — Memory Index (~125 tok)
 - `project_azure_migration.md` (~310 tok)
+- `project_phase3_pending.md` — Declares 2 (~359 tok)
+- `project_testing_status.md` — What was fixed during testing (~734 tok)
 
 ## ../Connexio_Front2/src/components/
 
@@ -26,7 +28,7 @@
 
 ## ./
 
-- `CLAUDE.md` — OpenWolf (~4808 tok)
+- `CLAUDE.md` — OpenWolf (~5719 tok)
 
 ## .claude/
 
@@ -266,6 +268,10 @@
 
 - `AIAgentPanel.jsx` — AIAgentPanel: triggers all MasarX intents, renders structured results (match/risks/workload/audit/docs/scaffold/PR), owner-gated, timeout-tolerant (~2600 tok)
 
+## F:/Connexio_Frontend2/src/
+
+- `App.jsx` — Shared (~1388 tok)
+
 ## F:/Connexio_Frontend2/src/api/
 
 - `socket.js` — Exports getSocket, sendSocketMessage, trackSocketRoom, disconnectSocket (~642 tok)
@@ -277,14 +283,22 @@
 - `NotificationBell.jsx` — NOTIF_ICON (~2851 tok)
 - `ProfessorOverride.jsx` — Form to log a manual risk override (low/medium/high + reason). Posts to /api/projects/:id/risk-override. (~928 tok)
 - `ReassignmentModal.jsx` — Fetches GET /tasks/:id/suggestions and lets leader reassign to a least-loaded member. (~1045 tok)
+- `Sidebar.jsx` — navItems (~2054 tok)
+- `SkillGapWidget.jsx` — SkillGapWidget (~544 tok)
 
 ## F:/Connexio_Frontend2/src/context/
 
-- `AppContext.jsx` — translations (~7408 tok)
+- `AppContext.jsx` — translations (~7487 tok)
 
 ## F:/Connexio_Frontend2/src/pages/
 
-- `ProjectDetail.jsx` — PHASES (~22746 tok)
+- `MentorBrowser.jsx` — STATUS_LABEL (~2592 tok)
+- `Profile.jsx` — parseSkills (~12244 tok)
+- `ProjectDetail.jsx` — PHASES (~23967 tok)
+
+## F:/Connexio_Frontend2/src/pages/Dashboard/
+
+- `DirectMessages.jsx` — formatTime (~24117 tok)
 
 ## F:/MasarX_A/
 
@@ -302,7 +316,7 @@
 
 ## F:/MasarX_A/docs/documentation/
 
-- `documentation.md` — Connexio Platform — Release Documentation (~6923 tok)
+- `documentation.md` — Connexio Platform — Release Documentation (~10025 tok)
 
 ## F:/MasarX_A/nginx/
 
@@ -325,7 +339,7 @@
 
 - `app.js` — app: startServer (~561 tok)
 - `bootstrap.js` — API routes: GET (5 endpoints) (~1719 tok)
-- `socket.js` — API routes: GET, POST (3 endpoints) (~10061 tok)
+- `socket.js` — API routes: GET, POST (3 endpoints) (~10105 tok)
 
 ## F:/connexio_back2/database/
 
@@ -367,12 +381,12 @@
 
 ## F:/connexio_back2/modules/professor/
 
-- `professor.controller.js` — Exports getProfessorDashboard, getProjectDrillDown, getStudentProgress (~1576 tok)
-- `professor.routes.js` — API routes: GET (3 endpoints) (~150 tok)
+- `professor.controller.js` — GET /api/professor/supervisions — projects this professor is supervising or has applied to (~1846 tok)
+- `professor.routes.js` — API routes: GET (4 endpoints) (~173 tok)
 
 ## F:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) (~19956 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~20233 tok)
 - `projects.routes.js` — API routes: GET, PUT, POST, DELETE (30 endpoints) (~853 tok)
 
 ## F:/connexio_back2/modules/skills/
@@ -387,8 +401,8 @@
 
 ## F:/connexio_back2/modules/users/
 
-- `user.controller.js` — modules/users/user.controller.js (~8653 tok)
-- `user.routes.js` — modules/users/user.routes.js (~625 tok)
+- `user.controller.js` — modules/users/user.controller.js (~8855 tok)
+- `user.routes.js` — modules/users/user.routes.js (~644 tok)
 
 ## F:/connexio_back2/services/
 
@@ -412,21 +426,21 @@
 ## f:/Connexio_Frontend2/src/components/
 
 - `AIMessageBubble.jsx` — Renders AI response in chat: content, source pills (no labels to user), Continue in AI Chat link. (~200 tok)
-- `IdeaCard.jsx` — Idea card with match score badge (green/yellow/red), tech stack, looking_for, join button. (~250 tok)
-- `ProjectDrillDown.jsx` — Modal: project task stats, team members, task list. Calls /professor/projects/:id. (~300 tok)
-- `RecommendationCard.jsx` — Skill gap recommendation with roadmap.sh link + Add to Profile button. (~150 tok)
-- `SkillGapWidget.jsx` — Compact widget showing top 5 skill gaps with link to /profile/skills/analysis. (~100 tok)
-- `StudentProgressModal.jsx` — Modal: student tasks completed/open, skills, evidence. Calls /professor/students/:id. (~250 tok)
-- `SubmitIdeaModal.jsx` — Modal form: title, description, tech_stack CSV, looking_for role multi-select. (~300 tok)
-- `TaskCreationConfirm.jsx` — Confirm modal for AI-suggested task creation. Posts to /tasks. (~200 tok)
-
 - `AIMessageBubble.jsx` — AIMessageBubble (~584 tok)
+- `AIToolbar.jsx` — ACTIONS — renders form (~3767 tok)
+- `IdeaCard.jsx` — Idea card with match score badge (green/yellow/red), tech stack, looking_for, join button. (~250 tok)
 - `IdeaCard.jsx` — IdeaCard (~971 tok)
+- `ProjectDrillDown.jsx` — Modal: project task stats, team members, task list. Calls /professor/projects/:id. (~300 tok)
 - `ProjectDrillDown.jsx` — ProjectDrillDown (~1372 tok)
+- `RecommendationCard.jsx` — Skill gap recommendation with roadmap.sh link + Add to Profile button. (~150 tok)
 - `RecommendationCard.jsx` — RecommendationCard (~627 tok)
+- `SkillGapWidget.jsx` — Compact widget showing top 5 skill gaps with link to /profile/skills/analysis. (~100 tok)
 - `SkillGapWidget.jsx` — SkillGapWidget (~468 tok)
+- `StudentProgressModal.jsx` — Modal: student tasks completed/open, skills, evidence. Calls /professor/students/:id. (~250 tok)
 - `StudentProgressModal.jsx` — StudentProgressModal (~1230 tok)
+- `SubmitIdeaModal.jsx` — Modal form: title, description, tech_stack CSV, looking_for role multi-select. (~300 tok)
 - `SubmitIdeaModal.jsx` — ROLE_OPTIONS — renders form (~1616 tok)
+- `TaskCreationConfirm.jsx` — Confirm modal for AI-suggested task creation. Posts to /tasks. (~200 tok)
 - `TaskCreationConfirm.jsx` — TaskCreationConfirm (~861 tok)
 
 ## f:/Connexio_Frontend2/src/components/shared/
@@ -449,92 +463,132 @@
 
 ## f:/Connexio_Frontend2/src/pages/
 
+- `ConnexioAI.jsx` — formatTime (~14319 tok)
 - `ConnexioHub.jsx` — REACTIONS (~29301 tok)
 - `Courses.jsx` — Course list page; professors create, students view enrolled. GET/POST /api/courses. (~1543 tok)
-- `IdeaDetail.jsx` — Full idea view with team formation preview, role coverage, join/leave. (~1884 tok)
+- `IdeaDetail.jsx` — ScoreBar (~5421 tok)
 - `IdeaMarketplace.jsx` — Ideas grid with search, skill-match scores, submit modal. Route: /ideas. (~994 tok)
-- `MentorBrowser.jsx` — Browse users, invite as mentor via /projects/:id/mentor/invite. Route: /mentors. (~1521 tok)
+- `MentorBrowser.jsx` — Supervisor Hub (professor/TA only). Professors browse student projects and offer supervision. Shows active + pending supervisions. Route: /supervisors. (~2200 tok)
 - `ProfessorCourses.jsx` — Professor course management page. Route: /admin/courses. (~1538 tok)
 - `ProfessorDashboard.jsx` — Stats + project risk + student performance. Gated: professor/TA. Route: /admin/dashboard. (~1864 tok)
-- `ProjectDetail.jsx` — PHASES — includes Settings tab (ai_trigger) for owners. (~23701 tok)
+- `ProjectDetail.jsx` — PHASES (~26202 tok)
 - `Projects.jsx` — ─── helpers ────────────────────────────────────────────────────────────────── (~10788 tok)
-- `SkillAnalysis.jsx` — Skill gaps vs project experience + roadmap.sh recommendations. Route: /profile/skills/analysis. (~1208 tok)
+- `SkillAnalysis.jsx` — SkillAnalysis (~1976 tok)
 
 ## f:/MasarX_A/
 
+- `DEPLOY.md` — MasarX — Deployment Reference (~565 tok)
 - `docker-compose.yml` — Docker Compose services (~144 tok)
+- `FRONTEND_TASKS.md` — Frontend Tasks (for the React agent) (~1500 tok)
+- `GAP_1.5_TESTING.md` — Gap 1.5 — Sprint-Scoped Task Generation — Testing Guide (~1382 tok)
+- `GAPS.md` — MasarX — Critical Gaps, Improvements & Open Questions (~11717 tok)
+- `IMPLEMENTATION_PLAN.md` — MasarX — Implementation Plan (~5096 tok)
+- `IMPLEMENTATION_TESTING.md` — Implementation Testing Guide — Plan Execution (2026-06-03) (~2005 tok)
+- `MASARX_GRAPHS_AND_INTENTS.md` — MasarX — Graphs, Intents & Logic Reference (~4386 tok)
+- `NOTES.md` — MasarX Integration Notes (~5487 tok)
+- `README.md` — Project documentation (~10845 tok)
+- `test_gemini.py` — test_basic, test_json_output, test_rate_limits, test_large_json (~1096 tok)
+- `test_openrouter.py` — test_model, grade, main (~1727 tok)
+
+## f:/MasarX_A/.wolf/
+
+- `buglog.json` — Declares backends (~3370 tok)
 
 ## f:/MasarX_A/docs/documentation/
 
 - `documentation.md` — Connexio Platform — Release Documentation (~7541 tok)
 
+## f:/MasarX_A/nginx/
+
+- `masarx.conf` — MasarX Agent — nginx reverse proxy (~491 tok)
+
 ## f:/MasarX_A/scratch/
 
-- `test_all_subgraphs.py` — get_state, dump, run_test, test_match_team (~2902 tok)
+- `test_all_subgraphs.py` — get_state, dump, run_test, test_match_team (~6508 tok)
 
 ## f:/MasarX_A/src/
 
-- `celery_app.py` (~701 tok)
+- `celery_app.py` (~818 tok)
 - `main.py` — API: 1 endpoints (~1958 tok)
 
 ## f:/MasarX_A/src/Routes/
 
-- `webhook_routes.py` — API: 4 endpoints (~11175 tok)
+- `webhook_routes.py` — API: 3 endpoints (~12806 tok)
 
 ## f:/MasarX_A/src/controllers/
 
-- `WorkflowController.py` — _MemoryCache: get, set, get, set + 13 more (~4519 tok)
+- `WorkflowController.py` — _MemoryCache: get, set, get, set + 13 more (~5497 tok)
+
+## f:/MasarX_A/src/controllers/edges/
+
+- `conditions.py` — route_to_subgraph, should_execute_plan, has_error, is_hitl_required (~523 tok)
 
 ## f:/MasarX_A/src/controllers/subgraphs/
 
-- `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report, save_audit_node (~2322 tok)
-- `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 5 more (~9606 tok)
-- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~3389 tok)
-- `pr_translator_subgraph.py` — Pydantic: PRBusinessSummary (~2209 tok)
-- `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~2384 tok)
-- `task_subgraph.py` — check_for_cycles, has_cycle, check_global_cycles, has_cycle (~11853 tok)
-- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~6289 tok)
+- `audit_subgraph.py` — AuditSubgraphState: fetch_global_context, generate_audit_report (~4168 tok)
+- `doc_subgraph.py` — DocSubgraphState: fetch_doc_context, aggregate_context_node, get_github, get_rag + 4 more (~11447 tok)
+- `ideas_subgraph.py` — IdeasSubgraphState: validate_idea_node, preview_team_node (~2275 tok)
+- `monitor_subgraph.py` — Phase 5.4 (G2): removed unused tavily_tool import (~5629 tok)
+- `pr_translator_subgraph.py` — Pydantic: PRBusinessSummary (~3887 tok)
+- `skill_endorsement_subgraph.py` — Pydantic: EndorsedSkill (~4690 tok)
+- `task_subgraph.py` — check_for_cycles, has_cycle, check_global_cycles, has_cycle (~20788 tok)
+- `team_subgraph.py` — TeamSubgraphState: fetch_target_context, cosine_similarity, team_matching_node, invitation_drafter + (~8063 tok)
 
 ## f:/MasarX_A/src/helpers/
 
+- `config.py` — Settings: get_settings (~1483 tok)
 
 ## f:/MasarX_A/src/models/db_schemas/
 
+- `live_models.py` — ProjectStatus: id, title, id, title + 1 more (~2452 tok)
 - `seed_data.py` — seed_data, init_database (~1036 tok)
 
 ## f:/MasarX_A/src/models/schemas/
 
-- `state.py` — MasarXState: add_results (~714 tok)
+- `state.py` — MasarXState: add_results (~732 tok)
+- `task_schema.py` — --- Requirement Parsing --- (~1389 tok)
 
 ## f:/MasarX_A/src/stores/llm/
 
+
+## f:/MasarX_A/src/stores/llm/providers/
+
+- `OpenAIProvider.py` — OpenAIProvider: set_generation_model, set_embedding_model, process_text, generate_text + 5 more (~8065 tok)
+- `OpenRouterProvider.py` — Declares OpenRouterProvider (~478 tok)
 
 ## f:/MasarX_A/src/stores/vectordb/
 
 
 ## f:/MasarX_A/src/tasks/
 
-- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan, cleanup_webhook_results, cleanup_pending_plans (~1824 tok)
+- `cron_jobs.py` — Celery tasks: run_workload_scan, run_risk_scan, run_match_precompute, cleanup_webhook_results, clean (~3236 tok)
 
 ## f:/MasarX_A/src/utils/
 
+- `backend_client.py` — BackendApiClient: close, health_check, sync_tasks, sync_user_profile + 6 more (~4556 tok)
+- `model_rotator.py` — ModelRotator: mark_rate_limited, iter_with_fallback (~838 tok)
 
 ## f:/MasarX_A/src/utils/prompts/
 
 - `audit_prompts.py` (~384 tok)
 - `doc_prompts.py` (~830 tok)
+- `monitor_prompts.py` (~837 tok)
+- `task_prompts.py` — --- Requirements Parser Prompts --- (~2116 tok)
 
 ## f:/MasarX_A/src/utils/tools/
 
+- `db_tool.py` — DBTool: initialize, seed_data, get_project, update_project_repo + 3 more (~9093 tok)
+- `github_tool.py` — pyrefly: ignore [missing-import] (~4183 tok)
+- `skill_recommender_tool.py` — Skill recommender — suggests learning paths based on user skills and project requirements. (~2091 tok)
 
 ## f:/connexio_back2/
 
 - `app.js` — app: startServer (~704 tok)
-- `bootstrap.js` — API routes: GET (5 endpoints) (~1724 tok)
+- `bootstrap.js` — API routes: GET (5 endpoints) (~1826 tok)
 
 ## f:/connexio_back2/database/
 
-- `dbconnection.js` — database/dbconnection.js - MySQL Version (~5632 tok)
+- `dbconnection.js` — database/dbconnection.js - MySQL Version (~8854 tok)
 
 ## f:/connexio_back2/middleware/
 
@@ -548,6 +602,7 @@
 
 ## f:/connexio_back2/modules/ai/
 
+- `ai.routes.js` — Resolve the effective project ID from route param, query override, or DB fallback. (~2683 tok)
 
 ## f:/connexio_back2/modules/auth/
 
@@ -561,11 +616,6 @@
 - `contracts.controller.js` — createProjectContract, getContractStatus, signContract (in-app SHA-256 signing). (~250 tok)
 - `contracts.routes.js` — POST/GET /projects/:projectId + POST /projects/:projectId/sign. (~80 tok)
 
-## f:/connexio_back2/modules/payments/
-
-- `payments.controller.js` — POST /api/payments/create-checkout (~512 tok)
-- `payments.routes.js` — API routes: POST, GET (3 endpoints) (~142 tok)
-
 ## f:/connexio_back2/modules/courses/
 
 - `courses.controller.js` — CRUD for courses, course_members, course_projects. Professor-only create. (~600 tok)
@@ -573,18 +623,23 @@
 
 ## f:/connexio_back2/modules/ideas/
 
-- `ideas.controller.js` — Idea Marketplace: submit, list (AI skill-match scored), get, join, leave, status. (~700 tok)
-- `ideas.routes.js` — POST/GET /ideas + /:id/join + /:id/leave + /:id/status (~70 tok)
+- `ideas.controller.js` — Exports submitIdea, listIdeas, getIdea, updateIdeaStatus + 4 more (~6649 tok)
+- `ideas.routes.js` — API routes: POST, GET, DELETE, PATCH (16 endpoints) (~386 tok)
+
+## f:/connexio_back2/modules/payments/
+
+- `payments.controller.js` — POST /api/payments/create-checkout (~512 tok)
+- `payments.routes.js` — API routes: POST, GET (3 endpoints) (~142 tok)
 
 ## f:/connexio_back2/modules/professor/
 
-- `professor.controller.js` — Professor dashboard overview, project drill-down, student progress. Requires professor/TA role. (~600 tok)
-- `professor.routes.js` — GET /professor/dashboard + /professor/projects/:id + /professor/students/:studentId (~80 tok)
+- `professor.controller.js` — Dashboard overview, project drill-down, student progress, + getMySupervisedProjects (GET /professor/supervisions). Requires professor/TA role. (~700 tok)
+- `professor.routes.js` — GET /professor/dashboard + /professor/supervisions + /professor/projects/:id + /professor/students/:studentId (~200 tok)
 
 ## f:/connexio_back2/modules/projects/
 
-- `projects.controller.js` — API routes: POST (1 endpoints) + B8 mentor endpoints at end of file (~13500 tok)
-- `projects.routes.js` — API routes: POST, GET, PUT, DELETE (20+ endpoints) incl. mentor routes (~500 tok)
+- `projects.controller.js` — API routes: POST (1 endpoints) (~23307 tok)
+- `projects.routes.js` — API routes: GET, PUT, POST, DELETE (34 endpoints) (~982 tok)
 
 ## f:/connexio_back2/modules/skills/
 
@@ -593,16 +648,16 @@
 
 ## f:/connexio_back2/modules/sprints/
 
-- `sprints.routes.js` — Membership guard — only project members can manage sprints. (~1470 tok)
+- `sprints.routes.js` — Membership guard — only project members can manage sprints. (~1786 tok)
 
 ## f:/connexio_back2/modules/tasks/
 
-- `tasks.controller.js` — modules/tasks/tasks.controller.js (~6424 tok)
+- `tasks.controller.js` — modules/tasks/tasks.controller.js (~7510 tok)
 
 ## f:/connexio_back2/modules/users/
 
-- `user.controller.js` — modules/users/user.controller.js (~8348 tok)
-- `user.routes.js` — modules/users/user.routes.js (~525 tok)
+- `user.controller.js` — modules/users/user.controller.js (~9462 tok)
+- `user.routes.js` — modules/users/user.routes.js (~684 tok)
 
 ## f:/connexio_back2/modules/webhooks/
 

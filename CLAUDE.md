@@ -8,7 +8,7 @@ This project uses OpenWolf for context management. Read and follow .wolf/OPENWOL
 
 # CLAUDE.md — Connexio Platform Master Reference
 
-> **Last updated:** 2026-06-02 — Phase 3 implementation complete (all 21 items). Hostinger needs `git pull` + restart. RAG needs `git pull` + restart (NLPController shortcut handlers). Phase 4 ready to start.
+> **Last updated:** 2026-06-02 — Phase 3 complete + post-Phase-3 fixes/refinements applied (see §6 addendum). Hostinger needs `git pull` + restart. RAG shortcut handlers already deployed. Phase 4 ready to start.
 > **Source of truth for ecosystem details:** `F:\MasarX_A\AGENTS.md`
 > **Execution plans:** `F:\MasarX_A\.opencode\plans\`
 >
@@ -79,7 +79,7 @@ Connection pool: 20 connections. `query()` helper in `dbconnection.js` converts 
 
 **New tables (added Phase 0):** `project_contracts`, `contract_signatures`, `active_sessions`
 
-**Phase 3 tables (added):** `courses`, `course_members`, `course_projects`, `project_ideas`, `idea_members`, `mentor_applications`
+**Phase 3 tables (added):** `courses`, `course_members`, `course_projects`, `project_ideas`, `idea_members`, `mentor_applications` (supervisor requests — backend name kept as-is; UI calls them "supervision requests")
 
 **Planned tables:** `analytics_daily`, `push_subscriptions` (mobile Phase 5)
 
@@ -181,10 +181,22 @@ At project creation, owner picks: `commitment` / `nda` / `both` / `none`.
 - NDA template = Phase 2. Real provider integration = Phase 2.
 
 ### Professor / TA Dashboard
-New page at `/admin/dashboard`, gated by `user_type IN ('professor', 'ta')`.
+Page at `/admin/dashboard`, gated by `user_type IN ('professor', 'ta')`.
 - Different from the system-admin Electron panel at `F:\connexio-adminPanel`.
 - Shows: course list, per-project risk overview (🟢🟡🔴), student performance table, contribution evidence drill-down.
 - New `professorMiddleware.js` + `professor.controller.js`.
+
+### Supervisor Hub
+
+Page at `/supervisors`, visible **only** to users with `user_type IN ('professor', 'ta')` — hidden from students and other roles.
+
+- **Professor-initiated flow:** professor browses active student projects → clicks "Offer to Supervise" → `POST /projects/:id/mentor/apply` → project owner receives a `system` Notification.
+- Owner responds via `PUT /projects/:id/mentor/:mentorId/respond` with `action: 'accepted' | 'declined'`.
+- Accepted supervisions appear in the Supervisor Hub under "Currently Supervising".
+- Pending requests appear under "Pending Requests".
+- Backend table: `mentor_applications` (source='apply' for professor-initiated). Backend names unchanged from implementation — only UI labels say "Supervisor".
+- `GET /api/professor/supervisions` — returns all applications where `mentor_id = req.user.UID`.
+- **Org-mode supervisor invite flow:** deferred / removed. Not implemented.
 
 ### Idea Marketplace
 Page at `/ideas` and `/ideas/:id`. Public platform-wide.
@@ -195,10 +207,40 @@ Page at `/ideas` and `/ideas/:id`. Public platform-wide.
 - Tables: `project_ideas`, `idea_members`.
 
 ### Skill Gap Analysis
-- Profile widget: top 5 gaps (skills used in projects but not in profile).
+
+- Profile widget (`SkillGapWidget`): always visible — shows gaps or "No gaps detected!" when profile is complete.
 - Full page: `/profile/skills/analysis`.
 - Learning links: roadmap.sh (free, MIT).
-- Sources: declared skills + endorsed skills (MasarX) + task history + project tech stacks.
+- Sources: declared skills + project `technologyUsed` JSON + `contribution_evidence.metadata.skills`.
+
+---
+
+## 6b. Post-Phase-3 Refinements (applied 2026-06-02)
+
+These were discovered during Phase 3 integration testing and fixed immediately.
+
+### AI Chat — Group Chat Streaming
+
+- `DirectMessages.jsx` now handles `ai_chunk` + `ai_typing` socket events with a live streaming bubble (accumulates text as chunks arrive, clears on `ai_typing: false` or room switch).
+- AI source pills rendered inside `MsgContent` for `type === 'ai_response'` messages.
+- Slash command autocomplete: typing `/` in chat shows a 5-item dropdown (`/summary`, `/tasks`, `/blame`, `/docs`, `/audit`). Filters as you type.
+- `@mention` member autocomplete: typing `@` shows room participants filtered by typed text; clicking inserts `@FullName `.
+- `AI Trigger Keyword` in ProjectDetail Settings tab: saves with `toast.success/error`; blocks save if trigger matches a project member's full name.
+
+### Pro Model Tier — RAG
+
+- `socket.accountType` stored from JWT at auth time (`decoded.account_type`).
+- Both RAG streaming paths (ai_chatbot room + group chat @mention) pass `model_tier: 'generation'` for Pro users, `'auto'` for everyone else.
+
+### Supervisor Hub Route
+
+- Route `/mentors` renamed to `/supervisors`. `MentorBrowser.jsx` rewritten as professor-initiated project browser.
+- Sidebar `supervisors` entry only renders when `user?.user_type === 'professor' || 'ta'`.
+- `GET /api/users/mentors` endpoint kept (returns users with `user_type IN ('mentor','supervisor')`) but not used by the supervisor page.
+
+### Project Group Chat Member Auto-Sync
+
+- `addProjectMember` in `projects.controller.js` now calls `ChatRoom.findOneAndUpdate` with `$addToSet: { participants }` after `INSERT INTO project_members` — new project members are automatically added to the project group room.
 
 ---
 
@@ -242,11 +284,19 @@ Page at `/ideas` and `/ideas/:id`. Public platform-wide.
 - **401 redirect:** `window.location.href = '/login'` (not React Router navigate).
 - **Tailwind content:** `tailwind.config.js` must include all `src/**/*.{js,jsx,ts,tsx}` — extended in Phase 1.
 
+### Socket.IO (Backend)
+
+- `socket.accountType` is set at auth time from `decoded.account_type` (JWT). Always available on the socket object — no extra DB query needed.
+- RAG `model_tier` param: use `socket.accountType === 'pro' ? 'generation' : 'auto'` in both streaming paths.
+- `ai_chunk` events carry `{ roomId, chunk }`. `ai_typing` carries `{ roomId, typing: bool }`. Both scoped to a specific room.
+- After adding a project member, call `ChatRoom.findOneAndUpdate({ 'metadata.projectId': String(pid), type: 'group' }, { $addToSet: { participants: uid } })` to keep the group room in sync.
+
 ### RAG (Python)
 - All context injection goes through `NLPController._prepare_chat_context()`.
 - Session key format: `{project_id}_{user_id}` (unified across @mention and AI Chat page).
 - Token budget: 8000 for project-context queries.
 - GITHUB_TOKEN needed for L4 (recent commits) context injection.
+- Shortcut commands (`/summary` etc.) are intercepted at the top of both `answer_agent_chat` and `answer_agent_chat_stream` via `SHORTCUT_COMMANDS` dict — they force `model_tier='generation'`.
 
 ### MasarX (Python)
 - All new intents need routing in `WorkflowController.py` and a subgraph entry.
@@ -360,7 +410,7 @@ src/
 
 | Risk | Mitigation |
 |------|-----------|
-| B30 Socket.IO @mention — breaks all chat | Feature flag `AI_TRIGGER_ENABLED=false`. Test isolated before flipping. |
+| B30 Socket.IO @mention — breaks all chat | ✅ Resolved — streaming tested stable. Feature flag `AI_TRIGGER_ENABLED=false` still available as circuit-breaker. |
 | B18 JWT invalidation — locks out all users | Implement last in Phase 2. Test with 2 concurrent users. |
 | Stripe webhook misconfiguration | Use `stripe listen` locally + verify signature on every webhook |
 | Contract enforcement race condition | Always check `project_contracts` before `project_members` delete |

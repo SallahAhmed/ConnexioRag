@@ -1970,6 +1970,1557 @@
       "related_bugs": [],
       "occurrences": 1,
       "last_seen": "2026-06-02T14:16:35.481Z"
+    },
+    {
+      "id": "bug-122",
+      "timestamp": "2026-06-02T14:28:51.161Z",
+      "error_message": "Missing guard clause",
+      "file": "F:/Connexio_Frontend2/src/pages/Dashboard/DirectMessages.jsx",
+      "root_cause": "No early return/throw for edge case: activeRoomRef.current?.roomId === msg.roomId",
+      "fix": "Added guard clause: if (activeRoomRef.current?.roomId === msg.ro)",
+      "tags": [
+        "auto-detected",
+        "guard-clause",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:28:51.161Z"
+    },
+    {
+      "id": "bug-123",
+      "timestamp": "2026-06-02T14:29:11.899Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/pages/Dashboard/DirectMessages.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: if (isAI) {; const sources = msg.metadata?.sources;",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-02T14:30:58.776Z"
+    },
+    {
+      "id": "bug-124",
+      "timestamp": "2026-06-02T14:30:09.651Z",
+      "error_message": "CSS fix: id",
+      "file": "F:/Connexio_Frontend2/src/components/Sidebar.jsx",
+      "root_cause": "id: 'hub', path: '/hub', icon: Hash → 'mentors', path: '/mentors', icon: UserCheck",
+      "fix": "Changed id: 'hub', path: '/hub', icon: Hash → 'mentors', path: '/mentors', icon: UserCheck",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:30:09.651Z"
+    },
+    {
+      "id": "bug-125",
+      "timestamp": "2026-06-02T14:45:49.448Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/users/user.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:45:49.448Z"
+    },
+    {
+      "id": "bug-126",
+      "timestamp": "2026-06-02T14:48:14.958Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/pages/Dashboard/DirectMessages.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:48:14.958Z"
+    },
+    {
+      "id": "bug-127",
+      "timestamp": "2026-06-02T14:49:48.239Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T14:49:48.239Z"
+    },
+    {
+      "id": "bug-128",
+      "timestamp": "2026-06-02T15:59:45.880Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/connexio_back2/socket.js",
+      "root_cause": "Had 'auto'",
+      "fix": "Changed to 'pro'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T15:59:45.880Z"
+    },
+    {
+      "id": "bug-129",
+      "timestamp": "2026-06-02T16:00:01.776Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/professor/professor.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:00:01.776Z"
+    },
+    {
+      "id": "bug-130",
+      "timestamp": "2026-06-02T16:00:51.936Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "F:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:00:51.936Z"
+    },
+    {
+      "id": "bug-131",
+      "timestamp": "2026-06-02T16:02:17.950Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/components/Sidebar.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:02:17.950Z"
+    },
+    {
+      "id": "bug-132",
+      "timestamp": "2026-06-02T16:02:24.324Z",
+      "error_message": "CSS fix: id",
+      "file": "F:/Connexio_Frontend2/src/components/Sidebar.jsx",
+      "root_cause": "id: 'mentors', path: '/mentors', icon: UserCheck → 'supervisors', path: '/supervisors', icon: UserCheck",
+      "fix": "Changed id: 'mentors', path: '/mentors', icon: UserCheck → 'supervisors', path: '/supervisors', icon: UserCheck",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:02:24.324Z"
+    },
+    {
+      "id": "bug-133",
+      "timestamp": "2026-06-02T16:02:36.223Z",
+      "error_message": "Wrong reference: MentorBrowser should be Supervisors",
+      "file": "F:/Connexio_Frontend2/src/App.jsx",
+      "root_cause": "Used \"MentorBrowser\" instead of \"Supervisors\"",
+      "fix": "Changed MentorBrowser → Supervisors",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:02:36.223Z"
+    },
+    {
+      "id": "bug-134",
+      "timestamp": "2026-06-02T16:02:41.010Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/Connexio_Frontend2/src/App.jsx",
+      "root_cause": "Had \"/mentors\"",
+      "fix": "Changed to \"/supervisors\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:02:41.010Z"
+    },
+    {
+      "id": "bug-135",
+      "timestamp": "2026-06-02T16:02:46.074Z",
+      "error_message": "Incorrect value in code",
+      "file": "F:/Connexio_Frontend2/src/context/AppContext.jsx",
+      "root_cause": "Had 'Mentors'",
+      "fix": "Changed to 'Supervisors'",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-02T16:02:51.590Z"
+    },
+    {
+      "id": "bug-136",
+      "timestamp": "2026-06-02T16:04:46.947Z",
+      "error_message": "Null/undefined access in ",
+      "file": "F:/Connexio_Frontend2/src/pages/Dashboard/DirectMessages.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:04:46.947Z"
+    },
+    {
+      "id": "bug-137",
+      "timestamp": "2026-06-02T16:08:34.653Z",
+      "error_message": "Null/undefined access in ",
+      "file": "CLAUDE.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:08:34.653Z"
+    },
+    {
+      "id": "bug-138",
+      "timestamp": "2026-06-02T16:13:09.639Z",
+      "error_message": "Function not marked async",
+      "file": "F:/MasarX_A/docs/documentation/documentation.md",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-02T16:13:09.639Z"
+    },
+    {
+      "id": "bug-139",
+      "timestamp": "2026-06-03T03:36:12.622Z",
+      "error_message": "Wrong reference: 2048 should be 3000",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "Used \"2048\" instead of \"3000\"",
+      "fix": "Changed 2048 → 3000",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T03:36:12.622Z"
+    },
+    {
+      "id": "bug-140",
+      "timestamp": "2026-06-03T04:15:31.165Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/utils/tools/skill_recommender_tool.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 10→50 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T04:15:31.165Z"
+    },
+    {
+      "id": "bug-141",
+      "timestamp": "2026-06-03T04:43:13.146Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T04:43:13.146Z"
+    },
+    {
+      "id": "bug-142",
+      "timestamp": "2026-06-03T05:02:44.317Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/bootstrap.js",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 7→12 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:02:44.317Z"
+    },
+    {
+      "id": "bug-143",
+      "timestamp": "2026-06-03T05:22:06.708Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 25→34 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:22:06.708Z"
+    },
+    {
+      "id": "bug-144",
+      "timestamp": "2026-06-03T05:49:13.192Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/utils/tools/skill_recommender_tool.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 8→11 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:49:13.192Z"
+    },
+    {
+      "id": "bug-145",
+      "timestamp": "2026-06-03T05:55:45.576Z",
+      "error_message": "CSS fix: background, border, color",
+      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "background: 'var(--cx-primary)', color: '#fff', → 'rgba(234,33,67,0.05)', borderRadius: 12,; border: '1px solid var(--cx-border)', → '1px solid rgba(234,33,67,0.2)', padding: 20, marginTop: 20,; color: 'var(--cx-text-3)', fontSize: 11, marginTop: 8 → 'var(--cx-text-2)', fontSize: 12, marginBottom: 14, marginTop: 0",
+      "fix": "Changed background: 'var(--cx-primary)', color: '#fff', → 'rgba(234,33,67,0.05)', borderRadius: 12,; border: '1px solid var(--cx-border)', → '1px solid rgba(234,33,67,0.2)', padding: 20, marginTop: 20,; color: 'var(--cx-text-3)', fontSize: 11, marginTop: 8 → 'var(--cx-text-2)', fontSize: 12, marginBottom: 14, marginTop: 0",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:55:45.576Z"
+    },
+    {
+      "id": "bug-146",
+      "timestamp": "2026-06-03T05:56:07.007Z",
+      "error_message": "Missing error handling in CloseProjectButton",
+      "file": "f:/Connexio_Frontend2/src/pages/ProjectDetail.jsx",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:56:07.007Z"
+    },
+    {
+      "id": "bug-147",
+      "timestamp": "2026-06-03T05:56:33.788Z",
+      "error_message": "Missing await",
+      "file": "f:/Connexio_Frontend2/src/pages/SkillAnalysis.jsx",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:56:33.788Z"
+    },
+    {
+      "id": "bug-148",
+      "timestamp": "2026-06-03T05:56:48.208Z",
+      "error_message": "CSS fix: fontSize, color",
+      "file": "f:/Connexio_Frontend2/src/pages/SkillAnalysis.jsx",
+      "root_cause": "fontSize: 22, fontWeight: 800, color: 'var(--cx-text)', marginBottom: 6, marginTop: 0 → 12, padding: '4px 12px', borderRadius: 20,; color: 'var(--cx-text-2)', fontSize: 13, marginBottom: 28 → aiLoading ? 'var(--cx-text-3)' : '#fff',",
+      "fix": "Changed fontSize: 22, fontWeight: 800, color: 'var(--cx-text)', marginBottom: 6, marginTop: 0 → 12, padding: '4px 12px', borderRadius: 20,; color: 'var(--cx-text-2)', fontSize: 13, marginBottom: 28 → aiLoading ? 'var(--cx-text-3)' : '#fff',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T05:56:48.209Z"
+    },
+    {
+      "id": "bug-149",
+      "timestamp": "2026-06-03T06:00:03.007Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/ideas/ideas.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:00:03.007Z"
+    },
+    {
+      "id": "bug-150",
+      "timestamp": "2026-06-03T06:00:40.261Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/Connexio_Frontend2/src/pages/IdeaDetail.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: {/* AI Actions */}; <div style={{ display: 'flex', gap: 10, marginBottom: 20, fl",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T06:01:04.961Z"
+    },
+    {
+      "id": "bug-151",
+      "timestamp": "2026-06-03T06:02:08.786Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/NOTES.md",
+      "root_cause": "Had `POST /api/ideas/:id/validate`",
+      "fix": "Changed to `preview_team`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 4,
+      "last_seen": "2026-06-03T06:02:43.986Z"
+    },
+    {
+      "id": "bug-152",
+      "timestamp": "2026-06-03T06:13:55.747Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:13:55.747Z"
+    },
+    {
+      "id": "bug-153",
+      "timestamp": "2026-06-03T06:37:20.740Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/WorkflowController.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:37:20.740Z"
+    },
+    {
+      "id": "bug-154",
+      "timestamp": "2026-06-03T06:38:16.532Z",
+      "error_message": "Wrong return value",
+      "file": "f:/MasarX_A/src/utils/tools/skill_recommender_tool.py",
+      "root_cause": "Was returning: self._default_recommendation(gaps, project_techs)",
+      "fix": "Now returns: self._default_recommendation(gaps)",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:38:16.532Z"
+    },
+    {
+      "id": "bug-155",
+      "timestamp": "2026-06-03T06:40:05.013Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 34→57 lines (3 removed) | Also: tasks_data=str(tasks_data)[:3000], # Truncate for ; activity_log=\"No recent activity logs available in",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T06:40:51.313Z"
+    },
+    {
+      "id": "bug-156",
+      "timestamp": "2026-06-03T06:40:25.450Z",
+      "error_message": "Wrong reference: TypedDict should be Optional",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+      "root_cause": "Used \"TypedDict\" instead of \"Optional\"",
+      "fix": "Changed TypedDict → Optional",
+      "tags": [
+        "auto-detected",
+        "wrong-reference",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:40:25.450Z"
+    },
+    {
+      "id": "bug-157",
+      "timestamp": "2026-06-03T06:41:12.358Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
+      "root_cause": "17 lines replaced/restructured",
+      "fix": "Rewrote 22→12 lines (17 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T06:41:12.358Z"
+    },
+    {
+      "id": "bug-158",
+      "timestamp": "2026-06-03T09:12:29.756Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/ideas_subgraph.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→5 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:12:29.756Z"
+    },
+    {
+      "id": "bug-159",
+      "timestamp": "2026-06-03T09:20:10.625Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/utils/tools/skill_recommender_tool.py",
+      "root_cause": "13 lines replaced/restructured",
+      "fix": "Rewrote 22→3 lines (13 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:20:10.625Z"
+    },
+    {
+      "id": "bug-160",
+      "timestamp": "2026-06-03T09:56:15.349Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/pr_translator_subgraph.py",
+      "root_cause": "Had \"{project.project_name}: {project.description}\"",
+      "fix": "Changed to \"{project.title}: {project.description}\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:56:15.349Z"
+    },
+    {
+      "id": "bug-161",
+      "timestamp": "2026-06-03T09:56:23.144Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 19→26 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:56:23.144Z"
+    },
+    {
+      "id": "bug-162",
+      "timestamp": "2026-06-03T09:56:26.139Z",
+      "error_message": "CSS fix: desc",
+      "file": "f:/Connexio_Frontend2/src/components/AIToolbar.jsx",
+      "root_cause": "desc: 'Generates a sprint retrospective report — what went well, what to improve, and action items.', → 'Manually generates a sprint retrospective report — what went well, what to improve, and action items. (Sprint close UI coming in Phase 4 — use this button as a manual trigger.)',",
+      "fix": "Changed desc: 'Generates a sprint retrospective report — what went well, what to improve, and action items.', → 'Manually generates a sprint retrospective report — what went well, what to improve, and action items. (Sprint close UI coming in Phase 4 — use this button as a manual trigger.)',",
+      "tags": [
+        "auto-detected",
+        "style-fix",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:56:26.139Z"
+    },
+    {
+      "id": "bug-163",
+      "timestamp": "2026-06-03T09:56:48.646Z",
+      "error_message": "Wrong return value",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
+      "root_cause": "Was returning: {\"error\": f\"Task '{task_id}' not found — skipping ",
+      "fix": "Now returns: {\"error\": f\"Task story_points ({task.story_points}",
+      "tags": [
+        "auto-detected",
+        "return-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:56:48.646Z"
+    },
+    {
+      "id": "bug-164",
+      "timestamp": "2026-06-03T09:57:32.214Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/backend_client.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:57:32.215Z"
+    },
+    {
+      "id": "bug-165",
+      "timestamp": "2026-06-03T09:57:55.919Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/monitor_subgraph.py",
+      "root_cause": "6 lines replaced/restructured",
+      "fix": "Rewrote 47→74 lines (6 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T09:57:55.919Z"
+    },
+    {
+      "id": "bug-166",
+      "timestamp": "2026-06-03T09:58:40.613Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/GAPS.md",
+      "root_cause": "Had `f:\\MasarX_A\\start.sh`",
+      "fix": "Changed to `start.sh`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T09:58:57.680Z"
+    },
+    {
+      "id": "bug-167",
+      "timestamp": "2026-06-03T10:04:38.442Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/ideas/ideas.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T10:04:38.442Z"
+    },
+    {
+      "id": "bug-168",
+      "timestamp": "2026-06-03T10:05:03.936Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/Connexio_Frontend2/src/pages/IdeaDetail.jsx",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T10:05:03.936Z"
+    },
+    {
+      "id": "bug-169",
+      "timestamp": "2026-06-03T10:05:20.446Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/Connexio_Frontend2/src/pages/IdeaDetail.jsx",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "jsx"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T10:05:20.446Z"
+    },
+    {
+      "id": "bug-170",
+      "timestamp": "2026-06-03T10:18:23.733Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/GAPS.md",
+      "root_cause": "Had `start_date`",
+      "fix": "Changed to `sprints`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 9,
+      "last_seen": "2026-06-03T10:19:28.551Z"
+    },
+    {
+      "id": "bug-171",
+      "timestamp": "2026-06-03T11:12:52.560Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "Had ', '",
+      "fix": "Changed to ') or '",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T11:12:52.560Z"
+    },
+    {
+      "id": "bug-172",
+      "timestamp": "2026-06-03T11:13:24.694Z",
+      "error_message": "Wrong operator: == should be !=",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "Used \"==\" instead of \"!=\"",
+      "fix": "Changed operator == → !=",
+      "tags": [
+        "auto-detected",
+        "operator-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T11:13:24.694Z"
+    },
+    {
+      "id": "bug-173",
+      "timestamp": "2026-06-03T12:22:55.541Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/test_openrouter.py",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 10→10 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T12:22:55.541Z"
+    },
+    {
+      "id": "bug-174",
+      "timestamp": "2026-06-03T12:27:49.962Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/test_openrouter.py",
+      "root_cause": "Had \"TIMEOUT (>45s)\"",
+      "fix": "Changed to \"TIMEOUT (>60s)\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T12:27:56.160Z"
+    },
+    {
+      "id": "bug-175",
+      "timestamp": "2026-06-03T12:41:12.254Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/test_openrouter.py",
+      "root_cause": "8 lines replaced/restructured",
+      "fix": "Rewrote 10→15 lines (8 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T12:41:12.254Z"
+    },
+    {
+      "id": "bug-176",
+      "timestamp": "2026-06-03T12:59:03.004Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/test_openrouter.py",
+      "root_cause": "12 lines replaced/restructured",
+      "fix": "Rewrote 15→13 lines (12 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T12:59:03.004Z"
+    },
+    {
+      "id": "bug-177",
+      "timestamp": "2026-06-03T13:06:05.676Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/stores/llm/providers/OpenRouterProvider.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 29→44 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T13:06:05.676Z"
+    },
+    {
+      "id": "bug-178",
+      "timestamp": "2026-06-03T13:08:14.031Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "25 lines replaced/restructured",
+      "fix": "Rewrote 61→98 lines (25 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T13:08:14.031Z"
+    },
+    {
+      "id": "bug-179",
+      "timestamp": "2026-06-03T16:45:00.000Z",
+      "error_message": "MasarX onboarding/sync tasks land in MySQL with points=0 and no deadline (Gap 2.2) — likely field-name mismatch, not a sync failure",
+      "file": "f:/connexio_back2/modules/tasks/tasks.controller.js (bulkCreateTasks) <-> MasarX sync payload",
+      "root_cause": "The MySQL bulk sync endpoint POST /api/tasks/bulk reads assigned_to / points / start_date / end_date. MasarX-side fields are named assignee_id / story_points / deadline. Mismatched keys are silently dropped, so tasks insert with points defaulting to 0 and end_date NULL even when the sync 'succeeds'.",
+      "fix": "Not yet applied — documented as the Q2.3 answer in F:/MasarX_A/GAPS.md. When implementing Gap 2.2, map assignee_id->assigned_to, story_points->points, deadline->end_date in the MasarX sync payload before POSTing to /api/tasks/bulk.",
+      "tags": [
+        "masarx",
+        "task-sync",
+        "field-mismatch",
+        "mysql",
+        "gaps-md",
+        "latent"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T16:45:00.000Z"
+    },
+    {
+      "id": "bug-180",
+      "timestamp": "2026-06-03T14:52:18.516Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "root_cause": "Had `ai_review_on_open_prs BOOL`",
+      "fix": "Changed to `tasks`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 3,
+      "last_seen": "2026-06-03T14:55:41.890Z"
+    },
+    {
+      "id": "bug-181",
+      "timestamp": "2026-06-03T15:02:25.128Z",
+      "error_message": "Function not marked async",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:02:25.128Z"
+    },
+    {
+      "id": "bug-182",
+      "timestamp": "2026-06-03T15:03:00.856Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/sprints/sprints.routes.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:03:00.856Z"
+    },
+    {
+      "id": "bug-183",
+      "timestamp": "2026-06-03T15:03:23.676Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/tasks/tasks.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check) | Also: end_date,; sprint_id",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T15:03:36.773Z"
+    },
+    {
+      "id": "bug-184",
+      "timestamp": "2026-06-03T15:04:01.002Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/modules/sprints/sprints.routes.js",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 9→11 lines (5 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:04:01.002Z"
+    },
+    {
+      "id": "bug-185",
+      "timestamp": "2026-06-03T15:08:28.651Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: # --- Gap 1.5: first sprint — persist this freshly generated; # roadmap, then emit only its first phase batch. Subsequent ",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T15:09:14.784Z"
+    },
+    {
+      "id": "bug-186",
+      "timestamp": "2026-06-03T15:09:05.459Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "5 lines replaced/restructured",
+      "fix": "Rewrote 16→35 lines (5 removed) | Also: sync_payloads.append({; \"points\": t[\"story_points\"]",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T15:09:36.108Z"
+    },
+    {
+      "id": "bug-187",
+      "timestamp": "2026-06-03T16:00:00.000Z",
+      "error_message": "MasarX-synced tasks land in MySQL with end_date NULL — deadline never persisted (resolves bug-179 residual)",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py (task_executor sync payload)",
+      "root_cause": "The sync payload already mapped assignee_id->assigned_to and story_points->points, but NEVER sent the deadline. The backend bulk endpoint reads end_date, so the deadline was silently dropped and every synced task got end_date NULL.",
+      "fix": "task_executor now maps deadline -> end_date (ISO string) in each sync payload, and also attaches sprint_id (Gap 1.5). Backend bulkCreateTasks persists sprint_id into the new tasks.sprint_id column.",
+      "tags": [
+        "masarx",
+        "task-sync",
+        "deadline",
+        "end_date",
+        "gap-1.5",
+        "bug-179"
+      ],
+      "related_bugs": [
+        "bug-179"
+      ],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T16:00:00.000Z"
+    },
+    {
+      "id": "bug-188",
+      "timestamp": "2026-06-03T16:05:00.000Z",
+      "error_message": "task_planner idempotency guard never fired — re-triggering create_tasks regenerated the plan every time",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/task_subgraph.py",
+      "root_cause": "The guard called db_tool.get_pending_plan(project_id), but that method expects an approval_token (queries WHERE approval_token = project_id => no match). It then called .get() on the returned SQLAlchemy ORM object, which has no .get() — the AttributeError was swallowed by the surrounding try/except. So the guard was dead code.",
+      "fix": "Switched to get_pending_plan_by_project(project_id) (already filters approved IS NULL + unexpired) and read ORM attributes (existing.plan_data, existing.approval_token) instead of .get(). This also strengthens Gap 1.5 cross-sprint duplicate prevention.",
+      "tags": [
+        "masarx",
+        "idempotency",
+        "pending-plan",
+        "orm",
+        "dead-code",
+        "gap-1.5"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T16:05:00.000Z"
+    },
+    {
+      "id": "bug-189",
+      "timestamp": "2026-06-03T16:10:00.000Z",
+      "error_message": "Sprint-close retro reported 0 completed tasks always, and counted project-wide instead of per-sprint",
+      "file": "f:/connexio_back2/modules/sprints/sprints.routes.js (close handler)",
+      "root_cause": "Retro summary used SUM(status='done') but the tasks.status ENUM has no 'done' value (it's 'completed'), so done was always 0. It also counted WHERE project_id=? (all project tasks) rather than the closing sprint's tasks.",
+      "fix": "Gap 1.5: scoped the summary to WHERE project_id=? AND sprint_id=?, switched to SUM(status='completed') for done and SUM(status NOT IN ('completed','cancelled')) for pending, wrapped in COALESCE.",
+      "tags": [
+        "backend",
+        "sprints",
+        "retro",
+        "status-enum",
+        "gap-1.5"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T16:10:00.000Z"
+    },
+    {
+      "id": "bug-190",
+      "timestamp": "2026-06-03T15:16:55.296Z",
+      "error_message": "Function not marked async",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "Function uses await but wasn't declared async",
+      "fix": "Added async modifier",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:16:55.297Z"
+    },
+    {
+      "id": "bug-191",
+      "timestamp": "2026-06-03T15:20:12.322Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "3 lines replaced/restructured",
+      "fix": "Rewrote 26→35 lines (3 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:20:12.322Z"
+    },
+    {
+      "id": "bug-192",
+      "timestamp": "2026-06-03T15:21:12.697Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/backend_client.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:21:12.697Z"
+    },
+    {
+      "id": "bug-193",
+      "timestamp": "2026-06-03T15:30:10.975Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/backend_client.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:30:10.975Z"
+    },
+    {
+      "id": "bug-194",
+      "timestamp": "2026-06-03T15:31:37.712Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/connexio_back2/modules/projects/projects.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:31:37.712Z"
+    },
+    {
+      "id": "bug-195",
+      "timestamp": "2026-06-03T15:34:19.965Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:34:19.965Z"
+    },
+    {
+      "id": "bug-196",
+      "timestamp": "2026-06-03T15:34:56.169Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/audit_subgraph.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 15→34 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:34:56.169Z"
+    },
+    {
+      "id": "bug-197",
+      "timestamp": "2026-06-03T15:35:53.977Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:35:53.977Z"
+    },
+    {
+      "id": "bug-198",
+      "timestamp": "2026-06-03T15:37:29.897Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 4→11 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T15:37:29.897Z"
+    },
+    {
+      "id": "bug-199",
+      "timestamp": "2026-06-03T17:30:00.000Z",
+      "error_message": "Audit/risk metadata could not be persisted — Document model had no metadata column and SQLAlchemy reserves `.metadata`",
+      "file": "f:/MasarX_A/src/models/db_schemas/live_models.py + db_tool.save_document",
+      "root_cause": "Gap 3.2/7.1 need a machine-readable summary on masarx_documents, but `metadata` is a reserved attribute name on SQLAlchemy declarative models.",
+      "fix": "Added doc_metadata = Column('metadata', JSONB) (attribute doc_metadata -> DB column metadata) + idempotent ALTER, and save_document now writes doc_data['metadata'].",
+      "tags": [
+        "masarx",
+        "sqlalchemy",
+        "reserved-name",
+        "gap-3.2",
+        "gap-7.1"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T17:30:00.000Z"
+    },
+    {
+      "id": "bug-200",
+      "timestamp": "2026-06-03T19:51:32.455Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/tools/github_tool.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T19:51:32.455Z"
+    },
+    {
+      "id": "bug-201",
+      "timestamp": "2026-06-03T19:51:59.469Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/Routes/webhook_routes.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T19:51:59.469Z"
+    },
+    {
+      "id": "bug-202",
+      "timestamp": "2026-06-03T19:55:03.287Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: await _notify_scaffold_failure(state, repo_name, description",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T19:55:10.093Z"
+    },
+    {
+      "id": "bug-203",
+      "timestamp": "2026-06-03T19:55:17.409Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/doc_subgraph.py",
+      "root_cause": "Had \"error\"",
+      "fix": "Changed to \"GitHub API timeout\"",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T19:55:17.409Z"
+    },
+    {
+      "id": "bug-204",
+      "timestamp": "2026-06-03T19:56:55.149Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/tools/db_tool.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T19:56:55.149Z"
+    },
+    {
+      "id": "bug-205",
+      "timestamp": "2026-06-03T19:57:25.927Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 31→43 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T19:57:25.927Z"
+    },
+    {
+      "id": "bug-206",
+      "timestamp": "2026-06-03T19:57:33.650Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: # Gap 2.4: record invited candidates for 30-day dedup + resp; if pending_payloads:",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T19:57:41.489Z"
+    },
+    {
+      "id": "bug-207",
+      "timestamp": "2026-06-03T20:04:46.366Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/skill_endorsement_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call | Also: # Gap 6.2: persist recommendations as a document (platform-w; try:",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 2,
+      "last_seen": "2026-06-03T20:04:59.009Z"
+    },
+    {
+      "id": "bug-208",
+      "timestamp": "2026-06-03T20:06:08.016Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/connexio_back2/modules/users/user.controller.js",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:06:08.016Z"
+    },
+    {
+      "id": "bug-209",
+      "timestamp": "2026-06-03T20:09:15.635Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/tasks/cron_jobs.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:09:15.635Z"
+    },
+    {
+      "id": "bug-210",
+      "timestamp": "2026-06-03T20:09:25.647Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:09:25.647Z"
+    },
+    {
+      "id": "bug-211",
+      "timestamp": "2026-06-03T20:13:31.165Z",
+      "error_message": "Null/undefined access in ",
+      "file": "f:/MasarX_A/IMPLEMENTATION_TESTING.md",
+      "root_cause": "Property access on potentially null/undefined value",
+      "fix": "Added null safety (optional chaining or null check)",
+      "tags": [
+        "auto-detected",
+        "null-safety",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:13:31.165Z"
+    },
+    {
+      "id": "bug-212",
+      "timestamp": "2026-06-03T20:13:45.329Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 3→5 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:13:45.329Z"
+    },
+    {
+      "id": "bug-213",
+      "timestamp": "2026-06-03T20:19:48.174Z",
+      "error_message": "Missing error handling in unknown",
+      "file": "f:/connexio_back2/modules/users/user.controller.js",
+      "root_cause": "Code path had no error handling — exceptions would propagate uncaught",
+      "fix": "Added try/catch block",
+      "tags": [
+        "auto-detected",
+        "error-handling",
+        "js"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:19:48.174Z"
+    },
+    {
+      "id": "bug-214",
+      "timestamp": "2026-06-03T20:19:57.696Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/utils/backend_client.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:19:57.696Z"
+    },
+    {
+      "id": "bug-215",
+      "timestamp": "2026-06-03T20:20:06.561Z",
+      "error_message": "Missing await",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "root_cause": "Async call without await — returned Promise instead of value",
+      "fix": "Added await to async call",
+      "tags": [
+        "auto-detected",
+        "async-fix",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:20:06.561Z"
+    },
+    {
+      "id": "bug-216",
+      "timestamp": "2026-06-03T20:20:30.659Z",
+      "error_message": "Significant refactor of ",
+      "file": "f:/MasarX_A/src/controllers/subgraphs/team_subgraph.py",
+      "root_cause": "2 lines replaced/restructured",
+      "fix": "Rewrote 15→24 lines (2 removed)",
+      "tags": [
+        "auto-detected",
+        "refactor",
+        "py"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:20:30.659Z"
+    },
+    {
+      "id": "bug-217",
+      "timestamp": "2026-06-03T20:24:28.045Z",
+      "error_message": "Incorrect value in code",
+      "file": "f:/MasarX_A/IMPLEMENTATION_PLAN.md",
+      "root_cause": "Had `IMPLEMENTATION_TESTING.md`",
+      "fix": "Changed to `user_skills.proficiency_level`",
+      "tags": [
+        "auto-detected",
+        "wrong-value",
+        "md"
+      ],
+      "related_bugs": [],
+      "occurrences": 1,
+      "last_seen": "2026-06-03T20:24:28.045Z"
     }
   ]
 }

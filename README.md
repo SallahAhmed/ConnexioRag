@@ -45,7 +45,7 @@ graph TD
         Controller <--> Workflow[Intent Detection & Workflow Manager]
         Controller <--> Tools[Tool Manager]
 
-        subgraph "Workflow Nodes[Specialized Agents]"
+        subgraph "Workflow Nodes - Specialized Agents"
             ONB[ONBOARDING]
             TEAM[TEAM_FORMATION]
             PHASE[PHASE_TRANSITION]
@@ -65,7 +65,7 @@ graph TD
 
     subgraph "Knowledge Sources"
         Tools --> SQL[PostgreSQL Database]
-        Tools --> Vector[Vector Database (PGVector)]
+        Tools --> Vector[Vector Database - PGVector]
         Tools --> Wiki[Wikipedia API]
         Tools --> Google[Google Search / SerpAPI]
         Tools --> Github[GitHub API]
