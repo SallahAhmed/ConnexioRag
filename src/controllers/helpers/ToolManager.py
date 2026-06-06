@@ -639,6 +639,14 @@ class ToolManager:
                         f"Open Issues: {d['open_issues_count']}"
                     )
 
+        except httpx.HTTPStatusError as e:
+            if e.response.status_code == 404:
+                self.logger.warning(
+                    f"GitHub Tool: repo '{repo_name}' not found or is private (404) — skipping L4 context"
+                )
+                return f"Error: GitHub repository '{repo_name}' not found or is private."
+            self.logger.error(f"GitHub Tool Error: {str(e)}")
+            return f"Error fetching GitHub data: {str(e)}"
         except Exception as e:
             self.logger.error(f"GitHub Tool Error: {str(e)}")
             return f"Error fetching GitHub data: {str(e)}"
