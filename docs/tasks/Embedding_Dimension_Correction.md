@@ -1,3 +1,0 @@
-- [x] Update `src/.env` with Correct Embedding size (768).
-- [x] Clear old Qdrant database folder.
-- [ ] Verify the application starts correctly and re-indexes.
