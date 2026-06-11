@@ -236,12 +236,3 @@ class BackendApiClient:
             "members": members,
             "tasks": tasks,
         }
-
-    def invalidate_project_cache(self, project_id: int) -> None:
-        """Manually evict all cached entries for a given project."""
-        for key in [f"project:{project_id}", f"members:{project_id}"]:
-            self._cache.pop(key, None)
-
-    def invalidate_user_cache(self, user_id: int) -> None:
-        """Manually evict cached user profile."""
-        self._cache.pop(f"user:{user_id}", None)

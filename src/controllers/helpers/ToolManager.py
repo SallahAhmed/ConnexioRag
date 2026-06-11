@@ -13,7 +13,6 @@ INTEGRATION NOTE:
 import asyncio
 import json
 import logging
-import warnings
 from typing import Optional
 
 import httpx
@@ -22,7 +21,6 @@ from langchain_community.tools import WikipediaQueryRun
 # pyrefly: ignore [missing-import]
 from langchain_community.utilities import (
     SerpAPIWrapper,
-    SQLDatabase,
     WikipediaAPIWrapper,
 )
 
@@ -71,12 +69,6 @@ class ToolManager:
         self.stackoverflow_api_key = stackoverflow_api_key
         self.logger = logging.getLogger(__name__)
 
-        # SQL tool (RAG's OWN PostgreSQL only — for Text-to-SQL on RAG tables)
-        sync_url = db_engine_url.replace("+asyncpg", "")
-        with warnings.catch_warnings():
-            warnings.simplefilter("ignore")
-            self.db = SQLDatabase.from_uri(sync_url)
-
         # Wikipedia
         api_wrapper = WikipediaAPIWrapper(top_k_results=5, doc_content_chars_max=4000)
         self.wiki_tool = WikipediaQueryRun(api_wrapper=api_wrapper)
@@ -94,66 +86,6 @@ class ToolManager:
     def _get_collection_name(self, project_id) -> str:
         """Single source of truth for vector collection naming."""
         return f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
-
-    # ------------------------------------------------------------------
-    # SQL Tool (RAG's own DB only)
-    # ------------------------------------------------------------------
-
-    async def execute_sql_query(self, query_text: str) -> str:
-        """
-        Translate natural language to SQL and execute against the RAG's own
-        PostgreSQL database. This accesses only RAG-internal tables
-        (projects, chunks, assets) — NOT the main backend's database.
-
-        Safety: generated SQL is validated to ensure it is a SELECT-only query.
-        Any DDL/DML keywords (INSERT, UPDATE, DELETE, DROP, ALTER, CREATE,
-        TRUNCATE, GRANT, REVOKE, EXEC, EXECUTE) cause immediate rejection.
-        """
-        DANGEROUS_KEYWORDS = [
-            "INSERT", "UPDATE", "DELETE", "DROP", "ALTER", "CREATE",
-            "TRUNCATE", "GRANT", "REVOKE", "EXEC", "EXECUTE",
-            "COPY", "\\i", ";", "--", "/*", "*/",
-        ]
-
-        try:
-            schema = await asyncio.to_thread(self.db.get_table_info)
-            if len(schema) > 5000:
-                schema = schema[:5000] + "\n[...schema truncated...]"
-
-            prompt = (
-                f"Given the following SQL schema:\n{schema}\n\n"
-                f"Generate a single PostgreSQL SELECT query to answer: {query_text}\n"
-                "Return ONLY the SQL code. No explanations, no markdown."
-            )
-
-            sql_query = await self.generation_client.generate_text(prompt=prompt)
-            if not sql_query:
-                return "Could not generate SQL query."
-
-            sql_query = sql_query.strip().replace("```sql", "").replace("```", "").strip()
-
-            # Safety validation: reject any query containing dangerous keywords
-            sql_upper = sql_query.upper()
-            for keyword in DANGEROUS_KEYWORDS:
-                if keyword in sql_upper:
-                    self.logger.warning(
-                        "SQL query rejected — contains forbidden keyword: %s", keyword
-                    )
-                    return "Query rejected: only read-only SELECT queries are allowed."
-
-            # Ensure it starts with SELECT
-            if not sql_upper.startswith("SELECT"):
-                self.logger.warning("SQL query rejected — does not start with SELECT")
-                return "Query rejected: only SELECT queries are allowed."
-
-            result = await asyncio.to_thread(self.db.run, sql_query)
-            result = str(result)
-            if len(result) > 1500:
-                result = result[:1500] + "\n[...result truncated...]"
-            return result
-        except Exception as e:
-            self.logger.error(f"SQL Tool Error: {str(e)}")
-            return f"Error executing database query: {str(e)}"
 
     # ------------------------------------------------------------------
     # Wikipedia & Web Search Tools
@@ -194,9 +126,6 @@ class ToolManager:
             self.logger.error(f"Google Search Tool Error: {str(e)}")
             return "Unable to perform Google Search at this time."
 
-    def get_global_collection_name(self):
-        return self._get_collection_name(0)
-
     # ------------------------------------------------------------------
     # Vector Knowledge Base Tool
     # ------------------------------------------------------------------
@@ -222,8 +151,8 @@ class ToolManager:
             return None
 
     async def search_knowledge_base(self, project_id, query: str, limit: int = 5):
-        """Hybrid search over project KB + global KB, merged via RRF.
-        If project_id=0, searches only the global KB to avoid double-searching the same collection."""
+        """Hybrid search over the project's KB, merged via RRF.
+        For project_id=0 this collection IS the platform-wide KB."""
         try:
             vectors = await self.embedding_client.embed_text(text=query, document_type="query")
             if not vectors or len(vectors) == 0:
@@ -253,17 +182,6 @@ class ToolManager:
                     collection_name=project_collection, vector=query_vector, limit=limit * 2,
                 )
             add_results(project_results, "proj_")
-
-            # Search global KB
-            try:
-                global_results = await self.vectordb_client.hybrid_search(
-                    collection_name=self.get_global_collection_name(), query=query, vector=query_vector, limit=limit * 2,
-                )
-            except Exception:
-                global_results = await self.vectordb_client.search_by_vector(
-                    collection_name=self.get_global_collection_name(), vector=query_vector, limit=limit * 2,
-                )
-            add_results(global_results, "global_")
 
             if not scores:
                 return "No relevant documents found in the knowledge base."
@@ -324,18 +242,6 @@ class ToolManager:
                         collection_name=project_collection, vector=query_vector, limit=limit * 2,
                     )
                 add_results(project_results, "proj_")
-
-            global_collection = self.get_global_collection_name()
-            if await self.vectordb_client.is_collection_existed(global_collection):
-                try:
-                    global_results = await self.vectordb_client.hybrid_search(
-                        collection_name=global_collection, query=query, vector=query_vector, limit=limit * 2,
-                    )
-                except Exception:
-                    global_results = await self.vectordb_client.search_by_vector(
-                        collection_name=global_collection, vector=query_vector, limit=limit * 2,
-                    )
-                add_results(global_results, "global_")
 
             if not scores:
                 return []

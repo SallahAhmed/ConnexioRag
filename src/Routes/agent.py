@@ -120,37 +120,3 @@ async def agent_chat_stream(request: Request, project_id: int,
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
         )
-
-
-@agent_router.post("/cache/invalidate/{project_id}")
-@limiter.limit("10/minute")
-async def invalidate_cache(request: Request, project_id: int):
-    """Invalidate the in-memory cache for a project's data on the main backend.
-    Call this after updating project details, members, or tasks on the backend.
-    """
-    backend = getattr(request.app, 'backend_client', None)
-    if backend:
-        backend.invalidate_project_cache(project_id)
-        return JSONResponse(
-            content={"signal": "CACHE_INVALIDATED", "project_id": project_id}
-        )
-    return JSONResponse(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        content={"signal": "BACKEND_CLIENT_UNAVAILABLE"}
-    )
-
-
-@agent_router.post("/cache/invalidate/user/{user_id}")
-@limiter.limit("10/minute")
-async def invalidate_user_cache(request: Request, user_id: int):
-    """Invalidate the in-memory cache for a user's profile."""
-    backend = getattr(request.app, 'backend_client', None)
-    if backend:
-        backend.invalidate_user_cache(user_id)
-        return JSONResponse(
-            content={"signal": "CACHE_INVALIDATED", "user_id": user_id}
-        )
-    return JSONResponse(
-        status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-        content={"signal": "BACKEND_CLIENT_UNAVAILABLE"}
-    )

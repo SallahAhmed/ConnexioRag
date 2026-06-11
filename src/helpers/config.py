@@ -37,7 +37,6 @@ class Settings(BaseSettings):
     GITHUB_TOKEN: str | None = None
     STACKOVERFLOW_API_KEY: str | None = None
 
-    GENERATION_MODEL_ID_LITERAL: List[str] | None = None
     GENERATION_MODEL_ID: str | None = None
     UTILITY_MODEL_ID: str | None = "llama-3.1-8b-instant"
     EMBEDDING_MODEL_ID: str | None = None

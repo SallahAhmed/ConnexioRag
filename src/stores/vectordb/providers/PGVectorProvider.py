@@ -6,6 +6,23 @@ from typing import List
 from models.db_schemas import RetrievedDocument
 from sqlalchemy.sql import text as sql_text
 import json
+import re
+
+
+# Vector collections are always named `collection_{vector_size}_{project_id}`
+# (both integers — see NLPController.create_collection_name). A table/index name
+# is an SQL identifier, so it cannot be a bind parameter and must be interpolated
+# into the DDL/DML below. Validate it as a tripwire before it ever reaches SQL:
+# in normal operation this never fails, but it stops a malformed or
+# attacker-influenced name from becoming an injection vector (defence in depth).
+_VALID_COLLECTION = re.compile(r'^collection_\d+_\d+$')
+
+
+def _validate_collection(collection_name: str) -> str:
+    if not isinstance(collection_name, str) or not _VALID_COLLECTION.match(collection_name):
+        raise ValueError(f"Invalid vector collection name: {collection_name!r}")
+    return collection_name
+
 
 class PGVectorProvider(VectorDBInterface):
 
@@ -41,6 +58,7 @@ class PGVectorProvider(VectorDBInterface):
         pass
 
     async def is_collection_existed(self, collection_name: str) -> bool:
+        _validate_collection(collection_name)
 
         record = None
         async with self.db_client() as session:
@@ -62,6 +80,7 @@ class PGVectorProvider(VectorDBInterface):
         return records
     
     async def get_collection_info(self, collection_name: str) -> dict:
+        _validate_collection(collection_name)
         async with self.db_client() as session:
             async with session.begin():
                 
@@ -93,6 +112,7 @@ class PGVectorProvider(VectorDBInterface):
                 }
             
     async def delete_collection(self, collection_name: str):
+        _validate_collection(collection_name)
         async with self.db_client() as session:
             async with session.begin():
                 self.logger.info(f"Deleting collection: {collection_name}")
@@ -169,6 +189,7 @@ class PGVectorProvider(VectorDBInterface):
             
     async def create_vector_index(self, collection_name: str,
                                         index_type: str = PgVectorIndexTypeEnums.HNSW.value):
+        _validate_collection(collection_name)
         is_index_existed = await self.is_index_existed(collection_name=collection_name)
         if is_index_existed:
             return False
@@ -196,7 +217,8 @@ class PGVectorProvider(VectorDBInterface):
 
     async def reset_vector_index(self, collection_name: str, 
                                        index_type: str = PgVectorIndexTypeEnums.HNSW.value) -> bool:
-        
+
+        _validate_collection(collection_name)
         index_name = self.default_index_name(collection_name)
         async with self.db_client() as session:
             async with session.begin():
@@ -302,10 +324,10 @@ class PGVectorProvider(VectorDBInterface):
                 search_sql = sql_text(f'SELECT {PgVectorTableSchemeEnums.TEXT.value} as text, 1 - ({PgVectorTableSchemeEnums.VECTOR.value} <=> :vector) as score'
                                       f' FROM {collection_name}'
                                       ' ORDER BY score DESC '
-                                      f'LIMIT {limit}'
+                                      'LIMIT :limit'
                                       )
-                
-                result = await session.execute(search_sql, {"vector": vector})
+
+                result = await session.execute(search_sql, {"vector": vector, "limit": limit})
 
                 records = result.fetchall()
 
@@ -332,11 +354,11 @@ class PGVectorProvider(VectorDBInterface):
                            similarity({PgVectorTableSchemeEnums.TEXT.value}, :query) as score
                     FROM {collection_name}
                     WHERE {PgVectorTableSchemeEnums.TEXT.value} % :query
-                    ORDER BY score DESC 
-                    LIMIT {limit}
+                    ORDER BY score DESC
+                    LIMIT :limit
                 """)
-                
-                result = await session.execute(search_sql, {"query": query})
+
+                result = await session.execute(search_sql, {"query": query, "limit": limit})
                 records = result.fetchall()
 
                 return [

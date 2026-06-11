@@ -34,14 +34,20 @@ async def index_project(request: Request, project_id: int, push_request: PushReq
 
 @nlp_router.get("/index/info/{project_id}")
 async def get_project_index_info(request: Request, project_id: int):
-    
+
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
-    project = await project_model.get_project_or_create_one(
-        project_id=project_id
-    )
+    project = await project_model.get_project(project_id=project_id)
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "signal": ResponseSignal.PROJECT_NOT_FOUND_ERROR.value,
+                "error": "No knowledge base exists for this project yet, so there's nothing to inspect. Upload a document to the project first, then retry.",
+            },
+        )
 
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,
@@ -64,14 +70,20 @@ async def get_project_index_info(request: Request, project_id: int):
 
 @nlp_router.post("/index/search/{project_id}")
 async def search_index(request: Request, project_id: int, search_request: SearchRequest):
-    
+
     project_model = await ProjectModel.create_instance(
         db_client=request.app.db_client
     )
 
-    project = await project_model.get_project_or_create_one(
-        project_id=project_id
-    )
+    project = await project_model.get_project(project_id=project_id)
+    if project is None:
+        return JSONResponse(
+            status_code=status.HTTP_404_NOT_FOUND,
+            content={
+                "signal": ResponseSignal.PROJECT_NOT_FOUND_ERROR.value,
+                "error": "No knowledge base exists for this project yet, so there's nothing to search. Upload a document to the project first, then retry.",
+            },
+        )
 
     nlp_controller = NLPController(
         vectordb_client=request.app.vectordb_client,

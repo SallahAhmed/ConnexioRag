@@ -141,7 +141,7 @@ The platform is executing a 5-phase enhancement plan (61 items). Source: `F:\Mas
 
 ### Phase 0 Checklist
 - [x] H1: `users.username` + `users.is_admin` + `users.account_type` columns — `dbconnection.js`
-- [x] H33: Account type enforcement (3/month normal) + monthly counter columns — `projects.controller.js`
+- [x] H33: Account type enforcement (5/year normal) + yearly counter columns — `projects.controller.js`
 - [x] H34: `project_contracts` + `contract_signatures` tables — `dbconnection.js`
 - [x] Stripe Pro upgrade flow — `stripeService.js` + `payments` module. **Needs: npm install stripe + .env keys**
 - [x] In-app e-signature (typed name + canvas) — `eSignatureService.js` + `ContractSigning.jsx`
@@ -167,10 +167,19 @@ The platform is executing a 5-phase enhancement plan (61 items). Source: `F:\Mas
 ## 6. New Features (Execution Plan)
 
 ### Account Types
-Three tiers: **Normal** (free, 3 projects/month create+join), **Pro** ($20/mo via Stripe, unlimited + extended AI context + priority matching), **Org** (Phase 2, admin-managed orgs).
-- Normal users hitting 3/month limit → upgrade prompt modal.
+Three tiers: **Normal** (free, 5 projects/year create+join), **Pro** ($20/mo via Stripe, unlimited + extended AI context + priority matching), **Org** (admin-managed orgs with sub-roles).
+
+- Normal users hitting 5/year limit → upgrade prompt modal.
 - Pro: real Stripe Checkout subscription → webhook flips `account_type` to `pro`.
-- `account_type` + `projects_created_this_month` + `project_limit_reset_at` on `users` table.
+- `account_type` + `projects_created_this_year` + `project_limit_reset_at` on `users` table.
+
+**Org sub-roles:**
+
+- **Org Admin:** purchases the system, manages the org admin panel (`F:\connexio-adminPanel`), adds users to the org.
+- **Instructor / Mentor:** can create projects and assign them to students in their courses.
+- **Student:** cannot create projects — only gets assigned to projects by instructors/mentors.
+
+Each sub-role has a distinct platform view.
 
 ### Contract / Commitment System
 At project creation, owner picks: `commitment` / `nda` / `both` / `none`.

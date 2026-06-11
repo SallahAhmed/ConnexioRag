@@ -31,66 +31,67 @@ The core vision of Connexio is to bridge the gap between raw project documentati
 
 ---
 
-## 🏗️ High-Level Architecture
+## 🏗️ Architecture
 
-Connexio is built on a modular, service-oriented architecture designed for scalability and observability, featuring an advanced agentic workflow with intent detection and corrective RAG capabilities.
+Connexio RAG is a layered, service-oriented system. A request flows top-down through six concerns — **edge → API → orchestration → AI → knowledge → async** — with **observability** wrapped around all of them.
 
 ```mermaid
 graph TD
-    User([User/Client]) <--> Nginx[Nginx Reverse Proxy]
-    Nginx <--> API[FastAPI Server]
+    Client([Node.js Backend / Browser]) -->|X-API-Key| Nginx[Nginx Reverse Proxy]
+    Nginx --> API[FastAPI · REST + SSE streaming]
 
-    subgraph "Logic & Orchestration"
-        API <--> Controller[NLP Controller]
-        Controller <--> Workflow[Intent Detection & Workflow Manager]
-        Controller <--> Tools[Tool Manager]
-
-        subgraph "Workflow Nodes - Specialized Agents"
-            ONB[ONBOARDING]
-            TEAM[TEAM_FORMATION]
-            PHASE[PHASE_TRANSITION]
-            BLOCK[BLOCKER]
-            MILE[MILESTONE_WARNING]
-            GEN[GENERAL]
-            OUT[OUT_OF_SCOPE]
-        end
+    subgraph ORCH["🧠 Orchestration"]
+        NLP[NLPController<br/>chat · L1–L5 context · CRAG · model routing]
+        WF[WorkflowController<br/>intent · language · relevance grading]
+        TM[ToolManager]
+        NLP --- WF
+        NLP --- TM
     end
+    API --> NLP
 
-    subgraph "AI Services"
-        Controller <--> LLM[LLM Provider Factory]
-        LLM --- Groq[Groq / GPT-OSS 120B + Llama 4 Scout 17B]
-        LLM --- OpenAI[OpenAI / Compatible API]
-        LLM --- Jina[Jina AI / Embeddings v3 + Reranker]
+    subgraph AILAYER["🤖 AI — LLM Provider Factory"]
+        GEN[Generation · gpt-oss-120b]
+        UTIL[Utility · llama-4-scout-17b]
+        EMB[Jina embeddings v3]
+        RER[Jina reranker v2]
     end
+    NLP --> GEN & UTIL & EMB & RER
 
-    subgraph "Knowledge Sources"
-        Tools --> SQL[PostgreSQL Database]
-        Tools --> Vector[Vector Database - PGVector]
-        Tools --> Wiki[Wikipedia API]
-        Tools --> Google[Google Search / SerpAPI]
-        Tools --> Github[GitHub API]
-        Tools --> ArXiv[ArXiv API]
-        Tools --> StackOverflow[StackOverflow API]
-        Tools --> MasarX[MasarX Agent - Shared DB]
-        Tools --> Backend[Node.js Backend API]
+    subgraph KNOW["📚 Knowledge Sources"]
+        VDB[(PGVector<br/>HNSW + GIN trigram · RRF)]
+        SQL[(PostgreSQL<br/>text-to-SQL · SELECT-only)]
+        BE[Node.js Backend REST]
+        CA[ConnexioAgent tables]
+        EXT[Wikipedia · Google · GitHub<br/>ArXiv · StackOverflow]
     end
+    TM --> VDB & SQL & BE & CA & EXT
 
-    subgraph "Asynchronous Processing"
-        API --> Broker[RabbitMQ / Redis]
-        Broker --> Worker[Celery Workers - file_processing, data_indexing, default]
-        Worker <--> FS[Local Assets / PDF / DOCX / MD]
-        Worker <--> PGVector[(PostgreSQL + pgvector)]
-        Worker --- Beat[Celery Beat - 24h cleanup]
+    subgraph ASYNC["⚙️ Async Processing"]
+        BRK[(RabbitMQ / Redis)]
+        CEL[Celery Workers<br/>file_processing · data_indexing · default]
+        BEAT[Celery Beat<br/>30-day sessions · 24-hour tasks]
     end
+    API --> BRK --> CEL --> VDB
+    BEAT --> CEL
 
-    subgraph "Observability"
-        API --- Prometheus[Prometheus - /metrics]
-        Prometheus --- Grafana[Grafana]
-        Worker --- Flower[Flower Dashboard]
-        API --- Sentry[Sentry Error Tracking]
-        API --- OpenTelemetry[OpenTelemetry]
-    end
+    OBS[["📊 Observability — Prometheus + Grafana · Flower · Sentry · OpenTelemetry"]]
+    API -.-> OBS
+    CEL -.-> OBS
 ```
+
+### Layers at a glance
+
+| Layer | Components | Responsibility |
+| :--------------- | :------------------------------------------------------------ | :------------------------------------------------------------------ |
+| **Edge** | Nginx | TLS, reverse proxy, anti-buffering headers for SSE |
+| **API** | FastAPI | REST + SSE endpoints, `X-API-Key` auth, per-IP rate limiting |
+| **Orchestration** | `NLPController`, `WorkflowController`, `ToolManager` | Intent detection (OOS / project / GENERAL), L1–L5 context injection, CRAG, tiered model routing |
+| **AI** | LLM Provider Factory | Groq generation (120B) + utility (17B); Jina embeddings + reranker |
+| **Knowledge** | PGVector, PostgreSQL, Backend REST, ConnexioAgent tables, external APIs | Hybrid retrieval (RRF), text-to-SQL, live project data, corrective-RAG tools |
+| **Async** | RabbitMQ/Redis, Celery (+ Beat) | Document ingestion / indexing, scheduled cleanup |
+| **Observability** | Prometheus + Grafana, Flower, Sentry, OpenTelemetry | Metrics, worker monitoring, error tracking, tracing |
+
+> The per-request decision flow (intent → tiered model → hybrid retrieval → grading → CRAG → answer) is detailed in [The Brain: RAG Pipeline & Logic](#-the-brain-rag-pipeline--logic).
 
 ---
 
@@ -110,7 +111,7 @@ Node.js Backend  ←─── connexio.icu (Hostinger, MySQL)
          │   GET  /api/v1/nlp/agent/chat/stream/{pid}
          │   POST /api/v1/projects/sync
          │
-         └── Service JWT ─────► MasarX Agent  (HF Spaces)
+         └── Service JWT ─────► ConnexioAgent  (Azure VM)
              POST /api/v1/masarx/webhook/event/{type}/{pid}
              POST /api/v1/masarx/agent/{intent}/{pid}
 ```
@@ -118,14 +119,14 @@ Node.js Backend  ←─── connexio.icu (Hostinger, MySQL)
 **Shared PostgreSQL Database (Neon.tech):**
 
 - **Connexio RAG owns**: `projects`, `assets`, `chunks`, `rag_chat_sessions`, `collection_{size}_{pid}`
-- **MasarX Agent owns**: `masarx_notifications`, `masarx_pending_plans`, `user`, `task`
-- **MasarX reads**: `projects`, `chunks` (read-only)
+- **ConnexioAgent owns**: `masarx_notifications`, `masarx_pending_plans`, `user`, `task`
+- **ConnexioAgent reads**: `projects`, `chunks` (read-only)
 
 **Service-to-Service Auth:**
 
 - Backend → RAG: `X-API-Key` header (`CONNEXIO_INTERNAL_API_KEY`)
 - RAG → Backend: Service JWT generated by `BackendApiClient._make_service_token()`
-- Backend → MasarX: Short-lived JWT (`JWT_SECRET`, 5-min expiry)
+- Backend → ConnexioAgent: Short-lived JWT (`JWT_SECRET`, 5-min expiry)
 
 ### Backend Client
 
@@ -192,6 +193,10 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
   - **Project intents** (blocker, milestone, onboarding, team, phase) — **GPT-OSS 120B** directly (quality needed)
   - **model_tier** param allows manual override: `"generation"` or `"utility"`
 
+- **Shortcut Commands**: Power-user slash commands intercepted *before* intent detection — `/summary`, `/tasks`, `/blame`, `/docs`, `/audit`. Each maps to a curated project-context query and forces the 120B generation model for a high-quality, structured answer (handled by the `SHORTCUT_COMMANDS` dict at the top of both chat paths).
+
+- **Pro Tier Context**: Pro-account users are served with `model_tier='generation'` (120B) by default for richer answers; Normal users use `'auto'` (intent-gated routing). The tier is read from the JWT (`account_type`) at socket-auth time.
+
 - **Intent Detection & Workflow Routing**: Every query is analyzed and routed to one of seven specialized workflow nodes:
   - ONBOARDING: Guidance for new users
   - TEAM_FORMATION: Intelligent teammate matching logic
@@ -225,7 +230,7 @@ Connexio implements advanced intelligent capabilities beyond basic RAG:
 - **Asset Management**: Full CRUD for uploaded files — list all assets per project, delete assets with cascade cleanup (vector rows, SQL chunks, physical file)
 - **Upload-and-Query**: Synchronous flow — upload file → ingest → embed → search → generate answer in a single request
 - **URL Content Ingestion**: Paste a URL; the system downloads the content, detects PDF/docx/text, and extracts up to 8000 characters for context
-- **MasarX Integration**: Direct PostgreSQL reads of MasarX agent task tables (`"TaskId"`, `"TaskName"`, `"PID"`, `"UID"` with quoted identifiers) for cross-agent intelligence
+- **ConnexioAgent Integration**: Direct PostgreSQL reads of the ConnexioAgent (codename MasarX) task tables (`"TaskId"`, `"TaskName"`, `"PID"`, `"UID"` with quoted identifiers) for cross-agent intelligence
 - **Backend Caching**: 5-minute in-memory TTL for project details and user profiles (tasks are not cached — always live)
 - **Text-to-SQL Tool**: Natural language → SQL query with safety validation (SELECT-only enforced, all mutating operations blocked)
 - **Matching Intelligence**: 6-factor teammate matching algorithm (Skills 35%, Availability 25%, Rating 20%, Experience 12%, Goals 5%, Domain 3%) with team gap analysis
@@ -413,6 +418,20 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
   - **Backend REST** for live user/project/member/task data via `BackendApiClient`
 - **Internal Tracing**: Every step is logged by the `TraceManager`, allowing developers to visualize the AI's "thought process", latency, and decision-making for debugging and optimization.
 
+### 4. Smart Context Layers (L1–L5)
+
+For project sessions, `NLPController._prepare_chat_context()` injects up to five layers of live context (8000-token budget; L3 truncated first if the budget is exceeded):
+
+| Layer | Source | Content |
+| :---- | :------------------ | :--------------------------------------------------- |
+| **L1** | Project profile | Name, description, tech stack, phase, GitHub URL |
+| **L2** | Active tasks | Open / in-progress tasks + recent completions |
+| **L3** | Chat history | Rolling summary of the last ~5 messages |
+| **L4** | GitHub | Recent commits (requires `GITHUB_TOKEN`) |
+| **L5** | ConnexioAgent audit | Task-health + risk-level snapshot from the agent's shared tables |
+
+Sessions are keyed `{project_id}_{user_id}`, unified across the AI Chat page and `@mention` group-chat streaming.
+
 ---
 
 ## 🗺️ Key Files Reference
@@ -428,10 +447,10 @@ The `NLPController` manages the conversation flow through a sophisticated agenti
 | `src/controllers/DataController.py`      | File upload validation and sanitization              |
 | `src/controllers/ProcessController.py`   | Document loading (PDF/DOCX/TXT/MD), chunking         |
 | `src/controllers/ProjectController.py`   | Project directory management on disk                 |
-| `src/controllers/helpers/ToolManager.py` | Wiki, Google, GitHub, ArXiv, StackOverflow, SQL, KB, MasarX |
+| `src/controllers/helpers/ToolManager.py` | Wiki, Google, GitHub, ArXiv, StackOverflow, SQL, KB, ConnexioAgent reads |
 | `src/controllers/helpers/TraceManager.py`| Step tracer for RAG pipeline observability           |
 | `src/utils/backend_client.py`            | REST client to Node.js backend (JWT auth + 5min cache)|
-| `src/utils/masarx_client.py`             | Direct PostgreSQL reads of MasarX task tables        |
+| `src/utils/masarx_client.py`             | Direct PostgreSQL reads of ConnexioAgent task tables |
 | `src/utils/security.py`                  | `verify_api_key()` FastAPI dependency                |
 | `src/utils/metrics.py`                   | Prometheus middleware + obfuscated metrics endpoint  |
 | `src/utils/idempotency_manager.py`       | Celery task dedup (SHA-256) + stuck detection        |

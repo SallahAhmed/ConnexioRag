@@ -39,6 +39,21 @@ class ProjectModel(BaseDataModel):
                 else:
                     return project
 
+    async def get_project(self, project_id: int):
+        """Read-only lookup — returns the Project or None, and NEVER inserts.
+
+        Use this on query/inspection endpoints (search, collection info) so an
+        unknown project_id yields a 404 instead of silently creating a phantom
+        mirror row. The upload/indexing paths keep using
+        get_project_or_create_one, where creating the row is intended.
+        """
+        async with self.db_client() as session:
+            async with session.begin():
+                result = await session.execute(
+                    select(Project).where(Project.project_id == project_id)
+                )
+                return result.scalar_one_or_none()
+
     async def get_all_projects(self, page: int=1, page_size: int=10):
 
         async with self.db_client() as session:

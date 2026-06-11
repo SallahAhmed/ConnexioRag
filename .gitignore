@@ -55,3 +55,28 @@ Thumbs.db
 traces/
 .wolf
 .wolf/
+
+# --- Build artifacts ---
+*.egg-info/
+
+# --- Dev scratch scripts (kept local, not published) ---
+scratch/
+
+# --- Internal working docs (kept local, not published) ---
+docs/fixes/
+docs/imp_plans/
+docs/improvements/
+docs/roadmap/
+docs/tasks/
+docs/walkthroughs/
+docs/masarx_files/
+docs/important note/
+docs/SESSION_HANDOFF.md
+docs/NEXT_SESSION_PLAN.md
+docs/FINAL_RETEST_RESULTS.md
+docs/SMOKE_TEST_RESULTS.md
+docs/RAG MODEL Tasks.txt
+docs/RAG_INTEGRATION_ANSWERS.md
+docs/previous_plan_fix_rag_accuracy.md
+docs/rag-tool-prioritization-overhaul.md
+docs/rag_feature_suggestions.md

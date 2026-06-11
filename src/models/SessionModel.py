@@ -56,6 +56,12 @@ class SessionModel(BaseDataModel):
             )
             if project_id:
                 query = query.where(ChatSession.project_id == project_id)
+            else:
+                # Projectless (general) chat must NOT resume a project-scoped
+                # session — otherwise one project's history leaks into the
+                # user's general chat (and vice-versa). Pin general chat to
+                # sessions that have no project.
+                query = query.where(ChatSession.project_id.is_(None))
 
             query = query.order_by(ChatSession.created_at.desc()).limit(1)
             result = await session.execute(query)
