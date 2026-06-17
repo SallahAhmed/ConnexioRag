@@ -190,6 +190,16 @@ class NLPController(BaseController):
         explicit_language = language is not None
         step_id = tracer.start_trace(trace_id, "Intent & Language Detection")
 
+        # The query's own script is the most reliable language signal and must override any
+        # caller-supplied hint: the AI Chat page sends the user's UI language, so an English-UI
+        # user typing Arabic would otherwise be force-answered in English. Arabic script is
+        # unambiguous; on this en/ar platform its absence means English.
+        if re.search(r'[؀-ۿ]', query or ""):
+            if language != "ar":
+                self.logger.info("Language hint '%s' overridden by Arabic script in query.", language)
+            language = "ar"
+            explicit_language = True
+
         # extra_context (file upload) → skip detection, always GENERAL, explicit language or en
         is_file_query = bool(extra_context)
         if is_file_query:
