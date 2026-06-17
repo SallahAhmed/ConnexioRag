@@ -403,6 +403,19 @@ class NLPController(BaseController):
         if is_temporal_query:
             self.logger.info(f"[RAG TEMPORAL] Detected temporal query: '{query[:50]}' -> Google forced")
 
+        # For project-scoped collaboration intents, the answer should come from project
+        # context + platform knowledge, NOT the open web. Firing StackOverflow/GitHub/Wikipedia
+        # on "I need a backend developer" or "move us to the next sprint" wastes tokens and adds
+        # nothing useful. BLOCKER is intentionally EXCLUDED — debugging genuinely benefits from
+        # StackOverflow/GitHub. When set, we use KB context only and never fire external CRAG.
+        NO_EXTERNAL_CRAG_NODES = {
+            WorkflowNodeEnum.TEAM_FORMATION,
+            WorkflowNodeEnum.PHASE_TRANSITION,
+            WorkflowNodeEnum.MILESTONE_WARNING,
+            WorkflowNodeEnum.ONBOARDING,
+        }
+        skip_external_crag = bool(project_id) and node in NO_EXTERNAL_CRAG_NODES
+
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
             tracer.end_trace(trace_id, step_id, "Skipped (Out of Scope)")
 
@@ -424,13 +437,17 @@ class NLPController(BaseController):
             )
 
             if not raw_docs:
-                tracer.end_trace(trace_id, step_id, "Empty KB — firing 2 CRAG tools")
-                crag_results = await self._run_crag_tools(
-                    query, language, utility_history, trace_id, max_tools=2
-                )
-                for source_name, result_text in crag_results:
-                    retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
-                    sources.append(source_name)
+                if skip_external_crag:
+                    # Collaboration intent — rely on Live Project Data injected below, not the web.
+                    tracer.end_trace(trace_id, step_id, f"Empty KB — external CRAG skipped ({node.value})")
+                else:
+                    tracer.end_trace(trace_id, step_id, "Empty KB — firing 2 CRAG tools")
+                    crag_results = await self._run_crag_tools(
+                        query, language, utility_history, trace_id, max_tools=2
+                    )
+                    for source_name, result_text in crag_results:
+                        retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
+                        sources.append(source_name)
             else:
                 # Batch-grade all docs in one LLM call
                 grades = await self.workflow_controller.grade_relevance_batch(query, raw_docs)
@@ -463,19 +480,24 @@ class NLPController(BaseController):
                     sources.append("Vector DB")
 
                 elif n_rel == 0 and n_amb == 0:
-                    # All irrelevant — discard KB, fire 2 CRAG tools
-                    tracer.end_trace(trace_id, step_id, f"All {n_total} docs irrelevant — CRAG only")
-                    crag_results = await self._run_crag_tools(
-                        query, language, utility_history, trace_id, max_tools=2
-                    )
-                    for source_name, result_text in crag_results:
-                        retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
-                        sources.append(source_name)
+                    # All irrelevant — discard KB. Fire CRAG unless this is a collaboration
+                    # intent, where the web adds nothing (Live Project Data carries the answer).
+                    if skip_external_crag:
+                        tracer.end_trace(trace_id, step_id, f"All {n_total} docs irrelevant — external CRAG skipped ({node.value})")
+                    else:
+                        tracer.end_trace(trace_id, step_id, f"All {n_total} docs irrelevant — CRAG only")
+                        crag_results = await self._run_crag_tools(
+                            query, language, utility_history, trace_id, max_tools=2
+                        )
+                        for source_name, result_text in crag_results:
+                            retrieved_context.append(f"\n[{source_name}]:\n{result_text}")
+                            sources.append(source_name)
 
                 else:
-                    # Mixed — filtered KB. Skip CRAG when KB already has relevant
-                    # docs for a project query (external tools rarely add value).
-                    if n_rel > 0 and project_id and node == WorkflowNodeEnum.GENERAL:
+                    # Mixed — filtered KB. Skip CRAG when KB already has relevant docs for a
+                    # GENERAL project query, OR for any collaboration intent (external tools
+                    # rarely add value there).
+                    if skip_external_crag or (n_rel > 0 and project_id and node == WorkflowNodeEnum.GENERAL):
                         tracer.end_trace(trace_id, step_id, "Mixed grades — KB sufficient (CRAG skipped)")
                         retrieved_context.extend(kb_context)
                         sources.append("Vector DB")
