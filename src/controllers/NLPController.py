@@ -870,11 +870,17 @@ class NLPController(BaseController):
             model_tier = "generation"  # commands always need full project context
 
         # Fast path — greetings (skip ALL LLM calls, RAG, KB, etc.)
-        GREETINGS_EN = {"hello", "hi", "hey", "hi there", "hello there",
-                        "good morning", "good afternoon", "good evening",
-                        "whats up", "sup", "howdy", "greetings",
-                        "how are you", "how are you doing", "how's it going"}
-        GREETINGS_AR = {"مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً"}
+        GREETINGS_EN = {
+            "hello", "hi", "hey", "hi there", "hello there",
+            "good morning", "good afternoon", "good evening", "good day", "good night",
+            "whats up", "what's up", "sup", "howdy", "greetings", "yo", "morning",
+            "how are you", "how are you doing", "how's it going", "how are things",
+        }
+        GREETINGS_AR = {
+            "مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً",
+            "صباح الخير", "مساء الخير", "صباح النور", "مساء النور",
+            "كيف حالك", "كيف الحال", "ازيك", "أزيك",
+        }
         clean_query = query.strip().lower().rstrip("?!.,;:")
         is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
         greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN
@@ -1096,11 +1102,17 @@ class NLPController(BaseController):
             return
 
         # Fast path — greetings (skip ALL LLM calls)
-        GREETINGS_EN = {"hello", "hi", "hey", "hi there", "hello there",
-                        "good morning", "good afternoon", "good evening",
-                        "whats up", "sup", "howdy", "greetings",
-                        "how are you", "how are you doing", "how's it going"}
-        GREETINGS_AR = {"مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً"}
+        GREETINGS_EN = {
+            "hello", "hi", "hey", "hi there", "hello there",
+            "good morning", "good afternoon", "good evening", "good day", "good night",
+            "whats up", "what's up", "sup", "howdy", "greetings", "yo", "morning",
+            "how are you", "how are you doing", "how's it going", "how are things",
+        }
+        GREETINGS_AR = {
+            "مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً",
+            "صباح الخير", "مساء الخير", "صباح النور", "مساء النور",
+            "كيف حالك", "كيف الحال", "ازيك", "أزيك",
+        }
         clean_query = query.strip().lower().rstrip("?!.,;:")
         is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
         greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN

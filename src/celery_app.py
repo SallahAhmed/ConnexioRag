@@ -96,9 +96,9 @@ if celery_app is not None:
     # Time limits - Prevent hanging tasks
     task_time_limit=settings.CELERY_TASK_TIME_LIMIT,
 
-    # Result backend - Store results for status tracking
-    task_ignore_result=False,
-    result_expires=3600,
+    # No code polls AsyncResult.get() — results are fire-and-forget, so skip the SET+EXPIRE
+    # writes to Redis (saves ~2-3 commands per task execution).
+    task_ignore_result=True,
 
     # Worker settings
     worker_concurrency=settings.CELERY_WORKER_CONCURRENCY,
@@ -108,19 +108,26 @@ if celery_app is not None:
     broker_connection_retry_on_startup=True,
     broker_connection_retry=True,
     broker_connection_max_retries=10,
-    broker_heartbeat=None, # Disable heartbeats to prevent timeouts during long blocking tasks
+    # Upstash closes idle connections after ~60s. Heartbeat=45 → check every 22.5s (45/2),
+    # well within the timeout window at ~3,840 PINGs/day vs ~17,280 at heartbeat=10.
+    broker_heartbeat=45,
+    broker_heartbeat_checkrate=2,
     worker_cancel_long_running_tasks_on_connection_loss=True,
 
-    # Enable remote control but disable events to save Redis commands (not needed without Flower)
-    worker_enable_remote_control=True,
+    # Remote control (celery inspect/control CLI) requires a permanent pub/sub channel that
+    # costs ~700 commands/day even when idle. Disable it since we don't use Flower or CLI control.
+    worker_enable_remote_control=False,
     worker_send_task_events=False,
 
-    # Upstash/Redis optimization: increase polling interval to reduce 'GET' commands
+    # Upstash free-tier command budget optimization:
+    # - polling_interval=60: one BRPOP every 60s (~1,440/day) vs 20s (~4,320/day)
+    # - socket_keepalive: TCP-level keepalive as secondary guard against idle drops
     broker_transport_options={
         'visibility_timeout': 3600,
-        'polling_interval': 20.0, # Check for tasks every 20 seconds (Sweet spot for free tier)
+        'polling_interval': 60.0,
         'sepel_socket_timeout': 30,
         'sepel_socket_connect_timeout': 30,
+        'socket_keepalive': True,
     },
     redis_socket_timeout=30,
     redis_socket_connect_timeout=30,
