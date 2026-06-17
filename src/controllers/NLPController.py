@@ -580,7 +580,12 @@ class NLPController(BaseController):
                         f"Overdue Tasks: {overdue}\n"
                         f"Risk Level: {risk}"
                     )
-                    retrieved_context.append(f"\n[Project Health Snapshot]:\n{snapshot}")
+                    retrieved_context.append(
+                        f"\n[Project Health Snapshot]:\n{snapshot}\n"
+                        "When the user asks about project status, progress, deadlines, or risk, "
+                        "cite these EXACT numbers (completed/total, percentage, overdue count) — "
+                        "do not paraphrase them away or speak only in vague terms like 'medium risk'."
+                    )
                     self.logger.info(f"[L5] Injected health snapshot: {pct}% done, {overdue} overdue")
             except Exception as e:
                 self.logger.warning(f"[L5] Could not compute health snapshot: {e}")
