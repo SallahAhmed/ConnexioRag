@@ -413,18 +413,16 @@ class NLPController(BaseController):
         if is_temporal_query:
             self.logger.info(f"[RAG TEMPORAL] Detected temporal query: '{query[:50]}' -> Google forced")
 
-        # For project-scoped collaboration intents, the answer should come from project
-        # context + platform knowledge, NOT the open web. Firing StackOverflow/GitHub/Wikipedia
-        # on "I need a backend developer" or "move us to the next sprint" wastes tokens and adds
-        # nothing useful. BLOCKER is intentionally EXCLUDED — debugging genuinely benefits from
-        # StackOverflow/GitHub. When set, we use KB context only and never fire external CRAG.
-        NO_EXTERNAL_CRAG_NODES = {
-            WorkflowNodeEnum.TEAM_FORMATION,
-            WorkflowNodeEnum.PHASE_TRANSITION,
-            WorkflowNodeEnum.MILESTONE_WARNING,
-            WorkflowNodeEnum.ONBOARDING,
-        }
-        skip_external_crag = bool(project_id) and node in NO_EXTERNAL_CRAG_NODES
+        # In a PROJECT chat, the answer should come from project context (KB + L1-L5), not the
+        # open web. Firing StackOverflow/GitHub/Wikipedia on "plan our MVP", "I need a backend
+        # developer", or "move us to the next sprint" just adds latency and noise (extra LLM
+        # calls + external API round-trips) for no value. So skip external CRAG for every
+        # project-scoped intent EXCEPT:
+        #   - BLOCKER: debugging genuinely benefits from StackOverflow/GitHub.
+        #   - temporal queries ("latest"/"recent"/...): handled earlier via forced Google.
+        # OUT_OF_SCOPE never reaches CRAG. Projectless chats keep CRAG (general chat is where
+        # web search belongs).
+        skip_external_crag = bool(project_id) and node != WorkflowNodeEnum.BLOCKER
 
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
             tracer.end_trace(trace_id, step_id, "Skipped (Out of Scope)")
