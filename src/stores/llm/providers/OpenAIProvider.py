@@ -143,16 +143,37 @@ class OpenAIProvider(LLMInterface):
             self.construct_prompt(prompt=prompt, role=OpenAIEnums.USER.value)
         )
 
+        print(f"[LLM STREAM] {self.generation_model_id} -> streaming generation started")
+        self.last_usage = None
+
         try:
-            response = await self.client.chat.completions.create(
+            create_kwargs = dict(
                 model = self.generation_model_id,
                 messages = local_history,
                 max_tokens = max_output_tokens,
                 temperature = temperature,
-                stream=True
+                stream = True,
             )
+            # include_usage makes the provider emit a final usage-only chunk so we can log
+            # token counts like the non-streaming path. Not every OpenAI-compatible endpoint
+            # supports it, so fall back cleanly rather than breaking generation.
+            try:
+                response = await self.client.chat.completions.create(
+                    **create_kwargs, stream_options={"include_usage": True}
+                )
+            except Exception as opt_err:
+                self.logger.warning(f"stream_options unsupported, retrying without usage: {opt_err}")
+                response = await self.client.chat.completions.create(**create_kwargs)
 
             async for chunk in response:
+                # The usage-only final chunk carries usage and has empty choices.
+                if getattr(chunk, "usage", None):
+                    self.last_usage = {
+                        "prompt_tokens": chunk.usage.prompt_tokens,
+                        "completion_tokens": chunk.usage.completion_tokens,
+                        "total_tokens": chunk.usage.total_tokens,
+                    }
+                    print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {chunk.usage.prompt_tokens} | Completion: {chunk.usage.completion_tokens} | Total: {chunk.usage.total_tokens}")
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
