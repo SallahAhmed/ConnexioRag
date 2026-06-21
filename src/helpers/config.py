@@ -33,6 +33,8 @@ class Settings(BaseSettings):
     JINA_API_URL: str = "https://api.jina.ai/v1"
     GROQ_API_KEY: str | None = None
     GROQ_API_URL: str | None = "https://api.groq.com/openai/v1"
+    NVIDIA_API_KEY: str | None = None
+    NVIDIA_API_URL: str | None = "https://integrate.api.nvidia.com/v1"
     SERPAPI_API_KEY: str | None = None
     GITHUB_TOKEN: str | None = None
     STACKOVERFLOW_API_KEY: str | None = None

@@ -1,5 +1,5 @@
 from .LLMEnums import LLMEnums
-from .providers import OpenAIProvider, CoHereProvider, GroqProvider
+from .providers import OpenAIProvider, CoHereProvider, GroqProvider, NvidiaProvider
 
 class LLMProviderFactory:
     def __init__(self, config: dict):
@@ -32,11 +32,27 @@ class LLMProviderFactory:
                 default_generation_temperature=self.config.GENERATION_DEFAULT_TEMPERATURE
             )
 
+        if provider == LLMEnums.NVIDIA.value:
+            return NvidiaProvider(
+                api_key = self.config.NVIDIA_API_KEY,
+                api_url = api_url if api_url else self.config.NVIDIA_API_URL,
+                default_input_max_characters=self.config.INPUT_DEFAULT_MAX_CHARACTERS,
+                default_generation_max_output_tokens=self.config.GENERATION_DEFAULT_MAX_TOKENS,
+                default_generation_temperature=self.config.GENERATION_DEFAULT_TEMPERATURE
+            )
+
         return None
+
+    def _api_url_for_backend(self, backend: str):
+        if backend == LLMEnums.GROQ.value:
+            return self.config.GROQ_API_URL
+        if backend == LLMEnums.NVIDIA.value:
+            return self.config.NVIDIA_API_URL
+        return self.config.OPENAI_GENERATION_API_URL
 
     def create_generation_client(self):
         backend = self.config.GENERATION_BACKEND
-        api_url = self.config.GROQ_API_URL if backend == LLMEnums.GROQ.value else self.config.OPENAI_GENERATION_API_URL
+        api_url = self._api_url_for_backend(backend)
         client = self.create(backend, api_url)
         if client:
             client.set_generation_model(model_id=self.config.GENERATION_MODEL_ID)
@@ -44,7 +60,7 @@ class LLMProviderFactory:
 
     def create_utility_client(self):
         backend = getattr(self.config, 'UTILITY_BACKEND', None) or self.config.GENERATION_BACKEND
-        api_url = self.config.GROQ_API_URL if backend == LLMEnums.GROQ.value else self.config.OPENAI_GENERATION_API_URL
+        api_url = self._api_url_for_backend(backend)
         client = self.create(backend, api_url)
         if client:
             client.set_generation_model(model_id=self.config.UTILITY_MODEL_ID)

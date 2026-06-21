@@ -4,6 +4,7 @@ class LLMEnums(Enum):
     OPENAI = "OPENAI"
     COHERE = "COHERE"
     GROQ = "GROQ"
+    NVIDIA = "NVIDIA"
 
 class OpenAIEnums(Enum):
     SYSTEM = "system"
