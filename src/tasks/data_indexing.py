@@ -83,6 +83,10 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
 
         # setup batching
         total_chunks_count = await chunk_model.get_total_chunks_count(project_id=project.project_id)
+        logger.warning(
+            f"[EMBED] ▶ embedding into vector DB | collection='{collection_name}' "
+            f"project={project_id} total_chunks={total_chunks_count}"
+        )
         pbar = tqdm(total=total_chunks_count, desc="Vector Indexing", position=0, file=sys.stdout, dynamic_ncols=True)
 
 
@@ -90,14 +94,14 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
             page_chunks = await chunk_model.get_project_chunks(project_id=project.project_id, page_no=page_no)
             if len(page_chunks):
                 page_no += 1
-            
+
             if not page_chunks or len(page_chunks) == 0:
                 has_records = False
                 break
 
             chunks_ids =  [ c.chunk_id for c in page_chunks ]
             idx += len(page_chunks)
-            
+
             is_inserted = await nlp_controller.index_into_vector_db(
                 project=project,
                 chunks=page_chunks,
@@ -105,8 +109,8 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
             )
 
             if not is_inserted:
-                
 
+                logger.error(f"[EMBED] ✗ insert into vector DB FAILED | project={project_id}")
                 task_instance.update_state(
                     state="FAILURE",
                     meta={
@@ -118,8 +122,15 @@ async def _index_data_content(task_instance, project_id: int, do_reset: int):
 
             pbar.update(len(page_chunks))
             inserted_items_count += len(page_chunks)
-        
+            logger.warning(
+                f"[EMBED] … +{len(page_chunks)} vectors (running total {inserted_items_count}/{total_chunks_count})"
+            )
+
         pbar.close()
+        logger.warning(
+            f"[EMBED] ✓ DONE | {inserted_items_count} vectors inserted into '{collection_name}' "
+            f"(project={project_id}) — file is now queryable"
+        )
         
 
         task_instance.update_state(

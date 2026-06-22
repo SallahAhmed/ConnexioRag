@@ -56,6 +56,33 @@ class ProcessController(BaseController):
 
         raise FileNotFoundError(f"File not found on disk: {file_id}")
 
+    def get_file_excerpt(self, file_id: str, max_chars: int = 8000):
+        """Read only enough of a file to fill ~max_chars of answer context.
+
+        Uses lazy_load() so a large PDF is parsed page-by-page and stopped early
+        instead of fully loaded (the full parse was the main cause of upload
+        requests blocking past the caller's timeout). Falls back to load() for
+        loaders that don't implement lazy iteration.
+        """
+        loader = self.get_file_loader(file_id=file_id)
+        if not loader:
+            raise FileNotFoundError(f"File not found on disk: {file_id}")
+
+        def _collect(docs):
+            parts, total = [], 0
+            for doc in docs:
+                text = getattr(doc, "page_content", "") or ""
+                parts.append(text)
+                total += len(text)
+                if total >= max_chars:
+                    break
+            return " ".join(parts)[:max_chars]
+
+        try:
+            return _collect(loader.lazy_load())
+        except NotImplementedError:
+            return _collect(loader.load())
+
     def process_file_content(self, file_content: list, file_id: str,
                             chunk_size: int=100, overlap_size: int=20):
 

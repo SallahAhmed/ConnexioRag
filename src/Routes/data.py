@@ -345,6 +345,11 @@ async def upload_and_query(
     flow: ingest → embed → search → generate, so the caller gets a meaningful
     answer instead of just a "file received" acknowledgment.
     """
+    logger.info(
+        f"[UPLOAD-QUERY] ▶ received file='{file.filename}' type='{file.content_type}' "
+        f"project={project_id} user={user_id} query='{query[:60]}'"
+    )
+
     project_model = await ProjectModel.create_instance(db_client=request.app.db_client)
     project = await project_model.get_project_or_create_one(project_id=project_id)
 
@@ -352,10 +357,15 @@ async def upload_and_query(
     data_controller = DataController()
     is_valid, result_signal = data_controller.validate_uploaded_file(file=file)
     if not is_valid:
+        logger.warning(
+            f"[UPLOAD-QUERY] ✗ REJECTED file='{file.filename}' type='{file.content_type}' "
+            f"signal={result_signal} — check FILE_ALLOWED_TYPES in .env"
+        )
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": result_signal},
         )
+    logger.info(f"[UPLOAD-QUERY] ✓ validation OK: {file.filename}")
 
     # 2. Save file to disk
     file_path, file_id = data_controller.generate_unique_filepath(
@@ -382,34 +392,53 @@ async def upload_and_query(
         asset_size=os.path.getsize(file_path),
     )
     asset_record = await asset_model.create_asset(asset=asset_resource)
+    logger.info(
+        f"[UPLOAD-QUERY] ✓ saved to disk + asset created: asset_id={asset_record.asset_id} "
+        f"name={file_id} size={os.path.getsize(file_path)}B"
+    )
 
-    # 4. Read file content synchronously for immediate answer context
+    # 4. Read only an excerpt for the immediate answer. Parsing the whole file
+    #    here (e.g. an 8 MB PDF) just to keep the first 8000 chars was the main
+    #    cause of the request blocking past the caller's timeout — get_file_excerpt
+    #    reads lazily (page-by-page) and stops early.
     process_controller = ProcessController(project_id=project_id)
     try:
-        file_content = process_controller.get_file_content(file_id=file_id)
-        full_text = " ".join([doc.page_content for doc in file_content])
-        if len(full_text) > 8000:
-            full_text = full_text[:8000] + "\n[...content truncated...]"
-        extra_context = f"[Uploaded Document '{file.filename}']:\n{full_text}"
+        excerpt = process_controller.get_file_excerpt(file_id=file_id, max_chars=8000)
+        extra_context = f"[Uploaded Document '{file.filename}']:\n{excerpt}"
+        logger.info(f"[UPLOAD-QUERY] ✓ excerpt read for immediate answer: {len(excerpt)} chars")
     except Exception as e:
-        logger.warning(f"[upload_and_query] Could not read file content: {e}")
+        logger.warning(f"[UPLOAD-QUERY] ✗ could not read file content: {e}")
         extra_context = None
 
-    # 5. Start background indexing (fire-and-forget, does not block the answer)
-    asyncio.create_task(
-        _process_and_index(
-            db_client=request.app.db_client,
-            generation_client=request.app.generation_client,
-            embedding_client=request.app.embedding_client,
-            vectordb_client=request.app.vectordb_client,
-            template_parser=request.app.template_parser,
-            project_id=project_id,
-            asset_id=asset_record.asset_id,
-            file_id=file_id,
-            chunk_size=chunk_size,
-            overlap_size=overlap_size,
+    # 5. Offload full indexing (parse + chunk + embed) to a Celery worker so it
+    #    never blocks this web event loop. Reuses the same workflow the
+    #    fire-and-forget /upload-and-process endpoint uses; file_id here is the
+    #    on-disk asset name the task looks up. Falls back to the in-process task
+    #    only if dispatch fails (e.g. broker unreachable).
+    try:
+        workflow_res = process_and_push_workflow.delay(
+            project_id, file_id, chunk_size, overlap_size, 0
         )
-    )
+        logger.info(
+            f"[UPLOAD-QUERY] ✓ indexing dispatched to Celery: task_id={workflow_res.id} "
+            f"— watch the celery WORKER logs for [INDEX] (parse/chunk) and [EMBED] (vector DB)"
+        )
+    except Exception as e:
+        logger.warning(f"[UPLOAD-QUERY] ✗ Celery dispatch failed, indexing inline instead: {e}")
+        asyncio.create_task(
+            _process_and_index(
+                db_client=request.app.db_client,
+                generation_client=request.app.generation_client,
+                embedding_client=request.app.embedding_client,
+                vectordb_client=request.app.vectordb_client,
+                template_parser=request.app.template_parser,
+                project_id=project_id,
+                asset_id=asset_record.asset_id,
+                file_id=file_id,
+                chunk_size=chunk_size,
+                overlap_size=overlap_size,
+            )
+        )
 
     # 6. Answer the user's question using the file content as direct context
     chat_controller = NLPController(
@@ -446,6 +475,13 @@ async def upload_and_query(
                 "error": str(e),
             },
         )
+
+    _ans = result.get("answer", "") if isinstance(result, dict) else ""
+    _srcs = result.get("sources", []) if isinstance(result, dict) else []
+    logger.info(
+        f"[UPLOAD-QUERY] ✓ answer generated: {len(str(_ans))} chars, {len(_srcs)} source(s) "
+        f"— indexing continues in background"
+    )
 
     # 7. Return the answer (indexing continues in background)
     return JSONResponse(

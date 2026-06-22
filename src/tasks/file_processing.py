@@ -216,15 +216,22 @@ async def _process_project_files(task_instance, project_id: int,
         for asset_id, file_id in project_files_ids.items():
 
 
+            logger.warning(f"[INDEX] ▶ parsing file asset_id={asset_id} name={file_id}")
             try:
                 file_content = process_controller.get_file_content(file_id=file_id)
             except FileNotFoundError:
-                logger.error(f"File not found on disk: {file_id}. Removing record from database.")
+                logger.error(f"[INDEX] ✗ file not found on disk: {file_id}. Removing record from database.")
                 await asset_model.delete_asset_by_id(asset_id=asset_id)
                 continue
             except Exception as e:
-                logger.error(f"Error while processing file: {file_id}. {str(e)}")
+                logger.error(f"[INDEX] ✗ error while processing file: {file_id}. {str(e)}")
                 continue
+
+            logger.warning(
+                f"[INDEX] ✓ parsed {file_id}: "
+                f"{sum(len(getattr(d, 'page_content', '') or '') for d in file_content)} chars "
+                f"across {len(file_content)} doc(s)"
+            )
 
             file_chunks = process_controller.process_file_content(
                 file_content=file_content,
@@ -234,9 +241,11 @@ async def _process_project_files(task_instance, project_id: int,
             )
 
             if file_chunks is None or len(file_chunks) == 0:
-                
-                logger.error(f"No chunks for file_id: {file_id}")
+
+                logger.error(f"[INDEX] ✗ no chunks produced for file_id: {file_id}")
                 pass
+            else:
+                logger.warning(f"[INDEX] ✓ chunked {file_id}: {len(file_chunks)} chunks (chunk_size={chunk_size})")
 
             file_chunks_records = [
                 DataChunk(
@@ -268,7 +277,10 @@ async def _process_project_files(task_instance, project_id: int,
             result={"signal": ResponseSignal.PROCESSING_SUCCESS.value}
         )
 
-        logger.warning(f"inserted_chunks: {no_records}")
+        logger.warning(
+            f"[INDEX] ✓ DONE saving chunks to Postgres: {no_records} chunks from {no_files} file(s) "
+            f"(project={project_id}) — handing off to [EMBED]"
+        )
 
         return {
                     "signal": ResponseSignal.PROCESSING_SUCCESS.value,
