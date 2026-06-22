@@ -80,3 +80,8 @@ docs/RAG_INTEGRATION_ANSWERS.md
 docs/previous_plan_fix_rag_accuracy.md
 docs/rag-tool-prioritization-overhaul.md
 docs/rag_feature_suggestions.md
+
+# --- AI coding skills (installed locally, not published) ---
+.agents/
+.claude/skills/
+skills-lock.json
