@@ -73,11 +73,17 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
                 **result
             }
         )
-    except Exception as e:
-        logger.error(f"Agent Chat Error: {str(e)}")
+    except ValueError as e:
+        logger.warning(f"Agent Chat validation error: {e}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
+        )
+    except Exception as e:
+        logger.error(f"Agent Chat Error: {str(e)}", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": "An internal error occurred while processing your request."}
         )
 
 @agent_router.get("/chat/stream/{project_id}")
@@ -114,9 +120,15 @@ async def agent_chat_stream(request: Request, project_id: int,
                 "X-Accel-Buffering": "no",
             }
         )
-    except Exception as e:
-        logger.error(f"Agent Chat Stream Error: {str(e)}")
+    except ValueError as e:
+        logger.warning(f"Agent Chat Stream validation error: {e}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
             content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
+        )
+    except Exception as e:
+        logger.error(f"Agent Chat Stream Error: {str(e)}", exc_info=True)
+        return JSONResponse(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": "An internal error occurred while processing your request."}
         )
