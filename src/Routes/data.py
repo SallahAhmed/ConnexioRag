@@ -441,18 +441,8 @@ async def upload_and_query(
         )
 
     # 6. Answer the user's question using the file content as direct context
-    chat_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_client=request.app.generation_client,
-        utility_client=request.app.utility_client,
-        embedding_client=request.app.embedding_client,
-        template_parser=request.app.template_parser,
-        settings=getattr(request.app, "settings", None),
-        db_client=getattr(request.app, "db_client", None),
-        reranker=getattr(request.app, "reranker", None),
-        backend_client=getattr(request.app, "backend_client", None),
-        masarx_client=getattr(request.app, "masarx_client", None),
-    )
+    from .dependencies import get_nlp_controller
+    chat_controller = get_nlp_controller(request)
     try:
         result = await chat_controller.answer_agent_chat(
             user_id=user_id,
@@ -551,12 +541,8 @@ async def delete_project_asset(request: Request, asset_id: int):
 
     # 3. Remove matching rows from the dynamic PGVector collection table
     if chunk_ids:
-        nlp_controller = NLPController(
-            vectordb_client=request.app.vectordb_client,
-            generation_client=request.app.generation_client,
-            embedding_client=request.app.embedding_client,
-            template_parser=request.app.template_parser,
-        )
+        from .dependencies import make_nlp_controller
+        nlp_controller = make_nlp_controller(request)
         collection_name = nlp_controller.create_collection_name(project_id=project_id)
         if await request.app.vectordb_client.is_collection_existed(collection_name):
             try:
