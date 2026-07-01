@@ -22,8 +22,8 @@ services:
     env_file:
       - ./env/.env.app
     environment:
-      - CELERY_BROKER_URL=amqp://connexio_user:connexio_rabbitmq_2222@rabbitmq:5672/connexio_vhost
-      - CELERY_RESULT_BACKEND=redis://:connexio_redis_2222@redis:6379/0
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER:-connexio_user}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/${RABBITMQ_DEFAULT_VHOST:-connexio_vhost}
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
 
   # Nginx Service
   nginx:
@@ -64,8 +64,8 @@ services:
     env_file:
       - ./env/.env.app
     environment:
-      - CELERY_BROKER_URL=amqp://connexio_user:connexio_rabbitmq_2222@rabbitmq:5672/connexio_vhost
-      - CELERY_RESULT_BACKEND=redis://:connexio_redis_2222@redis:6379/0
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER:-connexio_user}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/${RABBITMQ_DEFAULT_VHOST:-connexio_vhost}
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
     command: ["python", "-m", "celery", "-A", "celery_app", "worker", "--queues=default,file_processing,data_indexing", "--loglevel=info"]
 
   # Celery Beat Scheduler
@@ -88,8 +88,8 @@ services:
     env_file:
       - ./env/.env.app
     environment:
-      - CELERY_BROKER_URL=amqp://connexio_user:connexio_rabbitmq_2222@rabbitmq:5672/connexio_vhost
-      - CELERY_RESULT_BACKEND=redis://:connexio_redis_2222@redis:6379/0
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER:-connexio_user}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/${RABBITMQ_DEFAULT_VHOST:-connexio_vhost}
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
     command: ["python", "-m", "celery", "-A", "celery_app", "beat", "--loglevel=info"]
 
 
@@ -110,9 +110,9 @@ services:
     env_file:
       - ./env/.env.app
     environment:
-      - CELERY_BROKER_URL=amqp://connexio_user:connexio_rabbitmq_2222@rabbitmq:5672/connexio_vhost
-      - CELERY_RESULT_BACKEND=redis://:connexio_redis_2222@redis:6379/0
-      - CELERY_FLOWER_BROKER_API=http://connexio_user:connexio_rabbitmq_2222@rabbitmq:15672/api/
+      - CELERY_BROKER_URL=amqp://${RABBITMQ_DEFAULT_USER:-connexio_user}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/${RABBITMQ_DEFAULT_VHOST:-connexio_vhost}
+      - CELERY_RESULT_BACKEND=redis://:${REDIS_PASSWORD}@redis:6379/0
+      - CELERY_FLOWER_BROKER_API=http://${RABBITMQ_DEFAULT_USER:-connexio_user}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:15672/api/
       - CELERY_FLOWER_STATE_SAVE_INTERVAL=1000
     command: ["python", "-m", "celery", "-A", "celery_app", "flower", "--conf=flowerconfig.py"]
 
@@ -190,7 +190,7 @@ services:
       test: ["CMD", "redis-cli", "ping"]
       timeout: 10s
       retries: 5
-    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD:-connexio_redis_2222}"]
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
 
   # ========================================================
   # --- MONITORING & METRICS ---

@@ -70,5 +70,5 @@ async def sync_project(request: Request, body: ProjectSyncRequest):
         logger.error(f"[sync_project] Error syncing project {body.mysql_pid}: {e}")
         return JSONResponse(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            content={"status": "error", "detail": str(e)},
+            content={"status": "error", "detail": "An internal error occurred while syncing the project."},
         )

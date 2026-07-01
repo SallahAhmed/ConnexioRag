@@ -472,7 +472,7 @@ async def upload_and_query(
             content={
                 "status": "chat_failed",
                 "file_id": str(asset_record.asset_id),
-                "error": str(e),
+                "error": "An internal error occurred while generating a response.",
             },
         )
 
@@ -562,9 +562,14 @@ async def delete_project_asset(request: Request, asset_id: int):
             try:
                 async with db_client() as session:
                     async with session.begin():
+                        # Validate collection_name to prevent SQL injection:
+                        # it must match the pattern collection_{size}_{pid}
+                        import re as _re
+                        if not _re.fullmatch(r'collection_\d+_\d+', collection_name):
+                            raise ValueError(f"Invalid collection name: {collection_name}")
                         await session.execute(
                             sql_text(
-                                f"DELETE FROM {collection_name} WHERE chunk_id = ANY(:ids)"
+                                f'DELETE FROM "{collection_name}" WHERE chunk_id = ANY(:ids)'
                             ),
                             {"ids": chunk_ids},
                         )

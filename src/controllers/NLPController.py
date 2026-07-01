@@ -337,6 +337,24 @@ class NLPController(BaseController):
             self.logger.info(f"[URL Parser] Detected URL in query: {extracted_url}")
             try:
                 import httpx
+                from urllib.parse import urlparse
+                import ipaddress
+
+                # SSRF guard: block requests to private/internal networks
+                parsed_url = urlparse(extracted_url)
+                hostname = parsed_url.hostname or ""
+                _blocked_hosts = {"localhost", "127.0.0.1", "0.0.0.0", "::1", "[::1]",
+                                  "metadata.google.internal", "169.254.169.254"}
+                if hostname.lower() in _blocked_hosts:
+                    raise ValueError(f"Blocked request to internal host: {hostname}")
+                try:
+                    addr = ipaddress.ip_address(hostname)
+                    if addr.is_private or addr.is_loopback or addr.is_link_local or addr.is_reserved:
+                        raise ValueError(f"Blocked request to private IP: {hostname}")
+                except ValueError as ip_err:
+                    if "Blocked" in str(ip_err):
+                        raise
+
                 async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
                     resp = await client.get(extracted_url)
                 if resp.status_code == 200:
