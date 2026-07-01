@@ -339,14 +339,19 @@ class NLPController(BaseController):
                 import httpx
                 from urllib.parse import urlparse
                 import ipaddress
+                import socket
 
-                # SSRF guard: block requests to private/internal networks
+                # SSRF guard: restrict schemes and block private/internal networks
                 parsed_url = urlparse(extracted_url)
+                if parsed_url.scheme not in ("http", "https"):
+                    raise ValueError(f"Blocked non-HTTP scheme: {parsed_url.scheme}")
                 hostname = parsed_url.hostname or ""
                 _blocked_hosts = {"localhost", "127.0.0.1", "0.0.0.0", "::1", "[::1]",
                                   "metadata.google.internal", "169.254.169.254"}
                 if hostname.lower() in _blocked_hosts:
                     raise ValueError(f"Blocked request to internal host: {hostname}")
+
+                # Resolve hostname and check all resolved IPs against private ranges
                 try:
                     addr = ipaddress.ip_address(hostname)
                     if addr.is_private or addr.is_loopback or addr.is_link_local or addr.is_reserved:
@@ -354,6 +359,15 @@ class NLPController(BaseController):
                 except ValueError as ip_err:
                     if "Blocked" in str(ip_err):
                         raise
+                    # hostname is not a literal IP — resolve via DNS
+                    try:
+                        resolved = socket.getaddrinfo(hostname, None, socket.AF_UNSPEC, socket.SOCK_STREAM)
+                        for family, _, _, _, sockaddr in resolved:
+                            resolved_ip = ipaddress.ip_address(sockaddr[0])
+                            if resolved_ip.is_private or resolved_ip.is_loopback or resolved_ip.is_link_local or resolved_ip.is_reserved:
+                                raise ValueError(f"Blocked: {hostname} resolves to private IP {sockaddr[0]}")
+                    except socket.gaierror:
+                        pass  # DNS resolution failed; let httpx handle the error
 
                 async with httpx.AsyncClient(follow_redirects=True, timeout=15.0) as client:
                     resp = await client.get(extracted_url)

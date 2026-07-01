@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request, Form
+from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request, Form, HTTPException
 from fastapi.responses import JSONResponse
 import os
+import re
 import asyncio
 from typing import Optional
 from helpers.config import get_settings, Settings
@@ -562,11 +563,8 @@ async def delete_project_asset(request: Request, asset_id: int):
             try:
                 async with db_client() as session:
                     async with session.begin():
-                        # Validate collection_name to prevent SQL injection:
-                        # it must match the pattern collection_{size}_{pid}
-                        import re as _re
-                        if not _re.fullmatch(r'collection_\d+_\d+', collection_name):
-                            raise ValueError(f"Invalid collection name: {collection_name}")
+                        if not re.fullmatch(r'collection_\d+_\d+', collection_name):
+                            raise HTTPException(status_code=400, detail="Invalid collection name.")
                         await session.execute(
                             sql_text(
                                 f'DELETE FROM "{collection_name}" WHERE chunk_id = ANY(:ids)'
