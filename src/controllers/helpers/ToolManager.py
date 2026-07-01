@@ -16,6 +16,7 @@ import logging
 from typing import Optional
 
 import httpx
+from utils.text_utils import parse_tech_list, rrf_merge
 # pyrefly: ignore [missing-import]
 from langchain_community.tools import WikipediaQueryRun
 # pyrefly: ignore [missing-import]
@@ -84,7 +85,7 @@ class ToolManager:
     # ------------------------------------------------------------------
 
     def _get_collection_name(self, project_id) -> str:
-        """Single source of truth for vector collection naming."""
+        """Mirror of NLPController.create_collection_name for ToolManager context."""
         return f"collection_{self.vectordb_client.default_vector_size}_{project_id}".strip()
 
     # ------------------------------------------------------------------
@@ -159,17 +160,6 @@ class ToolManager:
                 return "Could not embed query for knowledge base search."
 
             query_vector = vectors[0]
-            k = 60
-            scores = {}
-            doc_map = {}
-
-            def add_results(results, prefix=""):
-                if not results:
-                    return
-                for rank, doc in enumerate(results):
-                    doc_id = prefix + doc.text
-                    doc_map[doc_id] = doc
-                    scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
 
             # Search project KB
             project_collection = self._get_collection_name(project_id)
@@ -181,12 +171,15 @@ class ToolManager:
                 project_results = await self.vectordb_client.search_by_vector(
                     collection_name=project_collection, vector=query_vector, limit=limit * 2,
                 )
-            add_results(project_results, "proj_")
+
+            sorted_doc_ids, doc_map, scores = rrf_merge(
+                [project_results],
+                text_fn=lambda doc: "proj_" + doc.text,
+                limit=limit,
+            )
 
             if not scores:
                 return "No relevant documents found in the knowledge base."
-
-            sorted_doc_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)[:limit]
 
             if self.reranker and sorted_doc_ids:
                 docs_to_rerank = [doc_map[did] for did in sorted_doc_ids]
@@ -219,19 +212,9 @@ class ToolManager:
                 return []
 
             query_vector = vectors[0]
-            k = 60
-            scores = {}
-            doc_map = {}
-
-            def add_results(results, prefix=""):
-                if not results:
-                    return
-                for rank, doc in enumerate(results):
-                    doc_id = prefix + doc.text
-                    doc_map[doc_id] = doc
-                    scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
 
             project_collection = self._get_collection_name(project_id)
+            project_results = []
             if await self.vectordb_client.is_collection_existed(project_collection):
                 try:
                     project_results = await self.vectordb_client.hybrid_search(
@@ -241,12 +224,15 @@ class ToolManager:
                     project_results = await self.vectordb_client.search_by_vector(
                         collection_name=project_collection, vector=query_vector, limit=limit * 2,
                     )
-                add_results(project_results, "proj_")
+
+            sorted_doc_ids, doc_map, scores = rrf_merge(
+                [project_results],
+                text_fn=lambda doc: "proj_" + doc.text,
+                limit=limit,
+            )
 
             if not scores:
                 return []
-
-            sorted_doc_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)[:limit]
 
             if self.reranker and sorted_doc_ids:
                 docs_to_rerank = [doc_map[did] for did in sorted_doc_ids]
@@ -296,17 +282,14 @@ class ToolManager:
                 return f"Could not retrieve details for project {project_id} from the backend."
 
             # Parse skills — stored as comma-separated string in `technologies`
-            raw_techs = user_data.get("technologies") or ""
-            user_skills = [t.strip() for t in raw_techs.split(",") if t.strip()]
+            user_skills = parse_tech_list(user_data.get("technologies"))
 
             # skills JSON array (more granular) — merge both sources
             skill_list = user_data.get("skills") or []
             if isinstance(skill_list, list):
                 user_skills = list(set(user_skills + [str(s) for s in skill_list]))
 
-            project_techs = project_data.get("technologyUsed") or []
-            if isinstance(project_techs, str):
-                project_techs = [t.strip() for t in project_techs.split(",") if t.strip()]
+            project_techs = parse_tech_list(project_data.get("technologyUsed"))
 
             matched_techs = [t for t in user_skills if t in project_techs]
 
@@ -356,9 +339,7 @@ class ToolManager:
             if not project_data:
                 return f"Could not retrieve project {project_id} details."
 
-            required_techs = project_data.get("technologyUsed") or []
-            if isinstance(required_techs, str):
-                required_techs = [t.strip() for t in required_techs.split(",") if t.strip()]
+            required_techs = parse_tech_list(project_data.get("technologyUsed"))
 
             if not required_techs:
                 return (
@@ -375,11 +356,7 @@ class ToolManager:
             # Aggregate all skills across the team
             team_skills: set[str] = set()
             for member in members:
-                raw = member.get("technologies") or ""
-                for t in raw.split(","):
-                    t = t.strip()
-                    if t:
-                        team_skills.add(t)
+                team_skills.update(parse_tech_list(member.get("technologies")))
 
             missing = [t for t in required_techs if t not in team_skills]
             covered = [t for t in required_techs if t in team_skills]
@@ -455,9 +432,7 @@ class ToolManager:
             if isinstance(project_data, dict):
                 lines.append(f"Project: {project_data.get('PName', project_data.get('name', 'N/A'))}")
                 lines.append(f"Description: {project_data.get('Description', project_data.get('description', 'N/A'))}")
-                techs = project_data.get("technologyUsed") or []
-                if isinstance(techs, str):
-                    techs = [t.strip() for t in techs.split(",") if t.strip()]
+                techs = parse_tech_list(project_data.get("technologyUsed"))
                 lines.append(f"Technology stack: {', '.join(techs) if techs else 'N/A'}")
                 lines.append(f"Timeline: {project_data.get('startDate', '?')} → {project_data.get('endDate', '?')}")
                 # L1 additions: phase/status and GitHub URL

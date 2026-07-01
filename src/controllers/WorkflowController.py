@@ -1,5 +1,6 @@
 from .BaseController import BaseController
 from models.enums.WorkflowNodeEnum import WorkflowNodeEnum
+from utils.text_utils import contains_arabic
 import difflib
 import json
 import re
@@ -222,7 +223,7 @@ class WorkflowController(BaseController):
         if (
             len(query_lower) < 50
             and not any(p in query_lower for p in _SKIP_FAST_PATH)
-            and not re.search(r'[\u0600-\u06FF]', query_lower)
+            and not contains_arabic(query_lower)
         ):
             return WorkflowNodeEnum.GENERAL
 
@@ -266,9 +267,7 @@ class WorkflowController(BaseController):
         Checks Arabic Unicode ranges: Basic (0600-06FF), Extended-A (08A0-08FF),
         Presentation Forms-A (FB50-FDFF), Presentation Forms-B (FE70-FEFF).
         """
-        if re.search(r'[\u0600-\u06FF\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]', query):
-            return "ar"
-        return "en"
+        return "ar" if contains_arabic(query) else "en"
 
     async def grade_relevance(self, query: str, context: str) -> bool:
         """

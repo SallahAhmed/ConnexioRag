@@ -5,6 +5,7 @@ import logging
 from typing import List
 from models.db_schemas import RetrievedDocument
 from sqlalchemy.sql import text as sql_text
+from utils.text_utils import rrf_merge
 import json
 import re
 
@@ -375,30 +376,15 @@ class PGVectorProvider(VectorDBInterface):
         """
         vector_results = await self.search_by_vector(collection_name, vector, over_fetch) or []
         text_results = await self.search_by_text(collection_name, query, over_fetch) or []
-        
-        # RRF Algorithm Implementation
-        # k=60 is the standard constant used in RRF to balance ranking
-        k = 60
-        scores = {}
-        doc_map = {}
 
-        for rank, doc in enumerate(vector_results):
-            doc_id = doc.text
-            doc_map[doc_id] = doc
-            scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
-            
-        for rank, doc in enumerate(text_results):
-            doc_id = doc.text
-            doc_map[doc_id] = doc
-            scores[doc_id] = scores.get(doc_id, 0) + (1.0 / (k + rank + 1))
-            
-        # Sort by RRF score
-        sorted_doc_ids = sorted(scores.keys(), key=lambda x: scores[x], reverse=True)
-        
+        sorted_ids, doc_map, scores = rrf_merge(
+            [vector_results, text_results], limit=limit,
+        )
+
         final_results = []
-        for doc_id in sorted_doc_ids[:limit]:
+        for doc_id in sorted_ids:
             doc = doc_map[doc_id]
             doc.score = scores[doc_id]
             final_results.append(doc)
-            
+
         return final_results
