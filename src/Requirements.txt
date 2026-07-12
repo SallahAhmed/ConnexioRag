@@ -1,7 +1,11 @@
 # --- Core API & Web Server ---
-fastapi>=0.115.0
+# Pinned exactly: unbounded ranges let the deployed image drift to a
+# FastAPI/Starlette whose include_router() inserts a lazy `_IncludedRouter`
+# (no `.path`) into app.routes, which crashes opentelemetry-instrumentation-fastapi
+# 0.50b0 on every request (500). These versions are OTel-compatible.
+fastapi==0.135.2
 uvicorn[standard]==0.31.1
-starlette>=0.49.1
+starlette==1.0.0
 python-multipart==0.0.24
 python-dotenv==1.0.1
 PyJWT>=2.8.0
