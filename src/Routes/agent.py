@@ -77,7 +77,7 @@ async def agent_chat(request: Request, project_id: int, chat_request: AgentChatR
         logger.error(f"Agent Chat Error: {str(e)}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
+            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": "An internal error occurred while processing your request."}
         )
 
 @agent_router.get("/chat/stream/{project_id}")
@@ -118,5 +118,5 @@ async def agent_chat_stream(request: Request, project_id: int,
         logger.error(f"Agent Chat Stream Error: {str(e)}")
         return JSONResponse(
             status_code=status.HTTP_400_BAD_REQUEST,
-            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": str(e)}
+            content={"signal": ResponseSignal.AGENT_CHAT_ERROR.value, "error": "An internal error occurred while processing your request."}
         )

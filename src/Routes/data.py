@@ -1,6 +1,7 @@
-from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request, Form
+from fastapi import FastAPI, APIRouter, Depends, UploadFile, status, Request, Form, HTTPException
 from fastapi.responses import JSONResponse
 import os
+import re
 import asyncio
 from typing import Optional
 from helpers.config import get_settings, Settings
@@ -472,7 +473,7 @@ async def upload_and_query(
             content={
                 "status": "chat_failed",
                 "file_id": str(asset_record.asset_id),
-                "error": str(e),
+                "error": "An internal error occurred while generating a response.",
             },
         )
 
@@ -562,9 +563,11 @@ async def delete_project_asset(request: Request, asset_id: int):
             try:
                 async with db_client() as session:
                     async with session.begin():
+                        if not re.fullmatch(r'collection_\d+_\d+', collection_name):
+                            raise HTTPException(status_code=400, detail="Invalid collection name.")
                         await session.execute(
                             sql_text(
-                                f"DELETE FROM {collection_name} WHERE chunk_id = ANY(:ids)"
+                                f'DELETE FROM "{collection_name}" WHERE chunk_id = ANY(:ids)'
                             ),
                             {"ids": chunk_ids},
                         )

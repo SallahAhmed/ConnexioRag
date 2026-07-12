@@ -80,7 +80,7 @@ except Exception as _e:
     celery_app = None  # type: ignore
 
 if celery_app is not None:
-    _ssl_opts = {"ssl_cert_reqs": _ssl.CERT_NONE}
+    _ssl_opts = {"ssl_cert_reqs": _ssl.CERT_REQUIRED}
     celery_app.conf.update(
     broker_use_ssl=_ssl_opts,
     redis_backend_use_ssl=_ssl_opts,

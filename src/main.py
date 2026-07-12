@@ -51,6 +51,9 @@ app = FastAPI(
         "exclusively by the main Connexio backend (service-to-service)."
     ),
     version="1.0.0",
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 setup_metrics(app)
 
@@ -63,7 +66,7 @@ app.state.limiter = limiter
 async def rate_limit_handler(request, exc):
     return JSONResponse(
         status_code=429,
-        content={"signal": "RATE_LIMITED", "detail": str(exc)},
+        content={"signal": "RATE_LIMITED", "detail": "Too many requests. Please try again later."},
     )
 
 
@@ -214,5 +217,4 @@ async def root():
     return {
         "status": "Connexios RAG is running",
         "health": "healthy",
-        "documentation": "/docs",
     }
