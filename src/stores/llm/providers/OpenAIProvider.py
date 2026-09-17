@@ -106,8 +106,8 @@ class OpenAIProvider(LLMInterface):
                     await asyncio.sleep(wait)
                     retry_delay = min(retry_delay * 2, 30.0)
                 else:
-                    print(f"DEBUG: OpenAIProvider Error: {str(e)}")
-                    return f"Error during generation: {str(e)}"
+                    self.logger.error(f"OpenAI generation failed: {e}")
+                    return None
 
     @staticmethod
     def _parse_retry_after(error: Exception) -> Optional[float]:
@@ -177,8 +177,8 @@ class OpenAIProvider(LLMInterface):
                 if chunk.choices and chunk.choices[0].delta.content:
                     yield chunk.choices[0].delta.content
         except Exception as e:
-            print(f"DEBUG: OpenAIProvider Streaming Error: {str(e)}")
-            yield f"Error: {str(e)}"
+            self.logger.error(f"OpenAI streaming generation failed: {e}")
+            return
 
     async def embed_text(self, text: Union[str, List[str]], document_type: str = None):
         

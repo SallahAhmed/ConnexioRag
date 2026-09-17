@@ -1259,6 +1259,26 @@ class NLPController(BaseController):
 
         tracer.end_trace(trace_id, step_id, full_answer)
 
+        # If the LLM produced no output at all, emit a user-friendly fallback
+        if not full_answer.strip():
+            fallback = (
+                "عذراً، لم أتمكن من إنشاء رد. يرجى إعادة صياغة السؤال."
+                if language == "ar"
+                else "Sorry, I couldn't generate a response. Please try rephrasing your question."
+            )
+            self.logger.warning(f"[RAG STREAM] Empty LLM output for query: {query[:50]}...")
+            if not metadata_sent:
+                metadata = {
+                    "node": node.value,
+                    "language": language,
+                    "session_id": session_id,
+                    "trace_id": trace_id,
+                    "event": "meta",
+                }
+                yield f"data: {_json.dumps(metadata)}\n\n"
+            yield f"data: {_json.dumps({'text': fallback})}\n\n"
+            full_answer = fallback
+
         # Pipeline summary log
         model_name = getattr(prompt_client, 'generation_model_id', 'unknown')
         self.logger.info(

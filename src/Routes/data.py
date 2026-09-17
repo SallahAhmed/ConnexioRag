@@ -53,8 +53,11 @@ async def _process_and_index(
 
         try:
             file_content = process_controller.get_file_content(file_id=file_id)
+        except FileNotFoundError:
+            logger.error(f"[_process_and_index] File not found on disk: {file_id}")
+            return 0
         except Exception as e:
-            logger.error(f"[_process_and_index] Cannot read file {file_id}: {e}")
+            logger.error(f"[_process_and_index] Cannot read file {file_id}: {e}", exc_info=True)
             return 0
 
         file_chunks = process_controller.process_file_content(
@@ -65,7 +68,7 @@ async def _process_and_index(
         )
 
         if not file_chunks:
-            logger.warning(f"[_process_and_index] No chunks from file {file_id}")
+            logger.warning(f"[_process_and_index] No chunks produced from file {file_id} (empty or too short)")
             return 0
 
         chunk_records = [
@@ -88,7 +91,7 @@ async def _process_and_index(
             saved_chunks = result.scalars().all()
 
         if not saved_chunks:
-            logger.error(f"[_process_and_index] No saved chunks found for asset={asset_id}")
+            logger.error(f"[_process_and_index] Chunks were inserted but could not be read back for asset={asset_id}")
             return 0
 
         collection_name = nlp_controller.create_collection_name(project_id=project.project_id)
@@ -107,7 +110,7 @@ async def _process_and_index(
         logger.info(f"[_process_and_index] Done: project={project_id}, indexed={len(saved_chunks)} chunks")
         return len(saved_chunks)
     except Exception as e:
-        logger.error(f"[_process_and_index] Failed: project={project_id}, error={e}")
+        logger.error(f"[_process_and_index] Unexpected failure: project={project_id}, asset={asset_id}, error={e}", exc_info=True)
         return 0
 
 
@@ -550,6 +553,7 @@ async def delete_project_asset(request: Request, asset_id: int):
     chunk_ids = [c.chunk_id for c in chunks]
 
     # 3. Remove matching rows from the dynamic PGVector collection table
+    warnings = []
     if chunk_ids:
         nlp_controller = NLPController(
             vectordb_client=request.app.vectordb_client,
@@ -570,6 +574,7 @@ async def delete_project_asset(request: Request, asset_id: int):
                         )
             except Exception as q_err:
                 logger.error(f"[RAG] Failed to delete PGVector rows: {q_err}")
+                warnings.append(f"Vector DB cleanup failed: {q_err}")
 
     # 4. Remove the physical file from disk
     project_path = ProjectController().get_project_path(project_id=project_id)
@@ -579,9 +584,13 @@ async def delete_project_asset(request: Request, asset_id: int):
             os.remove(file_path)
         except Exception as f_err:
             logger.error(f"[RAG] Physical file removal failed: {f_err}")
+            warnings.append(f"Physical file removal failed: {f_err}")
 
     # 5. Drop SQL chunk records then asset record
     await chunk_model.delete_chunks_by_asset_id(asset_id=asset_id)
     await asset_model.delete_asset_by_id(asset_id=asset_id)
 
-    return {"success": True, "message": "Asset and vectors deleted successfully"}
+    response = {"success": True, "message": "Asset and vectors deleted successfully"}
+    if warnings:
+        response["warnings"] = warnings
+    return response

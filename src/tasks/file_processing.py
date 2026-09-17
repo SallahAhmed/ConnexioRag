@@ -243,7 +243,8 @@ async def _process_project_files(task_instance, project_id: int,
             if file_chunks is None or len(file_chunks) == 0:
 
                 logger.error(f"[INDEX] ✗ no chunks produced for file_id: {file_id}")
-                pass
+                continue
+
             else:
                 logger.warning(f"[INDEX] ✓ chunked {file_id}: {len(file_chunks)} chunks (chunk_size={chunk_size})")
 

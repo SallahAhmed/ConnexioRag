@@ -83,7 +83,7 @@ async def _clean_stale_sessions(task_instance):
         return deleted
     except Exception as e:
         logger.error(f"Session cleanup task failed: {str(e)}")
-        return 0
+        raise
     finally:
         if db_engine:
             await db_engine.dispose()
