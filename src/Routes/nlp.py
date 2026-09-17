@@ -3,10 +3,10 @@ from fastapi.responses import JSONResponse
 from .schemas.nlp import PushRequest, SearchRequest
 from models.ProjectModel import ProjectModel
 from models.ChunkModel import ChunkModel
-from controllers import NLPController
 from models import ResponseSignal
 from tasks.data_indexing import index_data_content
 from utils.security import verify_api_key
+from .dependencies import get_nlp_controller
 import logging
 
 logger = logging.getLogger('uvicorn.error')
@@ -49,15 +49,7 @@ async def get_project_index_info(request: Request, project_id: int):
             },
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_client=request.app.generation_client,
-        utility_client=request.app.utility_client,
-        embedding_client=request.app.embedding_client,
-        template_parser=request.app.template_parser,
-        settings=request.app.settings,
-        db_client=request.app.db_client
-    )
+    nlp_controller = get_nlp_controller(request)
 
     collection_info = await nlp_controller.get_vector_db_collection_info(project=project)
 
@@ -85,15 +77,7 @@ async def search_index(request: Request, project_id: int, search_request: Search
             },
         )
 
-    nlp_controller = NLPController(
-        vectordb_client=request.app.vectordb_client,
-        generation_client=request.app.generation_client,
-        utility_client=request.app.utility_client,
-        embedding_client=request.app.embedding_client,
-        template_parser=request.app.template_parser,
-        settings=request.app.settings,
-        db_client=request.app.db_client
-    )
+    nlp_controller = get_nlp_controller(request)
 
     results = await nlp_controller.search_vector_db_collection(
         project=project, text=search_request.text, limit=search_request.limit

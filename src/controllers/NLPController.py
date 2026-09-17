@@ -16,6 +16,14 @@ from .helpers.TraceManager import tracer
 import logging
 import os
 import tiktoken
+from utils.text_utils import (
+    contains_arabic,
+    detect_language as detect_lang_fast,
+    is_greeting,
+    is_clear_history,
+    get_oos_response,
+    GREETING_RESPONSES,
+)
 
 
 SHORTCUT_COMMANDS = {
@@ -194,7 +202,7 @@ class NLPController(BaseController):
         # caller-supplied hint: the AI Chat page sends the user's UI language, so an English-UI
         # user typing Arabic would otherwise be force-answered in English. Arabic script is
         # unambiguous; on this en/ar platform its absence means English.
-        if re.search(r'[؀-ۿ]', query or ""):
+        if contains_arabic(query or ""):
             if language != "ar":
                 self.logger.info("Language hint '%s' overridden by Arabic script in query.", language)
             language = "ar"
@@ -925,67 +933,16 @@ class NLPController(BaseController):
             model_tier = "generation"  # commands always need full project context
 
         # Fast path — greetings (skip ALL LLM calls, RAG, KB, etc.)
-        GREETINGS_EN = {
-            "hello", "hi", "hey", "hi there", "hello there",
-            "good morning", "good afternoon", "good evening", "good day", "good night",
-            "whats up", "what's up", "sup", "howdy", "greetings", "yo", "morning",
-            "how are you", "how are you doing", "how's it going", "how are things",
-        }
-        GREETINGS_AR = {
-            "مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً",
-            "صباح الخير", "مساء الخير", "صباح النور", "مساء النور",
-            "كيف حالك", "كيف الحال", "ازيك", "أزيك",
-        }
-        clean_query = query.strip().lower().rstrip("?!.,;:")
-        is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
-        greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN
-        if clean_query in greeting_set:
-            lang = language or ("ar" if is_ar else "en")
-            sid = 0
-            if self.db_client:
-                chat_session = await self.session_model.get_or_create_session(
-                    user_id=user_id, project_id=project_id, persona=persona, language=lang
-                )
-                sid = chat_session.session_id
-                await self.session_model.append_message(sid, "user", query, "general")
-            greeting_responses = {
-                "en": "Hello! How can I help you with your project today?",
-                "ar": "مرحباً! كيف يمكنني مساعدتك في مشروعك اليوم؟",
-            }
-            answer = greeting_responses.get(lang, greeting_responses["en"])
-            if self.db_client:
-                await self.session_model.append_message(sid, "assistant", answer, "general")
-            print(f"[RAG SOURCE] GREETING", file=sys.stderr)
-            return {
-                "answer": answer, "node": "general",
-                "language": lang, "sources": [], "session_id": sid,
-            }
+        if is_greeting(query):
+            return await self._handle_greeting(
+                user_id, project_id, query, persona, language, streaming=False,
+            )
 
         # Fast path — history clear
-        clear_commands = [
-            "clear history", "forget everything", "new topic",
-            "نظف السجل", "نسيان السجل", "موضوع جديد",
-        ]
-        if any(cmd in query.lower() for cmd in clear_commands):
-            if self.db_client:
-                chat_session = await self.session_model.get_or_create_session(
-                    user_id=user_id, project_id=project_id, persona=persona, language="en"
-                )
-                await self.session_model.append_message(
-                    chat_session.session_id, "system", "History cleared by user."
-                )
-                sid = chat_session.session_id
-            else:
-                sid = 0
-            lang = "ar" if any("\u0600" <= c <= "\u06FF" for c in query) else "en"
-            msg = (
-                "تم مسح سجل المحادثة بنجاح!" if lang == "ar"
-                else "Chat history cleared successfully!"
+        if is_clear_history(query):
+            return await self._handle_clear_history(
+                user_id, project_id, query, persona, streaming=False,
             )
-            return {
-                "answer": msg, "node": "general",
-                "language": lang, "sources": [], "session_id": sid,
-            }
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
             await self._prepare_chat_context(
@@ -998,13 +955,7 @@ class NLPController(BaseController):
 
         # Short-circuit: out-of-scope queries never reach the generation LLM.
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
-            answer = (
-                "أنا متخصص في التعاون في المشاريع والمهارات المهنية. "
-                "هل يمكنني مساعدتك في شيء متعلق بمشروعك؟"
-                if language == "ar"
-                else "I specialize in project collaboration and professional skills. "
-                     "Can I help you with something related to your project?"
-            )
+            answer = get_oos_response(language)
             if self.db_client:
                 await self.session_model.append_message(session_id, "user", query, node.value, source=source)
                 await self.session_model.append_message(session_id, "assistant", answer, node.value, source=source)
@@ -1034,8 +985,8 @@ class NLPController(BaseController):
         # Auto-escalate: if utility model gave a bad answer, retry with generation
         if prompt_client == self.utility_client and not use_generation:
             # Detect language mismatch: English query → Arabic answer (or vice versa)
-            query_has_arabic = bool(re.search(r'[\u0600-\u06FF]', query))
-            answer_has_arabic = bool(re.search(r'[\u0600-\u06FF]', answer or ""))
+            query_has_arabic = contains_arabic(query)
+            answer_has_arabic = contains_arabic(answer or "")
             lang_mismatch = (query_has_arabic and not answer_has_arabic) or (not query_has_arabic and answer_has_arabic)
 
             is_bad = (
@@ -1072,11 +1023,11 @@ class NLPController(BaseController):
         # Post-generation language correction: if the model responded in a different
         # language than detected, correct the response language metadata.
         if answer:
-            answer_has_arabic = bool(re.search(r'[\u0600-\u06FF]', answer))
+            answer_has_arabic = contains_arabic(answer)
             if answer_has_arabic and language != "ar":
                 self.logger.info(f"Language correction: '{language}' -> 'ar' (answer contains Arabic)")
                 language = "ar"
-            elif not answer_has_arabic and language == "ar" and not re.search(r'[\u0600-\u06FF]', query):
+            elif not answer_has_arabic and language == "ar" and not contains_arabic(query):
                 self.logger.info(f"Language correction: 'ar' -> 'en' (query+answer are English)")
                 language = "en"
 
@@ -1131,67 +1082,19 @@ class NLPController(BaseController):
             model_tier = "generation"
 
         # Fast path — history clear
-        clear_commands = [
-            "clear history", "forget everything", "new topic",
-            "نظف السجل", "نسيان السجل", "موضوع جديد",
-        ]
-        if any(cmd in query.lower() for cmd in clear_commands):
-            if self.db_client:
-                chat_session = await self.session_model.get_or_create_session(
-                    user_id=user_id, project_id=project_id, persona=persona
-                )
-                await self.session_model.append_message(
-                    chat_session.session_id, "system", "History cleared by user."
-                )
-                sid = chat_session.session_id
-            else:
-                sid = 0
-            lang = "ar" if any("\u0600" <= c <= "\u06FF" for c in query) else "en"
-            msg = (
-                "تم مسح سجل المحادثة بنجاح!" if lang == "ar"
-                else "Chat history cleared successfully!"
-            )
-            import json as _json
-            yield f"data: {_json.dumps({'answer': msg, 'session_id': sid, 'node': 'general', 'language': lang})}\n\n"
-            yield "data: [DONE]\n\n"
+        if is_clear_history(query):
+            for event in await self._handle_clear_history(
+                user_id, project_id, query, persona, streaming=True,
+            ):
+                yield event
             return
 
         # Fast path — greetings (skip ALL LLM calls)
-        GREETINGS_EN = {
-            "hello", "hi", "hey", "hi there", "hello there",
-            "good morning", "good afternoon", "good evening", "good day", "good night",
-            "whats up", "what's up", "sup", "howdy", "greetings", "yo", "morning",
-            "how are you", "how are you doing", "how's it going", "how are things",
-        }
-        GREETINGS_AR = {
-            "مرحبا", "اهلا", "السلام عليكم", "سلام", "أهلاً", "مرحباً",
-            "صباح الخير", "مساء الخير", "صباح النور", "مساء النور",
-            "كيف حالك", "كيف الحال", "ازيك", "أزيك",
-        }
-        clean_query = query.strip().lower().rstrip("?!.,;:")
-        is_ar = any("\u0600" <= c <= "\u06FF" for c in query)
-        greeting_set = GREETINGS_AR if is_ar else GREETINGS_EN
-        if clean_query in greeting_set:
-            lang = language or ("ar" if is_ar else "en")
-            sid = 0
-            if self.db_client:
-                chat_session = await self.session_model.get_or_create_session(
-                    user_id=user_id, project_id=project_id, persona=persona, language=lang
-                )
-                sid = chat_session.session_id
-                await self.session_model.append_message(sid, "user", query, "general")
-            greeting_responses = {
-                "en": "Hello! How can I help you with your project today?",
-                "ar": "مرحباً! كيف يمكنني مساعدتك في مشروعك اليوم؟",
-            }
-            answer = greeting_responses.get(lang, greeting_responses["en"])
-            if self.db_client:
-                await self.session_model.append_message(sid, "assistant", answer, "general")
-            import json as _json
-            print(f"[RAG SOURCE] GREETING", file=sys.stderr)
-            yield f"data: {_json.dumps({'node': 'general', 'language': lang, 'session_id': sid, 'event': 'meta'})}\n\n"
-            yield f"data: {_json.dumps({'text': answer})}\n\n"
-            yield "data: [DONE]\n\n"
+        if is_greeting(query):
+            for event in await self._handle_greeting(
+                user_id, project_id, query, persona, language, streaming=True,
+            ):
+                yield event
             return
 
         chat_history, footer_prompt, session_id, node, language, sources, trace_id, prompt_client, final_history = (
@@ -1202,13 +1105,7 @@ class NLPController(BaseController):
 
         # Short-circuit: out-of-scope queries never reach the generation LLM.
         if node == WorkflowNodeEnum.OUT_OF_SCOPE:
-            answer = (
-                "أنا متخصص في التعاون في المشاريع والمهارات المهنية. "
-                "هل يمكنني مساعدتك في شيء متعلق بمشروعك؟"
-                if language == "ar"
-                else "I specialize in project collaboration and professional skills. "
-                     "Can I help you with something related to your project?"
-            )
+            answer = get_oos_response(language)
             if self.db_client:
                 await self.session_model.append_message(session_id, "user", query, node.value, source=source)
                 await self.session_model.append_message(session_id, "assistant", answer, node.value, source=source)
@@ -1278,6 +1175,66 @@ class NLPController(BaseController):
             await self.session_model.append_message(session_id, "assistant", full_answer, node.value, source=source)
 
         yield "data: [DONE]\n\n"
+
+    # ------------------------------------------------------------------
+    # Shared fast-path helpers (greeting / clear-history)
+    # ------------------------------------------------------------------
+
+    async def _handle_greeting(
+        self, user_id, project_id, query, persona, language, *, streaming=False,
+    ):
+        lang = language or detect_lang_fast(query)
+        sid = 0
+        if self.db_client:
+            chat_session = await self.session_model.get_or_create_session(
+                user_id=user_id, project_id=project_id, persona=persona, language=lang,
+            )
+            sid = chat_session.session_id
+            await self.session_model.append_message(sid, "user", query, "general")
+        answer = GREETING_RESPONSES.get(lang, GREETING_RESPONSES["en"])
+        if self.db_client:
+            await self.session_model.append_message(sid, "assistant", answer, "general")
+        print("[RAG SOURCE] GREETING", file=sys.stderr)
+        if streaming:
+            import json as _json
+            return [
+                f"data: {_json.dumps({'node': 'general', 'language': lang, 'session_id': sid, 'event': 'meta'})}\n\n",
+                f"data: {_json.dumps({'text': answer})}\n\n",
+                "data: [DONE]\n\n",
+            ]
+        return {
+            "answer": answer, "node": "general",
+            "language": lang, "sources": [], "session_id": sid,
+        }
+
+    async def _handle_clear_history(
+        self, user_id, project_id, query, persona, *, streaming=False,
+    ):
+        if self.db_client:
+            chat_session = await self.session_model.get_or_create_session(
+                user_id=user_id, project_id=project_id, persona=persona,
+            )
+            await self.session_model.append_message(
+                chat_session.session_id, "system", "History cleared by user.",
+            )
+            sid = chat_session.session_id
+        else:
+            sid = 0
+        lang = detect_lang_fast(query)
+        msg = (
+            "تم مسح سجل المحادثة بنجاح!" if lang == "ar"
+            else "Chat history cleared successfully!"
+        )
+        if streaming:
+            import json as _json
+            return [
+                f"data: {_json.dumps({'answer': msg, 'session_id': sid, 'node': 'general', 'language': lang})}\n\n",
+                "data: [DONE]\n\n",
+            ]
+        return {
+            "answer": msg, "node": "general",
+            "language": lang, "sources": [], "session_id": sid,
+        }
 
     # ------------------------------------------------------------------
     # Helpers

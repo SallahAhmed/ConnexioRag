@@ -6,9 +6,9 @@ from slowapi.util import get_remote_address
 from .schemas.agent import (
     AgentChatRequest
 )
-from controllers import NLPController
 from models import ResponseSignal
 from utils.security import verify_api_key
+from .dependencies import get_nlp_controller
 import logging
 
 logger = logging.getLogger('uvicorn.error')
@@ -22,26 +22,6 @@ agent_router = APIRouter(
     # The main Connexio backend adds this header when proxying user requests.
     dependencies=[Depends(verify_api_key)],
 )
-
-def get_nlp_controller(request: Request) -> NLPController:
-    # Created once at app startup and reused across requests.
-    # Avoids recreating ToolManager (with expensive SQLDatabase init) per request.
-    controller = getattr(request.app, '_nlp_controller', None)
-    if controller is None:
-        controller = NLPController(
-            vectordb_client=request.app.vectordb_client,
-            generation_client=request.app.generation_client,
-            utility_client=request.app.utility_client,
-            embedding_client=request.app.embedding_client,
-            template_parser=request.app.template_parser,
-            settings=getattr(request.app, 'settings', None),
-            db_client=getattr(request.app, 'db_client', None),
-            reranker=getattr(request.app, 'reranker', None),
-            backend_client=getattr(request.app, 'backend_client', None),
-            masarx_client=getattr(request.app, 'masarx_client', None),
-        )
-        request.app._nlp_controller = controller
-    return controller
 
 def resolve_pid(project_id: int, request: Request) -> Optional[int]:
     """Resolve effective project ID with override via ?pid= or ?PID= query param."""
