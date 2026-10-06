@@ -71,12 +71,16 @@ class OpenAIProvider(LLMInterface):
 
         for attempt in range(max_retries):
             try:
-                response = await self.client.chat.completions.create(
+                create_kwargs = dict(
                     model = self.generation_model_id,
                     messages = local_history,
-                    max_tokens = max_output_tokens,
                     temperature = temperature
                 )
+                resolved_max_tokens = self._resolve_max_tokens(max_output_tokens)
+                if resolved_max_tokens is not None:
+                    create_kwargs["max_tokens"] = resolved_max_tokens
+
+                response = await self.client.chat.completions.create(**create_kwargs)
 
                 if response and response.usage:
                     self.last_usage = {
@@ -108,6 +112,22 @@ class OpenAIProvider(LLMInterface):
                 else:
                     print(f"DEBUG: OpenAIProvider Error: {str(e)}")
                     return f"Error during generation: {str(e)}"
+
+    def _resolve_max_tokens(self, max_output_tokens) -> Optional[int]:
+        """Resolve a usable max_tokens value, or None to omit the parameter.
+
+        GENERATION_DEFAULT_MAX_TOKENS defaults to None, which was being forwarded
+        verbatim as max_tokens=None. Groq ignored it, but NVIDIA NIM treats a null
+        max_tokens as a zero budget and returns an empty completion - which surfaced
+        as an SSE stream with zero frames. Omit the key instead so the provider's own
+        default applies.
+        """
+        for candidate in (max_output_tokens, self.default_generation_max_output_tokens):
+            if isinstance(candidate, bool):
+                continue
+            if isinstance(candidate, (int, float)) and candidate > 0:
+                return int(candidate)
+        return None
 
     @staticmethod
     def _parse_retry_after(error: Exception) -> Optional[float]:
@@ -150,10 +170,12 @@ class OpenAIProvider(LLMInterface):
             create_kwargs = dict(
                 model = self.generation_model_id,
                 messages = local_history,
-                max_tokens = max_output_tokens,
                 temperature = temperature,
                 stream = True,
             )
+            resolved_max_tokens = self._resolve_max_tokens(max_output_tokens)
+            if resolved_max_tokens is not None:
+                create_kwargs["max_tokens"] = resolved_max_tokens
             # include_usage makes the provider emit a final usage-only chunk so we can log
             # token counts like the non-streaming path. Not every OpenAI-compatible endpoint
             # supports it, so fall back cleanly rather than breaking generation.
@@ -165,6 +187,8 @@ class OpenAIProvider(LLMInterface):
                 self.logger.warning(f"stream_options unsupported, retrying without usage: {opt_err}")
                 response = await self.client.chat.completions.create(**create_kwargs)
 
+            content_seen = False
+            reasoning_seen = False
             async for chunk in response:
                 # The usage-only final chunk carries usage and has empty choices.
                 if getattr(chunk, "usage", None):
@@ -174,8 +198,41 @@ class OpenAIProvider(LLMInterface):
                         "total_tokens": chunk.usage.total_tokens,
                     }
                     print(f"[LLM USAGE] {self.generation_model_id} -> Prompt: {chunk.usage.prompt_tokens} | Completion: {chunk.usage.completion_tokens} | Total: {chunk.usage.total_tokens}")
-                if chunk.choices and chunk.choices[0].delta.content:
-                    yield chunk.choices[0].delta.content
+                if not chunk.choices:
+                    continue
+                delta = chunk.choices[0].delta
+                # Reasoning models on NVIDIA NIM emit their trace on
+                # reasoning_content and can leave content empty when the token
+                # budget is consumed by reasoning.
+                content = getattr(delta, "content", None)
+                if content:
+                    content_seen = True
+                    yield content
+                    continue
+                reasoning = getattr(delta, "reasoning_content", None)
+                if reasoning:
+                    reasoning_seen = True
+
+            if not content_seen and reasoning_seen:
+                self.logger.warning(
+                    "Stream produced only reasoning_content for %s; surfacing the "
+                    "reasoning trace because the final content was empty.",
+                    self.generation_model_id,
+                )
+                yield (
+                    "[The model returned only its reasoning trace and no final answer. "
+                    "Raise GENERATION_DEFAULT_MAX_TOKENS so it has room to answer.]"
+                )
+            elif not content_seen:
+                self.logger.error(
+                    "Stream for %s completed with no content chunks (max_tokens=%s).",
+                    self.generation_model_id,
+                    resolved_max_tokens,
+                )
+                yield (
+                    "[The model returned an empty response. No content was generated "
+                    "for this request.]"
+                )
         except Exception as e:
             print(f"DEBUG: OpenAIProvider Streaming Error: {str(e)}")
             yield f"Error: {str(e)}"
