@@ -3,7 +3,14 @@
 export PYTHONPATH=$PYTHONPATH:$(pwd)/src
 
 # Start Celery worker with embedded beat scheduler (-B runs Beat in-process)
-celery -A celery_app worker -B --loglevel=info &
+# ENABLE_CELERY only affects background indexing + scheduled maintenance.
+# Chat answering is fully served by uvicorn, so set ENABLE_CELERY=false to run
+# the Space standalone without a reachable Redis.
+if [ "${ENABLE_CELERY:-true}" = "true" ]; then
+  celery -A celery_app worker -B --loglevel=info &
+else
+  echo "ENABLE_CELERY is false - skipping background worker."
+fi
 
 # Start RAG FastAPI
 # Wrap with opentelemetry-instrument only when OTLP is configured (Grafana Cloud).

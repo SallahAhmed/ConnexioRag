@@ -73,6 +73,26 @@ class Settings(BaseSettings):
     SERVICE_USER_ID: int | None = None
     MAIN_BACKEND_URL: str = "https://connexio.icu"
 
+    # --- Standalone / Playground Mode ---
+    # When STANDALONE_MODE is on, the built-in chat UI is served at "/" and the
+    # service-to-service X-API-Key check is relaxed for that UI only. Every other
+    # route keeps enforcing the key. Lets the Space run and be tested without the
+    # Node.js backend or MasarX being up.
+    STANDALONE_MODE: bool = False
+    UI_DEFAULT_USER_ID: int = 11
+    UI_DEFAULT_PROJECT_ID: int = 0
+    UI_DEFAULT_PERSONA: str = "student"
+    UI_DEFAULT_LANGUAGE: str = "auto"
+
+    # --- Integration toggles ---
+    # ENABLE_BACKEND_SYNC: live project/user/task enrichment via the Node.js backend.
+    # ENABLE_MASARX_SYNC: AI-planned task injection from MasarX-owned tables.
+    # ENABLE_CELERY: background file indexing + scheduled maintenance (read by start.sh).
+    # All three degrade to None/skip when off, so the RAG runs on Neon + Jina + Groq alone.
+    ENABLE_BACKEND_SYNC: bool = True
+    ENABLE_MASARX_SYNC: bool = True
+    ENABLE_CELERY: bool = True
+
     # --- Observability (Sentry) ---
     SENTRY_DSN: str | None = None
     SENTRY_ENVIRONMENT: str = "production"

@@ -70,3 +70,22 @@ async def verify_api_key(x_api_key: str = Header(None, alias="x-api-key")) -> st
         )
 
     return x_api_key
+
+
+async def verify_api_key_or_standalone(x_api_key: str = Header(None, alias="x-api-key")) -> str:
+    """
+    Same contract as verify_api_key, but short-circuits to a pass when
+    STANDALONE_MODE is enabled.
+
+    Used by the built-in playground router only. The browser never sees the
+    internal key — the UI calls the controller in-process — so relaxing auth
+    here does not leak CONNEXIO_INTERNAL_API_KEY to the client.
+
+    When STANDALONE_MODE is off this is exactly equivalent to verify_api_key.
+    """
+    from helpers.config import get_settings
+
+    if get_settings().STANDALONE_MODE:
+        return x_api_key or "standalone"
+
+    return await verify_api_key(x_api_key)

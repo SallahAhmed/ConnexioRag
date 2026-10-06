@@ -24,6 +24,27 @@ def _is_rate_limited(client_ip: str) -> bool:
     timestamps.append(now)
     return False
 
+RATE_LIMIT_EXEMPT_EXACT = {"/", "/ui", "/docs", "/openapi.json", "/favicon.ico"}
+RATE_LIMIT_EXEMPT_PREFIXES = ("/ui/", "/static/")
+
+
+def _is_exempt_from_rate_limit(path: str) -> bool:
+    """
+    Static assets and the playground UI are never rate limited.
+
+    Hugging Face Spaces proxies every visitor through the same client IP, so a
+    shared 30/60s bucket would lock out manual testing of the chat UI (and let one
+    visitor starve everyone else). API routes keep their own limit.
+
+    Matching is by exact path or explicit sub-prefix. A bare "/" prefix is never
+    used here, because every absolute path starts with "/" and it would exempt
+    the entire API.
+    """
+    if path in RATE_LIMIT_EXEMPT_EXACT:
+        return True
+    return any(path.startswith(prefix) for prefix in RATE_LIMIT_EXEMPT_PREFIXES)
+
+
 class PrometheusMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
 
@@ -31,7 +52,7 @@ class PrometheusMiddleware(BaseHTTPMiddleware):
 
         # Rate limiting
         client_ip = request.client.host if request.client else "unknown"
-        if _is_rate_limited(client_ip):
+        if not _is_exempt_from_rate_limit(request.url.path) and _is_rate_limited(client_ip):
             from fastapi.responses import JSONResponse
             from fastapi import status
             return JSONResponse(

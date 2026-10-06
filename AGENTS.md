@@ -76,6 +76,32 @@ python -m celery -A celery_app beat --loglevel=info       # Celery Beat
 
 ---
 
+### Standalone / Playground Mode
+
+The Space can run with no Node.js backend and no MasarX. Set these as HF Space variables:
+
+```
+STANDALONE_MODE      = true
+ENABLE_BACKEND_SYNC  = false
+ENABLE_MASARX_SYNC   = false
+ENABLE_CELERY        = true   # set false if Redis is unreachable
+```
+
+- `STANDALONE_MODE` serves a dependency-free chat playground at `/` (`src/static/chat.html`, ~1000 lines of inline HTML/CSS/JS, no CDN).
+- The UI calls `NLPController.answer_agent_chat_stream` **in-process** via `src/Routes/ui.py` — it never loops back through HTTP, so the browser never sees `CONNEXIO_INTERNAL_API_KEY`.
+- Auth split: `verify_api_key_or_standalone` guards only `/ui/chat/stream` and `/ui/session/new`. `/` and `/ui/config` are open (they expose no secrets). Every other route still uses the strict `verify_api_key`.
+- `project_id=0` resolves to `None` → GENERAL node → auto-upgrades to the 70B generation model. KB retrieval still works against pgvector in Neon; only live project/user/task context is lost.
+- `ENABLE_CELERY` is read by `start.sh` and only affects background indexing + scheduled maintenance. Chat works fully with it off.
+- The shared `NLPController` is warmed once in `lifespan` and cached on `app._nlp_controller`, because constructing it initialises `ToolManager`'s `SQLDatabase` (slow).
+
+### Gotcha: the UTF-8 Content-Type middleware
+
+`ensure_utf8_response` in `main.py` only rewrites **JSON** responses. An earlier version set `Content-Type: application/json` on *every* response, which relabelled `/docs` HTML and SSE as JSON — browsers downloaded the Swagger UI and the playground instead of rendering it, and `EventSource` could not consume the stream. `src/tests/test_ui_routes.py` locks this behaviour in.
+
+### Gotcha: rate-limit exemption prefixes
+
+`RATE_LIMIT_EXEMPT_PREFIXES` in `src/utils/metrics.py` must never contain a bare `"/"`. Every absolute path starts with `/`, so a `"/"` prefix exempts the entire API from rate limiting. Root is matched exactly via `RATE_LIMIT_EXEMPT_EXACT` instead.
+
 ## Env Vars Quick Reference
 
 ### Required (app won't start without these):

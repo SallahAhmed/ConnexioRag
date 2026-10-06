@@ -12,7 +12,7 @@ from fastapi.responses import JSONResponse
 from fastapi import Request
 
 # --- Application Routes ---
-from Routes import base, data, nlp, agent
+from Routes import base, data, nlp, agent, ui
 from Routes.projects import projects_router
 
 # --- Configuration & Factories ---
@@ -159,15 +159,49 @@ async def lifespan(app: FastAPI):
         default_language=settings.DEFAULT_LANG,
     )
 
-    app.backend_client = BackendApiClient(
-        base_url=settings.MAIN_BACKEND_URL,
-        api_key=settings.CONNEXIO_INTERNAL_API_KEY or "",
-        jwt_secret=settings.JWT_SECRET,
-        service_user_id=settings.SERVICE_USER_ID,
-    )
+    # Optional integrations. Disabled in standalone mode so the Space can run on
+    # Neon + Jina + Groq alone; every call site already None-guards these.
+    if settings.ENABLE_BACKEND_SYNC:
+        app.backend_client = BackendApiClient(
+            base_url=settings.MAIN_BACKEND_URL,
+            api_key=settings.CONNEXIO_INTERNAL_API_KEY or "",
+            jwt_secret=settings.JWT_SECRET,
+            service_user_id=settings.SERVICE_USER_ID,
+        )
+    else:
+        app.backend_client = None
+        logger.warning("ENABLE_BACKEND_SYNC is off - Node.js backend enrichment disabled.")
 
-    from utils.masarx_client import MasarxApiClient
-    app.masarx_client = MasarxApiClient(db_client=app.db_client)
+    if settings.ENABLE_MASARX_SYNC:
+        from utils.masarx_client import MasarxApiClient
+        app.masarx_client = MasarxApiClient(db_client=app.db_client)
+    else:
+        app.masarx_client = None
+        logger.warning("ENABLE_MASARX_SYNC is off - MasarX task injection disabled.")
+
+    if settings.STANDALONE_MODE:
+        logger.warning("STANDALONE_MODE is on - the playground UI at / is publicly reachable.")
+
+    # Warm the shared controller so the first playground request is not slow.
+    # NLPController construction initialises ToolManager (SQLDatabase), which is slow.
+    try:
+        from Controllers.NLPController import NLPController
+
+        app._nlp_controller = NLPController(
+            vectordb_client=app.vectordb_client,
+            generation_client=app.generation_client,
+            utility_client=app.utility_client,
+            embedding_client=app.embedding_client,
+            template_parser=app.template_parser,
+            settings=settings,
+            db_client=app.db_client,
+            reranker=getattr(app, "reranker", None),
+            backend_client=app.backend_client,
+            masarx_client=app.masarx_client,
+        )
+        logger.info("NLPController warmed and cached on app.")
+    except Exception as e:
+        logger.error("NLPController warm-up failed (lazy init will retry): %s", e)
 
     if settings.CONNEXIO_INTERNAL_API_KEY:
         logger.info(
@@ -197,22 +231,21 @@ app.include_router(data.data_router)
 app.include_router(nlp.nlp_router)
 app.include_router(agent.agent_router)
 app.include_router(projects_router)
+# Included last: ui_router owns GET "/" and serves the playground in standalone mode.
+app.include_router(ui.ui_router)
 
 
 # --- UTF-8 Response Middleware ---
 # Ensures Arabic and other non-ASCII characters are encoded correctly
-# in HTTP responses (prevents mojibake on HF Spaces).
+# in JSON responses (prevents mojibake on HF Spaces).
+# Only JSON is touched. Forcing the header on every response used to relabel
+# HTML and SSE as JSON, which broke /docs and made browsers download the page
+# instead of rendering it.
 @app.middleware("http")
 async def ensure_utf8_response(request: Request, call_next):
     response = await call_next(request)
-    response.headers["Content-Type"] = "application/json; charset=utf-8"
+    content_type = response.headers.get("Content-Type", "")
+    base_type = content_type.split(";")[0].strip().lower()
+    if base_type in ("application/json", "text/json") and "charset=" not in content_type.lower():
+        response.headers["Content-Type"] = f"{content_type}; charset=utf-8"
     return response
-
-
-@app.get("/")
-async def root():
-    return {
-        "status": "Connexios RAG is running",
-        "health": "healthy",
-        "documentation": "/docs",
-    }

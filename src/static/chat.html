@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connexio RAG — Chat Playground</title>
+<style>
+:root {
+  --bg: #0d1117;
+  --bg-elev: #131a24;
+  --bg-elev-2: #1a2230;
+  --bg-input: #0b1017;
+  --border: #263041;
+  --border-strong: #36445c;
+  --text: #dfe6f2;
+  --text-dim: #8d9bb2;
+  --text-faint: #64748b;
+  --accent: #6f6bff;
+  --accent-2: #8b7bff;
+  --accent-soft: rgba(111, 107, 255, 0.14);
+  --user-bubble: #1d2a44;
+  --bot-bubble: #161d29;
+  --ok: #3fb98a;
+  --warn: #d9a441;
+  --err: #e5605f;
+  --mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  --sans: system-ui, -apple-system, "Segoe UI", Tahoma, "Noto Sans Arabic", sans-serif;
+  --radius: 14px;
+  --radius-sm: 9px;
+  --shadow: 0 8px 28px rgba(0, 0, 0, 0.36);
+  --focus: #7cc7ff;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #f4f6fa;
+    --bg-elev: #ffffff;
+    --bg-elev-2: #eef1f7;
+    --bg-input: #ffffff;
+    --border: #d9dfeb;
+    --border-strong: #b9c3d6;
+    --text: #17202e;
+    --text-dim: #566379;
+    --text-faint: #7c889c;
+    --accent: #4f46e5;
+    --accent-2: #6d5ef0;
+    --accent-soft: rgba(79, 70, 229, 0.1);
+    --user-bubble: #dfe4ff;
+    --bot-bubble: #ffffff;
+    --ok: #14804a;
+    --warn: #9a6b06;
+    --err: #c53030;
+    --shadow: 0 8px 24px rgba(23, 32, 46, 0.1);
+    --focus: #0b63c5;
+  }
+}
+* { box-sizing: border-box; }
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  font-size: 15px;
+  line-height: 1.55;
+  overflow: hidden;
+  -webkit-text-size-adjust: 100%;
+}
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+button, input, select, textarea {
+  font: inherit;
+  color: inherit;
+}
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+}
+.topbar {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-elev);
+  border-bottom: 1px solid var(--border);
+  min-height: 52px;
+}
+.brand {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+.brand b {
+  font-size: 15px;
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+}
+.brand span {
+  font-size: 11px;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.topbar .spacer { flex: 1 1 auto; }
+.pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 3px 9px;
+  white-space: nowrap;
+}
+.pill.live { color: var(--ok); border-color: rgba(63, 185, 138, 0.4); }
+.pill.off { color: var(--warn); border-color: rgba(217, 164, 65, 0.4); }
+.iconbtn {
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-dim);
+  flex: 0 0 auto;
+}
+.iconbtn:hover { color: var(--text); border-color: var(--border-strong); }
+.iconbtn[aria-expanded="true"] { color: var(--text); border-color: var(--accent); }
+.layout {
+  flex: 1 1 auto;
+  display: flex;
+  min-height: 0;
+  overflow: hidden;
+}
+.sidebar {
+  flex: 0 0 268px;
+  width: 268px;
+  background: var(--bg-elev);
+  border-right: 1px solid var(--border);
+  padding: 14px;
+  overflow-y: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sidebar[hidden] { display: none; }
+.sidegroup {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sidegroup > label,
+.legend {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-faint);
+  font-weight: 600;
+}
+.hint {
+  font-size: 11px;
+  color: var(--text-faint);
+  line-height: 1.4;
+}
+input[type="number"], select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 7px 9px;
+  font-size: 14px;
+  min-height: 36px;
+}
+select { cursor: pointer; }
+input[type="number"]:hover, select:hover { border-color: var(--border-strong); }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.primary, .secondary {
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  cursor: pointer;
+  font-size: 14px;
+  border: 1px solid transparent;
+  min-height: 38px;
+}
+.primary {
+  background: var(--accent);
+  color: #fff;
+  font-weight: 600;
+}
+.primary:hover { background: var(--accent-2); }
+.secondary {
+  background: var(--bg-elev-2);
+  border-color: var(--border);
+  color: var(--text);
+  width: 100%;
+}
+.secondary:hover { border-color: var(--accent); }
+.conn {
+  font-size: 11.5px;
+  line-height: 1.45;
+  color: var(--warn);
+  background: rgba(217, 164, 65, 0.1);
+  border: 1px solid rgba(217, 164, 65, 0.35);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: none;
+}
+.conn.show { display: block; }
+.conn[hidden] { display: none; }
+.main {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+}
+.scroller {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-width: thin;
+  padding: 18px 16px 8px;
+  overscroll-behavior: contain;
+}
+.scroller::-webkit-scrollbar { width: 10px; }
+.scroller::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 999px;
+  border: 3px solid var(--bg);
+}
+.thread {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.turn { display: flex; flex-direction: column; gap: 4px; }
+.turn.user { align-items: flex-end; }
+.turn.bot { align-items: flex-start; }
+.bubble {
+  max-width: min(100%, 640px);
+  padding: 11px 14px;
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  box-shadow: var(--shadow);
+}
+.turn.user .bubble {
+  background: var(--user-bubble);
+  border-color: var(--border-strong);
+  border-bottom-right-radius: 5px;
+}
+.turn.bot .bubble {
+  background: var(--bot-bubble);
+  border-bottom-left-radius: 5px;
+}
+.bubble .body[dir="rtl"] { text-align: right; }
+.bubble .body[dir="ltr"] { text-align: left; }
+.metastrip {
+  width: min(100%, 640px);
+  font-family: var(--mono);
+  font-size: 10.5px;
+  line-height: 1.5;
+  color: var(--text-faint);
+  background: var(--bg-elev-2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 5px 9px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 12px;
+  overflow-wrap: anywhere;
+}
+.metastrip b {
+  color: var(--text-dim);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.metastrip .err { color: var(--err); }
+.typing {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 0;
+}
+.typing i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--text-dim);
+  display: inline-block;
+  animation: blink 1.15s infinite ease-in-out;
+}
+.typing i:nth-child(2) { animation-delay: 0.18s; }
+.typing i:nth-child(3) { animation-delay: 0.36s; }
+@keyframes blink {
+  0%, 80%, 100% { opacity: 0.22; transform: translateY(0); }
+  40% { opacity: 1; transform: translateY(-2px); }
+}
+.empty {
+  margin: 6vh auto 0;
+  max-width: 640px;
+  text-align: center;
+}
+.empty h1 {
+  font-size: 20px;
+  margin: 0 0 8px;
+}
+.empty p {
+  color: var(--text-dim);
+  margin: 0 auto 18px;
+  font-size: 14px;
+  max-width: 52ch;
+}
+.empty ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.empty button {
+  width: 100%;
+  text-align: left;
+  background: var(--bg-elev);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 10px 13px;
+  cursor: pointer;
+  font-size: 13.5px;
+  color: var(--text-dim);
+}
+.empty button:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  background: var(--bg-elev-2);
+}
+.composer {
+  flex: 0 0 auto;
+  border-top: 1px solid var(--border);
+  background: var(--bg-elev);
+  padding: 10px 16px 14px;
+}
+.composer-inner {
+  max-width: 820px;
+  margin: 0 auto;
+  display: flex;
+  gap: 9px;
+  align-items: flex-end;
+}
+#input {
+  flex: 1 1 auto;
+  min-width: 0;
+  resize: none;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 13px;
+  min-height: 44px;
+  max-height: 168px;
+  line-height: 1.45;
+}
+#input:focus { border-color: var(--accent); }
+#input:disabled { opacity: 0.55; }
+#send {
+  flex: 0 0 auto;
+  background: var(--accent);
+  color: #fff;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  padding: 0 18px;
+  min-height: 44px;
+  font-weight: 600;
+  cursor: pointer;
+}
+#send:hover:not(:disabled) { background: var(--accent-2); }
+#send:disabled { opacity: 0.45; cursor: not-allowed; }
+.composer-note {
+  max-width: 820px;
+  margin: 7px auto 0;
+  font-size: 11px;
+  color: var(--text-faint);
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+@media (max-width: 760px) {
+  .layout { flex-direction: column; }
+  .sidebar {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: 55vh;
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+  }
+  .row2 { grid-template-columns: 1fr; }
+  .scroller { padding: 14px 11px 6px; }
+  .composer { padding: 9px 11px 12px; }
+  .bubble, .metastrip { max-width: 100%; }
+}
+@media (max-width: 400px) {
+  body { font-size: 14px; }
+  .brand span { display: none; }
+  #send { padding: 0 13px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <button class="iconbtn" id="sideToggle" aria-expanded="true" aria-controls="sidebar" type="button">Controls</button>
+    <div class="brand">
+      <b>Connexio RAG</b>
+      <span>chat playground</span>
+    </div>
+    <div class="spacer"></div>
+    <span class="pill" id="connPill">connecting…</span>
+  </header>
+
+  <div class="layout">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidegroup">
+        <label for="userId">user_id</label>
+        <input type="number" id="userId" value="11" min="0" step="1" inputmode="numeric">
+      </div>
+      <div class="sidegroup">
+        <label for="projectId">project_id</label>
+        <input type="number" id="projectId" value="0" min="0" step="1" inputmode="numeric">
+        <span class="hint">0 = general chat, no project</span>
+      </div>
+      <div class="sidegroup">
+        <label for="persona">persona</label>
+        <select id="persona"></select>
+      </div>
+      <div class="sidegroup">
+        <label for="modelTier">model_tier</label>
+        <select id="modelTier"></select>
+      </div>
+      <div class="sidegroup">
+        <label for="language">language</label>
+        <select id="language"></select>
+      </div>
+      <div class="sidegroup">
+        <label for="limit">limit</label>
+        <input type="number" id="limit" value="5" min="1" max="25" step="1" inputmode="numeric">
+        <span class="hint">1–25 sources per query</span>
+      </div>
+      <div class="sidegroup">
+        <span class="legend">session</span>
+        <button class="secondary" id="newSession" type="button">New session</button>
+        <span class="hint" id="sessionHint">no session yet</span>
+      </div>
+      <p class="conn" id="connNote"></p>
+    </aside>
+
+    <main class="main">
+      <div class="scroller" id="scroller">
+        <div class="thread" id="thread"></div>
+        <div class="empty" id="empty">
+          <h1>Manual RAG test harness</h1>
+          <p>Talks to <code>/ui/chat/stream</code> over SSE. Every reply carries a diagnostics strip with the detected workflow node, language, session id and retrieved sources — use it to check routing and retrieval.</p>
+          <ul>
+            <li><button type="button" data-ex="Explain what a CRAG retrieval workflow does, and how reflection decides whether to keep a result.">English — what is CRAG retrieval?</button></li>
+            <li><button type="button" data-ex="اشرح الفرق بين RAG و RAG Anyway، ومتى يكون من الأفضل استخدام كل طريقة؟">Arabic — اشرح الفرق بين RAG و RAG Anyway</button></li>
+            <li><button type="button" data-ex="Show me my project tasks and summarise which ones are at risk of missing the deadline.">Project — list and risk-check my project tasks</button></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="composer">
+        <div class="composer-inner">
+          <textarea id="input" rows="1" placeholder="Send a message…  (Enter to send, Shift+Enter for a new line)" aria-label="Message"></textarea>
+          <button id="send" type="button">Send</button>
+        </div>
+        <div class="composer-note">
+          <span id="ctxNote">project 0 · persona student</span>
+          <span id="charNote"></span>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var DEFAULTS = {
+    standalone: true,
+    user_id: 11,
+    project_id: 0,
+    persona: "student",
+    limit: 5,
+    personas: ["student", "early_career", "educator", "company"],
+    model_tiers: ["auto", "utility", "generation"],
+    languages: ["auto", "en", "ar"]
+  };
+
+  var state = {
+    config: null,
+    sessionId: null,
+    streaming: false,
+    connected: false
+  };
+
+  var el = {
+    thread: document.getElementById("thread"),
+    scroller: document.getElementById("scroller"),
+    empty: document.getElementById("empty"),
+    input: document.getElementById("input"),
+    send: document.getElementById("send"),
+    sidebar: document.getElementById("sidebar"),
+    sideToggle: document.getElementById("sideToggle"),
+    connPill: document.getElementById("connPill"),
+    connNote: document.getElementById("connNote"),
+    userId: document.getElementById("userId"),
+    projectId: document.getElementById("projectId"),
+    persona: document.getElementById("persona"),
+    modelTier: document.getElementById("modelTier"),
+    language: document.getElementById("language"),
+    limit: document.getElementById("limit"),
+    newSession: document.getElementById("newSession"),
+    sessionHint: document.getElementById("sessionHint"),
+    ctxNote: document.getElementById("ctxNote"),
+    charNote: document.getElementById("charNote")
+  };
+
+  var ARABIC = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+
+  function hasArabic(s) {
+    return typeof s === "string" && ARABIC.test(s);
+  }
+
+  function num(input, fallback, min, max) {
+    var v = parseInt(input.value, 10);
+    if (isNaN(v)) v = fallback;
+    if (min !== undefined && v < min) v = min;
+    if (max !== undefined && v > max) v = max;
+    input.value = String(v);
+    return v;
+  }
+
+  function str(input, fallback) {
+    var v = (input.value || "").trim();
+    return v === "" ? fallback : v;
+  }
+
+  function fillSelect(select, values, chosen) {
+    select.innerHTML = "";
+    values.forEach(function (v) {
+      var opt = document.createElement("option");
+      opt.value = String(v);
+      opt.textContent = String(v);
+      select.appendChild(opt);
+    });
+    if (values.indexOf(chosen) === -1) {
+      if (values.indexOf(fallbackFor(select)) === -1) {
+        var extra = document.createElement("option");
+        extra.value = String(chosen);
+        extra.textContent = String(chosen);
+        select.appendChild(extra);
+      }
+      select.value = String(chosen);
+    } else {
+      select.value = String(chosen);
+    }
+  }
+
+  function fallbackFor(select) {
+    if (select === el.persona) return DEFAULTS.persona;
+    if (select === el.modelTier) return DEFAULTS.model_tiers[0];
+    return DEFAULTS.languages[0];
+  }
+
+  function setConn(ok) {
+    state.connected = ok;
+    el.connPill.textContent = ok ? "backend online" : "config unreachable";
+    el.connPill.className = ok ? "pill live" : "pill off";
+    el.connNote.classList.toggle("show", !ok);
+    if (!ok) {
+      el.connNote.textContent = "Could not reach /ui/config — using built-in defaults. Streaming may still work.";
+    }
+  }
+
+  function applyConfig(cfg) {
+    state.config = cfg;
+    el.userId.value = String(cfg.user_id != null ? cfg.user_id : DEFAULTS.user_id);
+    el.projectId.value = String(cfg.project_id != null ? cfg.project_id : DEFAULTS.project_id);
+    fillSelect(el.persona, cfg.personas || DEFAULTS.personas, cfg.persona || DEFAULTS.persona);
+    fillSelect(el.modelTier, cfg.model_tiers || DEFAULTS.model_tiers, DEFAULTS.model_tiers[0]);
+    fillSelect(el.language, cfg.languages || DEFAULTS.languages, DEFAULTS.languages[0]);
+    var lim = cfg.limit != null ? cfg.limit : DEFAULTS.limit;
+    if (lim < 1) lim = 1;
+    if (lim > 25) lim = 25;
+    el.limit.value = String(lim);
+    syncNotes();
+  }
+
+  function syncNotes() {
+    var pid = el.projectId.value || "0";
+    var persona = el.persona.value || "—";
+    el.ctxNote.textContent = "project " + pid + " · persona " + persona;
+    var n = el.input.value.length;
+    el.charNote.textContent = n ? n + " chars" : "";
+  }
+
+  function atBottom() {
+    var s = el.scroller;
+    return s.scrollHeight - s.scrollTop - s.clientHeight < 90;
+  }
+
+  function scrollToBottom(force) {
+    if (!force && !atBottom()) return;
+    el.scroller.scrollTop = el.scroller.scrollHeight;
+  }
+
+  function clearThread() {
+    el.thread.innerHTML = "";
+    el.empty.hidden = false;
+    el.scroller.scrollTop = 0;
+  }
+
+  function addTurn(kind, text) {
+    el.empty.hidden = true;
+    var turn = document.createElement("div");
+    turn.className = "turn " + kind;
+
+    var bubble = document.createElement("div");
+    bubble.className = "bubble";
+
+    var body = document.createElement("div");
+    body.className = "body";
+    var t = text || "";
+    body.textContent = t;
+    var rtl = hasArabic(t);
+    body.dir = rtl ? "rtl" : "ltr";
+    body.lang = rtl ? "ar" : "en";
+    bubble.appendChild(body);
+    turn.appendChild(bubble);
+    el.thread.appendChild(turn);
+    scrollToBottom(true);
+    return { turn: turn, bubble: bubble, body: body };
+  }
+
+  function setText(entry, t) {
+    var rtl = hasArabic(t);
+    entry.body.textContent = t;
+    entry.body.dir = rtl ? "rtl" : "ltr";
+    entry.body.lang = rtl ? "ar" : "en";
+    scrollToBottom(false);
+  }
+
+  function appendMeta(entry, fields) {
+    var strip = document.createElement("div");
+    strip.className = "metastrip";
+    fields.forEach(function (f) {
+      if (f.value === null || f.value === undefined || f.value === "") return;
+      var span = document.createElement("span");
+      var b = document.createElement("b");
+      b.textContent = f.label + " ";
+      span.appendChild(b);
+      span.appendChild(document.createTextNode(String(f.value)));
+      if (f.cls) span.className = f.cls;
+      strip.appendChild(span);
+    });
+    entry.turn.appendChild(strip);
+    scrollToBottom(false);
+    return strip;
+  }
+
+  function sourcesLabel(sources) {
+    if (!Array.isArray(sources)) return "";
+    if (sources.length === 0) return "0";
+    return sources.length + " [" + sources.map(function (s) {
+      if (typeof s === "string") return s;
+      if (s && typeof s === "object") {
+        var title = s.title || s.name || s.source || s.url || s.file || "src";
+        var score = s.score != null ? s.score : s.relevance_score;
+        return String(title) + (score != null ? " (" + score + ")" : "");
+      }
+      return String(s);
+    }).join(", ") + "]";
+  }
+
+  function showTyping(entry) {
+    var box = document.createElement("div");
+    box.className = "typing";
+    box.setAttribute("aria-label", "Assistant is typing");
+    for (var i = 0; i < 3; i++) box.appendChild(document.createElement("i"));
+    entry.body.textContent = "";
+    entry.body.appendChild(box);
+    return box;
+  }
+
+  function removeTyping(box) {
+    if (box && box.parentNode) box.parentNode.removeChild(box);
+  }
+
+  function setBusy(busy) {
+    state.streaming = busy;
+    el.send.disabled = busy;
+    el.send.textContent = busy ? "…" : "Send";
+    el.input.setAttribute("aria-busy", busy ? "true" : "false");
+  }
+
+  function buildUrl(query) {
+    var p = new URLSearchParams();
+    p.set("query", query);
+    p.set("user_id", String(num(el.userId, 11, 0)));
+    p.set("project_id", String(num(el.projectId, 0, 0)));
+    p.set("persona", str(el.persona, DEFAULTS.persona));
+    var tier = str(el.modelTier, "auto");
+    if (tier) p.set("model_tier", tier);
+    var lang = str(el.language, "auto");
+    if (lang) p.set("language", lang);
+    if (state.sessionId !== null && state.sessionId !== undefined) {
+      p.set("session_id", String(state.sessionId));
+    }
+    p.set("limit", String(num(el.limit, 5, 1, 25)));
+    return "/ui/chat/stream?" + p.toString();
+  }
+
+  function handleFrame(payload, entry, acc) {
+    var frame;
+    try {
+      frame = JSON.parse(payload);
+    } catch (e) {
+      return;
+    }
+    if (typeof frame === "string") {
+      appendToken(entry, acc, frame);
+      return;
+    }
+    if (frame === null || typeof frame !== "object") return;
+
+    var isMeta = frame.event !== undefined || frame.node !== undefined ||
+      frame.trace_id !== undefined || frame.session_id !== undefined ||
+      frame.sources !== undefined || frame.language !== undefined;
+    if (isMeta) {
+      Object.keys(frame).forEach(function (k) {
+        acc.meta[k] = frame[k];
+      });
+      if (frame.session_id !== undefined && frame.session_id !== null && frame.session_id !== "") {
+        state.sessionId = frame.session_id;
+        renderSessionHint();
+      }
+    }
+    if (typeof frame.text === "string") appendToken(entry, acc, frame.text);
+  }
+
+  function appendToken(entry, acc, token) {
+    acc.text += token;
+    removeTyping(acc.typing);
+    setText(entry, acc.text);
+    scrollToBottom(false);
+  }
+
+  function renderSessionHint() {
+    if (state.sessionId === null || state.sessionId === undefined) {
+      el.sessionHint.textContent = "no session yet";
+    } else {
+      el.sessionHint.textContent = "session_id " + state.sessionId;
+    }
+  }
+
+  function finalizeMeta(entry, acc, errText) {
+    if (acc.strip) return;
+    var m = acc.meta || {};
+    var fields = [
+      { label: "node", value: m.node },
+      { label: "lang", value: m.language },
+      { label: "session", value: state.sessionId },
+      { label: "sources", value: sourcesLabel(m.sources) }
+    ];
+    if (m.trace_id) fields.push({ label: "trace", value: m.trace_id });
+    if (errText) fields.push({ label: "error", value: errText, cls: "err" });
+    if (fields.every(function (f) { return !f.value; })) return;
+    acc.strip = appendMeta(entry, fields);
+  }
+
+  async function send(text) {
+    var q = (text || "").trim();
+    if (!q || state.streaming) return;
+    syncNotes();
+    addTurn("user", q);
+    el.input.value = "";
+    autoGrow();
+    syncNotes();
+    setBusy(true);
+
+    var bot = addTurn("bot", "");
+    var acc = { text: "", meta: {}, typing: showTyping(bot), strip: null, note: "" };
+    var url = buildUrl(q);
+    var done = false;
+
+    try {
+      var res = await fetch(url, {
+        method: "GET",
+        headers: { "Accept": "text/event-stream" },
+        cache: "no-store"
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      if (!res.body) throw new Error("stream not readable");
+
+      var reader = res.body.getReader();
+      var decoder = new TextDecoder("utf-8");
+      var buffer = "";
+
+      while (true) {
+        var chunk = await reader.read();
+        if (chunk.done) {
+          buffer += decoder.decode();
+          break;
+        }
+        buffer += decoder.decode(chunk.value, { stream: true });
+        var parts = buffer.split(/\r?\n\r?\n/);
+        buffer = parts.pop();
+        for (var i = 0; i < parts.length; i++) {
+          if (consumeFrame(parts[i], bot, acc)) done = true;
+          if (done) break;
+        }
+        if (done) break;
+      }
+
+      if (!done) {
+        if (buffer.trim()) {
+          if (consumeFrame(buffer, bot, acc)) done = true;
+        }
+        if (!done) throw new Error("stream ended before [DONE]");
+      }
+    } catch (e) {
+      acc.note = (e && e.message) ? e.message : String(e);
+      finalizeMeta(bot, acc, acc.note);
+    }
+
+    removeTyping(acc.typing);
+    if (!acc.text) {
+      setText(bot, acc.note
+        ? "The stream failed before any text arrived."
+        : "The server returned an empty answer.");
+    }
+    finalizeMeta(bot, acc, null);
+    setBusy(false);
+    scrollToBottom(false);
+    autoGrow();
+    el.input.focus();
+  }
+
+  function consumeFrame(raw, entry, acc) {
+    var lines = String(raw).split(/\r?\n/);
+    var finished = false;
+    for (var i = 0; i < lines.length; i++) {
+      var line = lines[i];
+      if (!line) continue;
+      if (line.charAt(0) === ":") continue;
+      if (line.indexOf("data:") !== 0) continue;
+      var payload = line.slice(5).trim();
+      if (payload === "") continue;
+      if (payload === "[DONE]") {
+        finished = true;
+        break;
+      }
+      handleFrame(payload, entry, acc);
+    }
+    return finished;
+  }
+
+  function autoGrow() {
+    el.input.style.height = "auto";
+    el.input.style.height = Math.min(el.input.scrollHeight, 168) + "px";
+  }
+
+  async function newSession() {
+    el.newSession.disabled = true;
+    var body = {
+      user_id: num(el.userId, 11, 0),
+      project_id: num(el.projectId, 0, 0),
+      persona: str(el.persona, DEFAULTS.persona),
+      language: el.language.value === "auto" ? "en" : str(el.language, "en")
+    };
+    try {
+      var res = await fetch("/ui/session/new", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body)
+      });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var data = await res.json();
+      state.sessionId = data && data.session_id != null ? data.session_id : null;
+      clearThread();
+      renderSessionHint();
+    } catch (e) {
+      state.sessionId = null;
+      renderSessionHint();
+      var entry = addTurn("bot", "");
+      setText(entry, "Could not create a session: " + (e && e.message ? e.message : String(e)));
+      finalizeMeta(entry, { meta: {}, text: "", strip: null }, "session/new failed");
+    } finally {
+      el.newSession.disabled = false;
+    }
+  }
+
+  async function loadConfig() {
+    try {
+      var res = await fetch("/ui/config", { headers: { "Accept": "application/json" }, cache: "no-store" });
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      var cfg = await res.json();
+      if (!cfg || typeof cfg !== "object") throw new Error("bad payload");
+      applyConfig(cfg);
+      setConn(true);
+    } catch (e) {
+      applyConfig(DEFAULTS);
+      setConn(false);
+    }
+  }
+
+  el.send.addEventListener("click", function () {
+    send(el.input.value);
+  });
+
+  el.input.addEventListener("keydown", function (e) {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      send(el.input.value);
+    }
+  });
+
+  el.input.addEventListener("input", function () {
+    autoGrow();
+    syncNotes();
+  });
+
+  el.sideToggle.addEventListener("click", function () {
+    var open = el.sidebar.hidden;
+    el.sidebar.hidden = !open;
+    el.sideToggle.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  el.newSession.addEventListener("click", newSession);
+  el.projectId.addEventListener("input", syncNotes);
+  el.persona.addEventListener("change", syncNotes);
+
+  Array.prototype.forEach.call(document.querySelectorAll("[data-ex]"), function (btn) {
+    btn.addEventListener("click", function () {
+      var t = btn.getAttribute("data-ex") || "";
+      el.input.value = t;
+      autoGrow();
+      syncNotes();
+      send(t);
+    });
+  });
+
+  if (window.matchMedia && window.matchMedia("(max-width: 760px)").matches) {
+    el.sidebar.hidden = true;
+    el.sideToggle.setAttribute("aria-expanded", "false");
+  }
+
+  renderSessionHint();
+  applyConfig(DEFAULTS);
+  autoGrow();
+  loadConfig();
+})();
+</script>
+</body>
+</html>
