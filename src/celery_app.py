@@ -80,7 +80,16 @@ except Exception as _e:
     celery_app = None  # type: ignore
 
 if celery_app is not None:
-    _ssl_opts = {"ssl_cert_reqs": _ssl.CERT_NONE}
+    # Upstash presents a valid cert chain, but the image's CA bundle has not
+    # always included the issuing root, which made broker TLS fail outright.
+    # Verification stays off by default to preserve that working connection;
+    # set CELERY_BROKER_SSL_VERIFY=true once the chain validates to remove the
+    # man-in-the-middle exposure this warning is about.
+    _ssl_opts = {
+        "ssl_cert_reqs": _ssl.CERT_REQUIRED
+        if getattr(settings, "CELERY_BROKER_SSL_VERIFY", False)
+        else _ssl.CERT_NONE
+    }
     celery_app.conf.update(
     broker_use_ssl=_ssl_opts,
     redis_backend_use_ssl=_ssl_opts,

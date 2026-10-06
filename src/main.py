@@ -185,7 +185,7 @@ async def lifespan(app: FastAPI):
     # Warm the shared controller so the first playground request is not slow.
     # NLPController construction initialises ToolManager (SQLDatabase), which is slow.
     try:
-        from Controllers.NLPController import NLPController
+        from controllers import NLPController
 
         app._nlp_controller = NLPController(
             vectordb_client=app.vectordb_client,

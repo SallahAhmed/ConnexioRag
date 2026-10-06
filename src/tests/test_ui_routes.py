@@ -13,6 +13,70 @@ from utils.metrics import _is_exempt_from_rate_limit
 from utils.security import verify_api_key, verify_api_key_or_standalone
 
 
+def get_settings_flag(name="CELERY_BROKER_SSL_VERIFY"):
+    from helpers.config import get_settings
+
+    return getattr(get_settings(), name, False)
+
+
+class TestControllerWarmUp:
+    """main.lifespan warms the shared NLPController in a try/except, so a bad
+    import path fails silently and only shows up as a startup log line."""
+
+    def test_nlp_controller_import_path_resolves(self):
+        # main.py must use the lowercase package name, matching agent.py/nlp.py.
+        from controllers import NLPController as FromPackage
+        from controllers.NLPController import NLPController as FromModule
+
+        assert FromPackage is FromModule, "controllers must export the class itself"
+
+    def test_warmup_import_statement_is_valid(self):
+        import ast
+        import pathlib
+
+        source = pathlib.Path(__file__).resolve().parents[1] / "main.py"
+        tree = ast.parse(source.read_text(encoding="utf-8"))
+
+        bad = []
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.module:
+                head = node.module.split(".")[0]
+                if head in ("Controllers", "Models", "Stores", "Helpers", "Utils"):
+                    bad.append(node.module)
+        assert not bad, f"wrong-cased module imports in main.py: {bad}"
+
+    def test_chat_session_pk_is_session_id(self):
+        """The PK is session_id. Reading .id returns a 500."""
+        from models.db_schemas import ChatSession
+
+        assert hasattr(ChatSession, "session_id")
+        assert "session_id" in ChatSession.__table__.columns
+        assert "id" not in ChatSession.__table__.columns
+
+
+class TestCeleryBrokerTLS:
+    """CERT_NONE is a deliberate, documented workaround - keep it switchable."""
+
+    def test_ssl_opts_respect_setting(self):
+        import ssl as _ssl
+        import celery_app
+
+        if celery_app.celery_app is None:
+            pytest.skip("celery not initialised (no broker url configured)")
+
+        opts = celery_app._ssl_opts
+        assert opts["ssl_cert_reqs"] in (_ssl.CERT_NONE, _ssl.CERT_REQUIRED)
+
+        verify = get_settings_flag()
+        expected = _ssl.CERT_REQUIRED if verify else _ssl.CERT_NONE
+        assert opts["ssl_cert_reqs"] == expected
+
+    def test_verify_flag_defaults_to_false(self):
+        from helpers.config import get_settings
+
+        assert get_settings().CELERY_BROKER_SSL_VERIFY is False
+
+
 class TestUIRouteStructure:
     """The playground router must expose exactly the documented endpoints."""
 
@@ -242,8 +306,9 @@ class TestStreamRouteBehaviour:
     def test_new_session_maps_project_zero_to_none(self):
         from Routes.ui import ui_new_session
 
-        record = MagicMock()
-        record.id = 4242
+        # Plain namespace, not MagicMock: a mock would auto-create record.id and
+        # hide the real attribute name. ChatSession's PK is session_id.
+        record = SimpleNamespace(session_id=4242)
         session_model = MagicMock()
         session_model.create_session = AsyncMock(return_value=record)
         controller = MagicMock()
@@ -271,3 +336,27 @@ class TestStreamRouteBehaviour:
         assert kwargs["project_id"] is None
         assert kwargs["user_id"] == 5
         assert kwargs["language"] == "en", "'auto' must resolve to a real language"
+
+    def test_new_session_uses_session_id_attribute(self):
+        """ChatSession's PK is session_id, not id. Reading .id returns 500."""
+        from Routes.ui import ui_new_session
+
+        record = SimpleNamespace(session_id=99)
+        session_model = MagicMock()
+        session_model.create_session = AsyncMock(return_value=record)
+        controller = MagicMock()
+        controller.session_model = session_model
+        request = MagicMock()
+        request.app = SimpleNamespace(_nlp_controller=controller)
+
+        settings = SimpleNamespace(
+            STANDALONE_MODE=True,
+            UI_DEFAULT_USER_ID=11,
+            UI_DEFAULT_PROJECT_ID=0,
+            UI_DEFAULT_PERSONA="student",
+        )
+
+        with patch("Routes.ui.get_settings", return_value=settings):
+            result = asyncio.run(ui_new_session(request=request, payload={}))
+
+        assert result["session_id"] == 99

@@ -93,6 +93,12 @@ class Settings(BaseSettings):
     ENABLE_MASARX_SYNC: bool = True
     ENABLE_CELERY: bool = True
 
+    # --- Celery broker TLS ---
+    # False keeps ssl_cert_reqs=CERT_REQUIRED off, which is how the Upstash
+    # broker connection was made to work inside the image. Flip to true to
+    # restore full certificate validation once the CA chain resolves.
+    CELERY_BROKER_SSL_VERIFY: bool = False
+
     # --- Observability (Sentry) ---
     SENTRY_DSN: str | None = None
     SENTRY_ENVIRONMENT: str = "production"

@@ -166,5 +166,5 @@ async def ui_new_session(request: Request, payload: Optional[dict] = Body(None))
         language=language,
     )
 
-    logger.info("Playground new session id=%s user=%s", record.id, user_id)
-    return {"session_id": record.id}
+    logger.info("Playground new session id=%s user=%s", record.session_id, user_id)
+    return {"session_id": record.session_id}
