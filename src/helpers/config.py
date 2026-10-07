@@ -44,7 +44,7 @@ class Settings(BaseSettings):
     EMBEDDING_MODEL_ID: str | None = None
     EMBEDDING_MODEL_SIZE: int | None = None
     INPUT_DEFAULT_MAX_CHARACTERS: int | None = None
-    GENERATION_DEFAULT_MAX_TOKENS: int | None = None
+    GENERATION_DEFAULT_MAX_TOKENS: int | None = 4096
     GENERATION_DEFAULT_TEMPERATURE: float | None = None
     TOTAL_CONTEXT_TOKEN_BUDGET: int = 8000
     TOTAL_CONTEXT_CHAR_BUDGET: int = 25000
@@ -83,6 +83,10 @@ class Settings(BaseSettings):
     UI_DEFAULT_PROJECT_ID: int = 0
     UI_DEFAULT_PERSONA: str = "student"
     UI_DEFAULT_LANGUAGE: str = "auto"
+    # Ceiling on tokens generated for a single playground turn. Deliberately set
+    # equal to the production ceiling so the playground never restricts answer
+    # length. It exists only as a backstop against pathological runaway output.
+    PLAYGROUND_MAX_OUTPUT_TOKENS: int | None = 4096
 
     # --- Integration toggles ---
     # ENABLE_BACKEND_SYNC: live project/user/task enrichment via the Node.js backend.

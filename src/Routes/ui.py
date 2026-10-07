@@ -9,6 +9,7 @@ from helpers.config import get_settings
 from utils.security import verify_api_key_or_standalone
 
 from .agent import get_nlp_controller
+from controllers.NLPController import SHORTCUT_COMMANDS
 
 logger = logging.getLogger(__name__)
 
@@ -75,6 +76,7 @@ async def ui_config():
         "personas": PERSONAS,
         "model_tiers": MODEL_TIERS,
         "languages": LANGUAGES,
+        "slash_commands": sorted(SHORTCUT_COMMANDS),
     }
 
 
@@ -129,6 +131,7 @@ async def ui_chat_stream(
             model_tier=model_tier or "auto",
             language=language,
             source=source or "playground",
+            max_output_tokens=settings.PLAYGROUND_MAX_OUTPUT_TOKENS,
         ),
         media_type="text/event-stream",
         headers=SSE_HEADERS,

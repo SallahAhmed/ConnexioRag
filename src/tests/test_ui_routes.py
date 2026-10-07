@@ -130,6 +130,129 @@ class TestUIRouteStructure:
         assert "auto" in LANGUAGES
 
 
+class TestConfigPayload:
+    """/ui/config drives the playground controls, so its shape is a contract."""
+
+    SETTINGS = SimpleNamespace(
+        STANDALONE_MODE=True,
+        UI_DEFAULT_USER_ID=11,
+        UI_DEFAULT_PROJECT_ID=0,
+        UI_DEFAULT_PERSONA="student",
+        UI_DEFAULT_LANGUAGE="auto",
+        ENABLE_BACKEND_SYNC=False,
+        ENABLE_MASARX_SYNC=False,
+    )
+
+    def _config(self):
+        from Routes.ui import ui_config
+
+        with patch("Routes.ui.get_settings", return_value=self.SETTINGS):
+            return asyncio.run(ui_config())
+
+    def test_exposes_defaults_and_choice_lists(self):
+        cfg = self._config()
+        assert cfg["user_id"] == 11
+        assert cfg["project_id"] == 0
+        assert cfg["persona"] == "student"
+        assert cfg["personas"] == PERSONAS
+        assert cfg["model_tiers"] == MODEL_TIERS
+        assert cfg["languages"] == LANGUAGES
+
+    def test_slash_commands_mirror_the_controller(self):
+        """The page renders an autocomplete from this list, so it must not drift
+        from the dict the controller actually answers to."""
+        from controllers.NLPController import SHORTCUT_COMMANDS
+
+        cfg = self._config()
+        assert cfg["slash_commands"] == sorted(SHORTCUT_COMMANDS)
+        assert "/summary" in cfg["slash_commands"]
+        assert all(c.startswith("/") for c in cfg["slash_commands"])
+
+
+class TestPlaygroundAsset:
+    """The playground is one dependency-free HTML file. These lock the
+    properties that are easy to break and expensive to notice."""
+
+    @staticmethod
+    def _html():
+        from Routes.ui import _CHAT_HTML
+
+        return _CHAT_HTML.read_text(encoding="utf-8")
+
+    def test_no_external_stylesheets_or_scripts(self):
+        html = self._html()
+        assert "<link rel=\"stylesheet\"" not in html
+        assert "<script src" not in html
+        assert "@import" not in html
+        assert "cdn." not in html
+
+    def test_favicon_is_inlined(self):
+        """A missing icon makes the browser request /favicon.ico and 404."""
+        html = self._html()
+        assert '<link rel="icon" href="data:image/svg+xml' in html
+
+    def test_no_suggested_question_buttons(self):
+        """The old empty state shipped three clickable example prompts."""
+        html = self._html()
+        assert "data-ex" not in html
+
+    def test_empty_state_has_no_interactive_prompts(self):
+        html = self._html()
+        start = html.index('<div class="hero"')
+        end = html.index('<div class="thread"')
+        hero = html[start:end]
+        assert "<button" not in hero
+        assert "data-ex" not in hero
+
+    def test_markdown_is_escaped_before_rendering(self):
+        """Assistant output is untrusted: escape first, then transform."""
+        html = self._html()
+        assert "function escapeHtml(" in html
+        assert "function renderInline(" in html
+        assert "function renderMarkdown(" in html
+
+    def test_link_hrefs_are_protocol_checked(self):
+        html = self._html()
+        assert "function safeUrl(" in html
+        body = html.split("function safeUrl(")[1].split("}")[0]
+        assert "https?:" in body
+        assert "mailto:" in body
+        assert "javascript" not in body.lower()
+
+    def test_stream_handles_every_text_key(self):
+        """answer_agent_chat_stream yields `text`, but the clear-history fast
+        path yields `answer`. Reading only `text` showed an empty reply."""
+        html = self._html()
+        assert "frame.text" in html
+        assert "frame.answer" in html
+
+    def test_message_body_is_not_a_flex_row(self):
+        """Regression: a layout rule named `.body` also matched the message
+        body and squeezed tables and code blocks to one character wide."""
+        html = self._html()
+        assert ".bubble .body { display: block" in html
+        assert "\n.body {" not in html
+
+    def test_streaming_paint_is_cancelled_on_finalize(self):
+        """A pending animation frame repainted the finished answer as live,
+        which dropped syntax highlighting and stranded the caret."""
+        html = self._html()
+        assert "cancelAnimationFrame" in html
+
+    def test_composer_and_thread_are_present(self):
+        html = self._html()
+        for hook in ('id="input"', 'id="send"', 'id="thread"', 'id="scroller"'):
+            assert hook in html
+
+    def test_accessibility_landmarks(self):
+        html = self._html()
+        assert 'aria-live="polite"' in html
+        assert 'class="sr"' in html
+        assert '<label class="sr" for="input">Message</label>' in html
+        assert "<main" in html
+        assert 'aria-label="Toggle colour theme"' in html
+
+
 class TestStandaloneAuth:
     """verify_api_key_or_standalone must be a no-op only in standalone mode."""
 
@@ -265,6 +388,7 @@ class TestStreamRouteBehaviour:
             STANDALONE_MODE=True,
             UI_DEFAULT_USER_ID=11,
             UI_DEFAULT_PERSONA="student",
+            PLAYGROUND_MAX_OUTPUT_TOKENS=4096,
         )
 
         captured = {}

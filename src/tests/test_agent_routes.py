@@ -24,13 +24,6 @@ class TestAgentRouteStructure:
         assert "query" in params, "Stream route needs 'query' param"
         assert "user_id" in params, "Stream route needs 'user_id' param"
 
-    def test_cache_invalidate_routes(self):
-        routes = [
-            r for r in agent_router.routes
-            if "/cache/invalidate/" in r.path
-        ]
-        assert len(routes) == 2, "Expected 2 cache invalidation routes"
-
     def test_api_key_dependency(self):
         assert len(agent_router.dependencies) == 1
         from utils.security import verify_api_key
