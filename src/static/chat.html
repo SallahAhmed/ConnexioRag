@@ -1258,6 +1258,10 @@ input[type="range"]::-moz-range-thumb {
               <button class="mini" id="mLang" type="button" title="Language"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a15 15 0 0 1 0 18 15 15 0 0 1 0-18"/></svg><b class="lbl">lang</b><span class="v" id="vLang">auto</span></button>
               <span class="grow"></span>
               <span class="count" id="charNote"></span>
+              <button class="mini" id="uploadBtn" type="button" title="Attach a document and ask questions about it">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                <b class="lbl">doc</b><span class="v" id="vDoc">none</span>
+              </button>
               <button class="send" id="send" type="button" disabled aria-label="Send message">
                 <svg id="sendIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15m0 0-6-6m6 6-6 6"/></svg>
               </button>
@@ -1324,7 +1328,9 @@ input[type="range"]::-moz-range-thumb {
     connected: false,
     abort: null,
     turns: [],
-    pinned: true
+    pinned: true,
+    docId: null,
+    docName: null
   };
 
   var $ = function (id) { return document.getElementById(id); };
@@ -1368,6 +1374,7 @@ input[type="range"]::-moz-range-thumb {
     vPersona: $("vPersona"),
     vTier: $("vTier"),
     vLang: $("vLang"),
+    vDoc: $("vDoc"),
     mPersona: $("mPersona"),
     mTier: $("mTier"),
     mLang: $("mLang")
@@ -2266,6 +2273,7 @@ function hlRegex(spec) {
     p.set("model_tier", str(el.modelTier, "auto"));
     p.set("language", str(el.language, "auto"));
     if (state.sessionId != null && state.sessionId !== "") p.set("session_id", String(state.sessionId));
+    if (state.docId) p.set("doc_id", state.docId);
     p.set("limit", String(num(el.limit, DEFAULTS.limit, 1, 25)));
     return "/ui/chat/stream?" + p.toString();
   }
@@ -2289,6 +2297,40 @@ function hlRegex(spec) {
    * ------------------------------------------------------------------ */
 
   var current = null;
+
+  function attachDoc(docId, filename, chars) {
+    state.docId = docId;
+    state.docName = filename;
+    el.vDoc.textContent = filename.length > 14 ? filename.slice(0, 12) + "…" : filename;
+    syncNotes();
+    toast("Attached " + filename + " — " + (chars || 0) + " chars extracted", "ok");
+  }
+
+  function clearDoc() {
+    state.docId = null;
+    state.docName = null;
+    el.vDoc.textContent = "none";
+    syncNotes();
+  }
+
+  async function uploadDoc(file) {
+    if (!file) return;
+    try {
+      toast("Uploading " + file.name + "…");
+      var fd = new FormData();
+      fd.append("file", file);
+      var res = await fetch("/ui/upload", { method: "POST", body: fd });
+      if (!res.ok) {
+        var err = await res.text();
+        throw new Error("HTTP " + res.status + " " + err.slice(0, 120));
+      }
+      var data = await res.json();
+      attachDoc(data.doc_id, data.filename || file.name, data.chars);
+    } catch (e) {
+      toast("Upload failed: " + ((e && e.message) ? e.message : String(e)), "err");
+      clearDoc();
+    }
+  }
 
   async function send(text) {
     var q = (text == null ? el.input.value : text).trim();
@@ -2487,7 +2529,20 @@ applyTheme(loadTheme());
    * Wiring
    * ------------------------------------------------------------------ */
 
-  el.send.addEventListener("click", function () {
+    var DocBtn = $("uploadBtn");
+    var DocInput = document.createElement("input");
+    DocInput.type = "file";
+    DocInput.accept = ".txt,.md,.pdf,.docx";
+    DocInput.style.display = "none";
+    document.body.appendChild(DocInput);
+    DocBtn.addEventListener("click", function () { DocInput.click(); });
+    DocInput.addEventListener("change", function () {
+      if (DocInput.files && DocInput.files[0]) uploadDoc(DocInput.files[0]);
+      DocInput.value = "";
+    });
+    DocBtn.addEventListener("dblclick", clearDoc);
+
+    el.send.addEventListener("click", function () {
     if (state.streaming) {
       if (state.abort) state.abort.abort();
       return;

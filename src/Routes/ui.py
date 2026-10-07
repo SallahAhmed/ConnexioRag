@@ -1,8 +1,11 @@
 import logging
+import os
+import uuid
 from pathlib import Path
 from typing import Optional
 
-from fastapi import APIRouter, Body, Depends, HTTPException, Request, status
+import aiofiles
+from fastapi import APIRouter, Body, Depends, HTTPException, Request, UploadFile, File, status
 from fastapi.responses import FileResponse, JSONResponse, StreamingResponse
 
 from helpers.config import get_settings
@@ -10,6 +13,8 @@ from utils.security import verify_api_key_or_standalone
 
 from .agent import get_nlp_controller
 from controllers.NLPController import SHORTCUT_COMMANDS
+from controllers.ProcessController import ProcessController
+from controllers.DataController import DataController
 
 logger = logging.getLogger(__name__)
 
@@ -95,6 +100,7 @@ async def ui_chat_stream(
     model_tier: Optional[str] = None,
     language: Optional[str] = None,
     source: Optional[str] = None,
+    doc_id: Optional[str] = None,
 ):
     """Stream a chat answer to the playground.
 
@@ -107,6 +113,14 @@ async def ui_chat_stream(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail={"signal": "BAD_REQUEST", "error": "query must not be empty"},
         )
+
+    extra_context = None
+    if doc_id:
+        excerpt = _upload_store.get(str(doc_id))
+        if excerpt:
+            extra_context = (
+                f"[Uploaded document excerpt]:\n{excerpt}"
+            )
 
     settings = get_settings()
     effective_project_id = None if project_id == 0 else project_id
@@ -132,10 +146,62 @@ async def ui_chat_stream(
             language=language,
             source=source or "playground",
             max_output_tokens=settings.PLAYGROUND_MAX_OUTPUT_TOKENS,
+            extra_context=extra_context,
         ),
         media_type="text/event-stream",
         headers=SSE_HEADERS,
     )
+
+
+_upload_store = {}
+
+
+@ui_router.post(
+    "/ui/upload",
+    dependencies=[Depends(verify_api_key_or_standalone)],
+)
+async def ui_upload(request: Request, file: UploadFile = File(...)):
+    """Upload a document to attach its excerpt to the current chat.
+
+    Reads a lazily-parsed excerpt (PDF/TXT/DOCX/MD) and returns a doc_id that
+    the playground passes back to /ui/chat/stream as an inline context block.
+    """
+    settings = get_settings()
+    from controllers.ProjectController import ProjectController
+
+    project_id = settings.UI_DEFAULT_PROJECT_ID
+    project_path = ProjectController().get_project_path(project_id=project_id)
+    os.makedirs(project_path, exist_ok=True)
+
+    data_controller = DataController()
+    is_valid, result_signal = data_controller.validate_uploaded_file(file=file)
+    if not is_valid:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(result_signal))
+
+    try:
+        file_path, file_id = data_controller.generate_unique_filepath(
+            orig_file_name=file.filename, project_id=project_id
+        )
+    except Exception:
+        file_id = os.path.basename(file.filename or "document")
+        file_path = os.path.join(project_path, file_id)
+
+    try:
+        async with aiofiles.open(file_path, "wb") as f:
+            while chunk := await file.read(settings.FILE_DEFAULT_CHUNK_SIZE):
+                await f.write(chunk)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"upload_failed: {e}")
+
+    pdf_processor = ProcessController(project_id=str(project_id))
+    try:
+        excerpt = pdf_processor.get_file_excerpt(file_id=os.path.basename(file_path), max_chars=20000)
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"extract_failed: {e}")
+
+    doc_id = uuid.uuid4().hex
+    _upload_store[doc_id] = excerpt
+    return {"doc_id": doc_id, "filename": file.filename, "chars": len(excerpt)}
 
 
 @ui_router.post(
