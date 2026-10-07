@@ -22,23 +22,29 @@ _last_key_log: dict = {}
 def client_key(request: Request) -> str:
     """Resolve a stable rate-limit bucket for a request.
 
-    Keying on request.client.host did not work behind the Hugging Face proxy:
-    uvicorn's ProxyHeadersMiddleware rewrites client.host from X-Forwarded-For,
-    so requests that should share a bucket landed in separate ones and the limit
-    effectively never fired.
+    Keying on request.client.host does not work here. Uvicorn's
+    ProxyHeadersMiddleware rewrites client.host from X-Forwarded-For behind the
+    Hugging Face Space proxy, and the resulting value changes between requests
+    on a single keep-alive connection. Measured: 40 requests over one
+    connection produced 40 distinct buckets and zero 429s, while the in-process
+    Prometheus counter confirmed all 40 reached the same worker. So per-peer
+    bucketing is not achievable on this deployment.
 
-    Keying on the API key instead matches how this service is actually called -
-    there is a single shared key, so there is exactly one service bucket. Requests
-    without a key (the public playground) fall back to the peer address.
+    Therefore:
+      - authenticated traffic keys on a hash of X-API-Key. There is one shared
+        key, so there is exactly one service bucket, which is what the limit is
+        for. The key is hashed so the secret never sits in a dict key.
+      - anonymous traffic shares a single bucket. That is the conservative
+        choice: it still bounds public spend, and it does not depend on an
+        address the platform does not keep stable.
 
-    The API key is hashed rather than stored, so the shared secret never sits in
-    a long-lived dict key.
+    X-Forwarded-For is never consulted directly; it is client-controlled, so
+    using it would let a caller choose its own bucket.
     """
     api_key = request.headers.get("x-api-key")
     if api_key:
         return "key:" + hashlib.sha256(api_key.encode()).hexdigest()[:16]
-    host = request.client.host if request.client else "unknown"
-    return "anon:" + host
+    return "anon:shared"
 
 
 def _log_key_once_per_minute(request: Request, key: str, limited: bool) -> None:

@@ -57,20 +57,23 @@ class TestClientKey:
         b = client_key(_request(headers={"x-api-key": "k2"}))
         assert a != b
 
-    def test_anonymous_falls_back_to_peer_address(self):
-        key = client_key(_request(host="10.0.0.7"))
-        assert key == "anon:10.0.0.7"
+    def test_anonymous_traffic_is_stable(self):
+        """The peer address is rewritten per request by the Space proxy, so it
+        cannot be used. Anonymous traffic must resolve to one fixed bucket."""
+        assert client_key(_request(host="10.0.0.7")) == "anon:shared"
+
+    def test_anonymous_bucket_ignores_peer_address(self):
+        """The failure this guards: 40 requests, 40 buckets, zero throttles."""
+        keys = {client_key(_request(host=f"10.0.0.{i}")) for i in range(40)}
+        assert len(keys) == 1, f"anonymous bucket fragmented into {len(keys)} keys"
 
     def test_key_ignores_forwarded_for_header(self):
-        """X-Forwarded-For is client-controlled; it must not choose the bucket."""
-        spoofed = client_key(
-            _request(headers={"x-forwarded-for": "1.2.3.4"}, host="10.0.0.1")
-        )
+        spoofed = client_key(_request(headers={"x-forwarded-for": "1.2.3.4"}))
         honest = client_key(_request(host="10.0.0.1"))
         assert spoofed == honest
 
     def test_missing_client_is_safe(self):
-        assert client_key(_request(host=None)) == "anon:unknown"
+        assert client_key(_request(host=None)) == "anon:shared"
 
 
 class TestLimiterFires:
@@ -81,17 +84,18 @@ class TestLimiterFires:
         assert results[RATE_LIMIT_REQUESTS] is True, "must throttle at request 31"
         assert all(results[RATE_LIMIT_REQUESTS:]), "must stay throttled while over budget"
 
-    def test_anonymous_bucket_is_independent(self):
-        a = client_key(_request(host="10.0.0.1"))
-        b = client_key(_request(host="10.0.0.2"))
-        for _ in range(RATE_LIMIT_REQUESTS + 3):
-            _is_rate_limited(a)
-        assert _is_rate_limited(b) is False, "one visitor must not starve another"
-
-    def test_separate_callers_have_separate_budgets(self):
+    def test_anonymous_bucket_is_independent_of_the_service_bucket(self):
         for _ in range(RATE_LIMIT_REQUESTS + 3):
             _is_rate_limited(client_key(_request(headers={"x-api-key": "service"})))
-        assert _is_rate_limited(client_key(_request(host="10.0.0.5"))) is False
+        assert _is_rate_limited(client_key(_request())) is False, (
+            "anonymous traffic must have its own budget"
+        )
+
+    def test_anonymous_traffic_throttles_as_one_group(self):
+        """Different peer addresses, one shared bucket: this is what was broken."""
+        for i in range(RATE_LIMIT_REQUESTS):
+            assert _is_rate_limited(client_key(_request(host=f"10.0.0.{i}"))) is False
+        assert _is_rate_limited(client_key(_request(host="10.9.9.9"))) is True
 
     def test_window_is_sixty_seconds(self):
         assert RATE_LIMIT_WINDOW == 60
