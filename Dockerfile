@@ -8,6 +8,13 @@ ENV PYTHONUTF8=1
 
 WORKDIR /app
 
+# Serve the standalone chat playground at "/" on the HF Space. Avoid rebuilding
+# per-deploy; these are constant runtime flags for the Space.
+ENV STANDALONE_MODE=true \
+    ENABLE_BACKEND_SYNC=false \
+    ENABLE_MASARX_SYNC=false \
+    ENABLE_CELERY=false
+
 RUN apt-get update && apt-get install -y \
     build-essential \
     libpq-dev \
