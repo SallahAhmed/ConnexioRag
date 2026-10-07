@@ -6,7 +6,6 @@ from sqlalchemy.orm import sessionmaker
 import asyncio
 import logging
 from slowapi import Limiter
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
 from fastapi.responses import JSONResponse
 from fastapi import Request
@@ -23,7 +22,7 @@ from stores.llm.templates.template_parser import TemplateParser
 
 # --- Models & Utils ---
 from models.db_schemas.connexio.schemas import SQLAlchemyBase
-from utils.metrics import setup_metrics
+from utils.metrics import client_key, setup_metrics
 from utils.backend_client import BackendApiClient
 
 logger = logging.getLogger(__name__)
@@ -55,7 +54,10 @@ app = FastAPI(
 setup_metrics(app)
 
 # --- Rate Limiting ---
-limiter = Limiter(key_func=get_remote_address)
+# Both limiters resolve the bucket with client_key so they cannot disagree.
+# slowapi's own get_remote_address would key on request.client.host, which uvicorn
+# rewrites from X-Forwarded-For behind the Space proxy, so its limit would not fire.
+limiter = Limiter(key_func=client_key)
 app.state.limiter = limiter
 
 

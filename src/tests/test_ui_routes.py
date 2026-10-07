@@ -300,22 +300,19 @@ class TestStandaloneAuth:
 
 
 class TestRateLimitExemption:
-    """HF proxies every visitor through one IP, so UI paths must not be limited."""
+    """Rate limiting is owned by tests/test_rate_limit.py.
 
-    @pytest.mark.parametrize("path", ["/", "/ui/config", "/ui/chat/stream", "/ui/session/new", "/docs"])
-    def test_ui_paths_exempt(self, path):
+    Only the shell paths stay exempt. /ui/chat/stream and /ui/session/new are
+    deliberately rate limited because they spend real tokens, so exempting them
+    would leave public spend unbounded.
+    """
+
+    @pytest.mark.parametrize("path", ["/", "/ui", "/docs", "/openapi.json"])
+    def test_shell_paths_exempt(self, path):
         assert _is_exempt_from_rate_limit(path) is True
 
-    @pytest.mark.parametrize(
-        "path",
-        [
-            "/api/v1/nlp/agent/chat/1",
-            "/api/v1/nlp/agent/chat/stream/1",
-            "/api/v1/health",
-            "/api/v1/nlp/collection/list",
-        ],
-    )
-    def test_api_paths_still_limited(self, path):
+    @pytest.mark.parametrize("path", ["/ui/chat/stream", "/ui/session/new", "/ui/config"])
+    def test_playground_spending_paths_are_limited(self, path):
         assert _is_exempt_from_rate_limit(path) is False
 
 
