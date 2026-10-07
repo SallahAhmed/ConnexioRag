@@ -18,7 +18,7 @@ This is the **Connexios RAG** service (`C:\Users\salla\Connexios\src`). One of t
 
 ```bash
 uvicorn main:app --reload --port 8080                    # API server
-python -m pytest tests/ -v --tb=short                    # Run all tests (42 tests)
+python -m pytest tests/ -v --tb=short                    # Run all tests (110 tests)
 python -m celery -A celery_app worker --loglevel=info     # Celery worker
 python -m celery -A celery_app beat --loglevel=info       # Celery Beat
 ```
@@ -87,12 +87,25 @@ ENABLE_MASARX_SYNC   = false
 ENABLE_CELERY        = true   # set false if Redis is unreachable
 ```
 
-- `STANDALONE_MODE` serves a dependency-free chat playground at `/` (`src/static/chat.html`, ~1000 lines of inline HTML/CSS/JS, no CDN).
+- `STANDALONE_MODE` serves a dependency-free chat playground at `/` (`src/static/chat.html`, ~2900 lines of inline HTML/CSS/JS, zero network requests — no CDN, no fonts, no favicon file).
 - The UI calls `NLPController.answer_agent_chat_stream` **in-process** via `src/Routes/ui.py` — it never loops back through HTTP, so the browser never sees `CONNEXIO_INTERNAL_API_KEY`.
 - Auth split: `verify_api_key_or_standalone` guards only `/ui/chat/stream` and `/ui/session/new`. `/` and `/ui/config` are open (they expose no secrets). Every other route still uses the strict `verify_api_key`.
 - `project_id=0` resolves to `None` → GENERAL node → auto-upgrades to the 70B generation model. KB retrieval still works against pgvector in Neon; only live project/user/task context is lost.
 - `ENABLE_CELERY` is read by `start.sh` and only affects background indexing + scheduled maintenance. Chat works fully with it off.
 - The shared `NLPController` is warmed once in `lifespan` and cached on `app._nlp_controller`, because constructing it initialises `ToolManager`'s `SQLDatabase` (slow).
+- `/ui/config` also returns `slash_commands`, built from `NLPController.SHORTCUT_COMMANDS`. That dict is the single source of truth for `/summary`, `/tasks`, `/blame`, `/docs`, `/audit` — the page only renders the autocomplete, never a hardcoded copy.
+
+### Playground features (`src/static/chat.html`)
+
+Assistant output is rendered as **markdown in the page**: headings, lists (nested), tables, blockquotes, hr, fenced code with a language label and a copy button, plus a from-scratch syntax highlighter for 12 language families. Every message carries copy; assistant messages also regenerate, user messages edit-and-resend, and the send button becomes stop mid-stream (`AbortController`). Slash commands autocomplete on `/`. Theme (dark/light), drawer state and all controls persist in `localStorage`. `Ctrl+B` drawer, `Ctrl+K` new session, `Ctrl+J` focus, `Ctrl+S` export, `Ctrl+D` theme. Per-message diagnostics (node, lang, session, trace, sources, TTFT, total, chars, ~tokens) sit behind a collapsed disclosure.
+
+### Gotcha: SSE frames carry more than `text`
+
+`answer_agent_chat_stream` streams `{"text": ...}` chunks, but the clear-history fast path yields `{"answer": ...}` in one frame. A client that only reads `frame.text` shows "the server returned an empty answer" for `clear history` / `new topic` / `نظف السجل`. The page accepts `text`, `answer`, `delta` and `token`.
+
+### Gotcha: no shared CSS class names between layout and message markup
+
+The layout container is `.workspace`. It was briefly named `.body`, which also matched the per-message `.bubble .body` — that turned message bodies into row flexboxes and squeezed every table and code block to roughly one character wide while every HTML assertion still passed. Any new global class must be checked against the class names the message templates emit (`turn`, `col`, `bubble`, `body`, `rich`, `actions`, `diag`, `tag`, `code`).
 
 ### Gotcha: the UTF-8 Content-Type middleware
 
@@ -169,5 +182,7 @@ All live secrets in `.env` are **commented out** with `# TODO: rotate`. The `.en
 - `conftest.py` patches `get_settings` in all relevant modules via autouse fixture
 - `mock_utility_client` classifier detects jailbreak words to return `OUT_OF_SCOPE`
 - Mock `default_vector_size` = 1024 (matches jina-embeddings-v3)
-- All 42 tests pass
+- 109 of 110 pass
+- `tests/test_agent_routes.py::TestAgentRouteStructure::test_cache_invalidate_routes` fails on `main` and is unrelated to the playground: it asserts `agent_router` owns 2 `/cache/invalidate/` routes, but `src/Routes/agent.py` defines none
+- The in-page markdown renderer and syntax highlighter have no Python coverage — they are plain JS. `TestPlaygroundAsset` locks their structural invariants (escaping, URL scheme checks, no external deps); behaviour changes need a browser check
 - Tests pass `reranker=None` — no Jina reranker coverage

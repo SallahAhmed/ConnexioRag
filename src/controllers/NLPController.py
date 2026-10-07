@@ -1123,6 +1123,7 @@ class NLPController(BaseController):
         language: Optional[str] = None,
         extra_context: Optional[str] = None,
         source: Optional[str] = None,
+        max_output_tokens: Optional[int] = None,
     ):
         # Shortcut commands: override query with command prompt and force generation model
         cmd_key = query.strip().lower()
@@ -1234,25 +1235,30 @@ class NLPController(BaseController):
                     prompt_client.construct_prompt(prompt=msg["content"], role=msg["role"])
                 )
 
-        metadata_sent = False
         full_answer = ""
         step_id = tracer.start_trace(trace_id, "LLM Generation", {"streaming": True})
 
         import json as _json
         print(f"[RAG SOURCE] {' / '.join(sources) if sources else 'NONE'}", file=sys.stderr)
+
+        # Metadata is emitted before the provider is consumed. It used to be
+        # emitted inside the chunk loop, so a provider that yields nothing
+        # produced a completely empty SSE stream - the client could not tell a
+        # failure from a still-pending response.
+        metadata = {
+            "node": node.value,
+            "language": language,
+            "sources": sources,
+            "session_id": session_id,
+            "trace_id": trace_id,
+            "event": "meta",
+        }
+        yield f"data: {_json.dumps(metadata)}\n\n"
+
         async for chunk in prompt_client.generate_text_stream(
-            prompt=footer_prompt, chat_history=chat_history
+            prompt=footer_prompt, chat_history=chat_history,
+            max_output_tokens=max_output_tokens,
         ):
-            if not metadata_sent:
-                metadata = {
-                    "node": node.value,
-                    "language": language,
-                    "session_id": session_id,
-                    "trace_id": trace_id,
-                    "event": "meta",
-                }
-                yield f"data: {_json.dumps(metadata)}\n\n"
-                metadata_sent = True
             if chunk:
                 full_answer += chunk
                 yield f"data: {_json.dumps({'text': chunk})}\n\n"
